@@ -42,7 +42,7 @@ namespace netDxf.Collections
         internal Views(DxfDocument document, string handle)
             : base(document, DxfObjectCode.ViewTable, handle)
         {
-            this.MaxCapacity = short.MaxValue;
+            MaxCapacity = short.MaxValue;
         }
 
         #endregion
@@ -60,26 +60,26 @@ namespace netDxf.Collections
         /// </returns>
         internal override View Add(View view, bool assignHandle)
         {
-            if (this.list.Count >= this.MaxCapacity)
-                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
+            if (list.Count >= MaxCapacity)
+                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", CodeName, MaxCapacity));
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
 
             View add;
-            if (this.list.TryGetValue(view.Name, out add))
+            if (list.TryGetValue(view.Name, out add))
                 return add;
 
             if (assignHandle || string.IsNullOrEmpty(view.Handle))
-                this.Owner.NumHandles = view.AsignHandle(this.Owner.NumHandles);
+                Owner.NumHandles = view.AsignHandle(Owner.NumHandles);
 
-            this.list.Add(view.Name, view);
-            this.references.Add(view.Name, new List<DxfObject>());
+            list.Add(view.Name, view);
+            references.Add(view.Name, new List<DxfObject>());
 
             view.Owner = this;
 
-            view.NameChanged += this.Item_NameChanged;
+            view.NameChanged += Item_NameChanged;
 
-            this.Owner.AddedObjects.Add(view.Handle, view);
+            Owner.AddedObjects.Add(view.Handle, view);
 
             return view;
         }
@@ -92,7 +92,7 @@ namespace netDxf.Collections
         /// <remarks>Reserved views or any other referenced by objects cannot be removed.</remarks>
         public override bool Remove(string name)
         {
-            return this.Remove(this[name]);
+            return Remove(this[name]);
         }
 
         /// <summary>
@@ -106,23 +106,23 @@ namespace netDxf.Collections
             if (item == null)
                 return false;
 
-            if (!this.Contains(item))
+            if (!Contains(item))
                 return false;
 
             if (item.IsReserved)
                 return false;
 
-            if (this.references[item.Name].Count != 0)
+            if (references[item.Name].Count != 0)
                 return false;
 
-            this.Owner.AddedObjects.Remove(item.Handle);
-            this.references.Remove(item.Name);
-            this.list.Remove(item.Name);
+            Owner.AddedObjects.Remove(item.Handle);
+            references.Remove(item.Name);
+            list.Remove(item.Name);
 
             item.Handle = null;
             item.Owner = null;
 
-            item.NameChanged -= this.Item_NameChanged;
+            item.NameChanged -= Item_NameChanged;
 
             return true;
         }
@@ -133,15 +133,15 @@ namespace netDxf.Collections
 
         private void Item_NameChanged(TableObject sender, TableObjectChangedEventArgs<string> e)
         {
-            if (this.Contains(e.NewValue))
+            if (Contains(e.NewValue))
                 throw new ArgumentException("There is already another View with the same name.");
 
-            this.list.Remove(sender.Name);
-            this.list.Add(e.NewValue, (View) sender);
+            list.Remove(sender.Name);
+            list.Add(e.NewValue, (View) sender);
 
-            List<DxfObject> refs = this.references[sender.Name];
-            this.references.Remove(sender.Name);
-            this.references.Add(e.NewValue, refs);
+            List<DxfObject> refs = references[sender.Name];
+            references.Remove(sender.Name);
+            references.Add(e.NewValue, refs);
         }
 
         #endregion

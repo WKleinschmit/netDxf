@@ -69,7 +69,7 @@ namespace netDxf.Tables
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name), "The application registry name should be at least one character long.");
 
-            this.IsReserved = name.Equals(DefaultName, StringComparison.OrdinalIgnoreCase);
+            IsReserved = name.Equals(DefaultName, StringComparison.OrdinalIgnoreCase);
         }
 
         #endregion
@@ -98,7 +98,7 @@ namespace netDxf.Tables
         {
             ApplicationRegistry copy = new ApplicationRegistry(newName);
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 copy.XData.Add((XData)data.Clone());
 
             return copy ;
@@ -110,7 +110,7 @@ namespace netDxf.Tables
         /// <returns>A new ApplicationRegistry that is a copy of this instance.</returns>
         public override object Clone()
         {
-            return this.Clone(this.Name);
+            return Clone(Name);
         }
 
         #endregion

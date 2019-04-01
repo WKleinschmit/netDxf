@@ -53,7 +53,7 @@ namespace netDxf.Entities
         /// </summary>
         public Attribute Item
         {
-            get { return this.item; }
+            get { return item; }
         }
 
         #endregion

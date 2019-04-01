@@ -57,7 +57,7 @@ namespace netDxf.Blocks
         /// </summary>
         public EntityObject Item
         {
-            get { return this.item; }
+            get { return item; }
         }
 
         #endregion

@@ -94,7 +94,7 @@ namespace netDxf.Entities
 
         protected virtual TextStyle OnTextStyleChangedEvent(TextStyle oldTextStyle, TextStyle newTextStyle)
         {
-            TextStyleChangedEventHandler ae = this.TextStyleChanged;
+            TextStyleChangedEventHandler ae = TextStyleChanged;
             if (ae != null)
             {
                 TableObjectChangedEventArgs<TextStyle> eventArgs = new TableObjectChangedEventArgs<TextStyle>(oldTextStyle, newTextStyle);
@@ -236,7 +236,7 @@ namespace netDxf.Entities
         {
             this.text = text;
             this.position = position;
-            this.attachmentPoint = MTextAttachmentPoint.TopLeft;
+            attachmentPoint = MTextAttachmentPoint.TopLeft;
             if (style == null)
                 throw new ArgumentNullException(nameof(style));
             this.style = style;
@@ -244,10 +244,10 @@ namespace netDxf.Entities
             if (height <= 0.0)
                 throw new ArgumentOutOfRangeException(nameof(height), this.text, "The MText height must be greater than zero.");
             this.height = height;
-            this.lineSpacing = 1.0;
-            this.lineSpacingStyle = MTextLineSpacingStyle.AtLeast;
-            this.drawingDirection = MTextDrawingDirection.ByStyle;
-            this.rotation = 0.0;
+            lineSpacing = 1.0;
+            lineSpacingStyle = MTextLineSpacingStyle.AtLeast;
+            drawingDirection = MTextDrawingDirection.ByStyle;
+            rotation = 0.0;
         }
 
         #endregion
@@ -259,8 +259,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Rotation
         {
-            get { return this.rotation; }
-            set { this.rotation = MathHelper.NormalizeAngle(value); }
+            get { return rotation; }
+            set { rotation = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -268,12 +268,12 @@ namespace netDxf.Entities
         /// </summary>
         public double Height
         {
-            get { return this.height; }
+            get { return height; }
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The MText height must be greater than zero.");
-                this.height = value;
+                height = value;
             }
         }
 
@@ -285,12 +285,12 @@ namespace netDxf.Entities
         /// </remarks>
         public double LineSpacingFactor
         {
-            get { return this.lineSpacing; }
+            get { return lineSpacing; }
             set
             {
                 if (value < 0.25 || value > 4.0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The MText LineSpacingFactor valid values range from 0.25 to 4.0");
-                this.lineSpacing = value;
+                lineSpacing = value;
             }
         }
 
@@ -303,12 +303,12 @@ namespace netDxf.Entities
         /// </remarks>
         public MTextLineSpacingStyle LineSpacingStyle
         {
-            get { return this.lineSpacingStyle; }
+            get { return lineSpacingStyle; }
             set
             {
                 if(value == MTextLineSpacingStyle.Default || value == MTextLineSpacingStyle.Multiple)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "");
-                this.lineSpacingStyle = value;
+                lineSpacingStyle = value;
             }
         }
 
@@ -317,8 +317,8 @@ namespace netDxf.Entities
         /// </summary>
         public MTextDrawingDirection DrawingDirection
         {
-            get { return this.drawingDirection; }
-            set { this.drawingDirection = value; }
+            get { return drawingDirection; }
+            set { drawingDirection = value; }
         }
 
         /// <summary>
@@ -331,12 +331,12 @@ namespace netDxf.Entities
         ///  </remarks>
         public double RectangleWidth
         {
-            get { return this.rectangleWidth; }
+            get { return rectangleWidth; }
             set
             {
                 if (value < 0.0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The MText rectangle width must be equals or greater than zero.");
-                this.rectangleWidth = value;
+                rectangleWidth = value;
             }
         }
 
@@ -345,8 +345,8 @@ namespace netDxf.Entities
         /// </summary>
         public MTextAttachmentPoint AttachmentPoint
         {
-            get { return this.attachmentPoint; }
-            set { this.attachmentPoint = value; }
+            get { return attachmentPoint; }
+            set { attachmentPoint = value; }
         }
 
         /// <summary>
@@ -354,12 +354,12 @@ namespace netDxf.Entities
         /// </summary>
         public TextStyle Style
         {
-            get { return this.style; }
+            get { return style; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.style = this.OnTextStyleChangedEvent(this.style, value);
+                style = OnTextStyleChangedEvent(style, value);
             }
         }
 
@@ -368,8 +368,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         /// <summary>
@@ -377,8 +377,8 @@ namespace netDxf.Entities
         /// </summary>
         public string Value
         {
-            get { return this.text; }
-            set { this.text = value; }
+            get { return text; }
+            set { text = value; }
         }
 
         #endregion
@@ -397,7 +397,7 @@ namespace netDxf.Entities
         /// </remarks>
         public void WriteFraction(string numerator, string denominator, FractionFormatType fractionType)
         {
-           this.WriteFraction(numerator, denominator, fractionType, null);
+           WriteFraction(numerator, denominator, fractionType, null);
         }
 
         /// <summary>
@@ -428,7 +428,7 @@ namespace netDxf.Entities
                     break;
             }
 
-            this.Write(txt, options);
+            Write(txt, options);
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace netDxf.Entities
         /// <param name="txt">Text string.</param>
         public void Write(string txt)
         {
-            this.Write(txt, null);
+            Write(txt, null);
         }
 
         /// <summary>
@@ -449,7 +449,7 @@ namespace netDxf.Entities
         {
             if (options == null)
             {
-                this.text += txt;
+                text += txt;
                 return;
             }
 
@@ -469,7 +469,7 @@ namespace netDxf.Entities
 
             string f;
             if (string.IsNullOrEmpty(options.FontName))
-                f = this.style.IsTrueType ? this.style.FontFamilyName : this.style.FontFile;
+                f = style.IsTrueType ? style.FontFamilyName : style.FontFile;
             else
                 f = options.FontName;
 
@@ -506,7 +506,7 @@ namespace netDxf.Entities
             if (!MathHelper.IsOne(options.WidthFactor))
                 formattedText = string.Format("\\W{0};{1}", options.WidthFactor.ToString(CultureInfo.InvariantCulture), formattedText);
 
-            this.text += "{" + formattedText + "}";
+            text += "{" + formattedText + "}";
         }
 
         /// <summary>
@@ -514,7 +514,7 @@ namespace netDxf.Entities
         /// </summary>
         public void EndParagraph()
         {
-            this.text += "\\P";
+            text += "\\P";
         }
 
         /// <summary>
@@ -528,7 +528,7 @@ namespace netDxf.Entities
         /// </remarks>
         public void StartParagraph()
         {
-            this.StartParagraph(null);
+            StartParagraph(null);
 
         }
         /// <summary>
@@ -545,7 +545,7 @@ namespace netDxf.Entities
         {
             if (options == null)
             {
-                this.text += "\\A1;";
+                text += "\\A1;";
                 return;
             }
 
@@ -601,7 +601,7 @@ namespace netDxf.Entities
 
             codes = string.Format("\\A{0};\\H{1}x;{2}", (int)options.VerticalAlignment, options.HeightFactor.ToString(CultureInfo.InvariantCulture), codes);
 
-            this.text += codes;
+            text += codes;
         }
 
         /// <summary>
@@ -611,10 +611,10 @@ namespace netDxf.Entities
         /// <returns>MText text value without the formatting codes.</returns>
         public string PlainText()
         {
-            if (string.IsNullOrEmpty(this.text))
+            if (string.IsNullOrEmpty(text))
                 return string.Empty;
 
-            string txt = this.text;
+            string txt = text;
 
             //text = text.Replace("%%c", "Ø");
             //text = text.Replace("%%d", "°");
@@ -735,11 +735,11 @@ namespace netDxf.Entities
             double newHeight;
             double newScale;
 
-            newPosition = transformation * this.Position + translation;
-            newNormal = transformation * this.Normal;
+            newPosition = transformation * Position + translation;
+            newNormal = transformation * Normal;
 
-            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
-            transOW *= Matrix3.RotationZ(this.Rotation * MathHelper.DegToRad);
+            Matrix3 transOW = MathHelper.ArbitraryAxis(Normal);
+            transOW *= Matrix3.RotationZ(Rotation * MathHelper.DegToRad);
 
             Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal);
             transWO = transWO.Transpose();
@@ -756,10 +756,10 @@ namespace netDxf.Entities
             newScale = newNormal.Modulus();
 
             //newRectangleWidth = sign * this.RectangleWidth * newScale;
-            newRectangleWidth = this.RectangleWidth * newScale;
+            newRectangleWidth = RectangleWidth * newScale;
             newRectangleWidth = MathHelper.IsZero(newRectangleWidth) ? 0.0 : newRectangleWidth;
 
-            newHeight = this.Height * newScale;
+            newHeight = Height * newScale;
             newHeight = MathHelper.IsZero(newHeight) ? MathHelper.Epsilon : newHeight;
 
             //transWO = Matrix3.RotationZ(angle).Transpose() * transWO;
@@ -771,11 +771,11 @@ namespace netDxf.Entities
             //newRectangleWidth = s.X <= 0 ? 0.0 : s.X;
             //newHeight = s.Y <= 0 ? MathHelper.Epsilon : s.Y;
 
-            this.Position = newPosition;
-            this.Normal = newNormal;
-            this.Rotation = newRotation;
-            this.Height = newHeight;
-            this.RectangleWidth = newRectangleWidth;           
+            Position = newPosition;
+            Normal = newNormal;
+            Rotation = newRotation;
+            Height = newHeight;
+            RectangleWidth = newRectangleWidth;           
         }
 
         /// <summary>
@@ -787,27 +787,27 @@ namespace netDxf.Entities
             MText entity = new MText
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //MText properties
-                Position = this.position,
-                Rotation = this.rotation,
-                Height = this.height,
-                LineSpacingFactor = this.lineSpacing,
-                LineSpacingStyle = this.lineSpacingStyle,
-                RectangleWidth = this.rectangleWidth,
-                AttachmentPoint = this.attachmentPoint,
-                Style = (TextStyle) this.style.Clone(),
-                Value = this.text
+                Position = position,
+                Rotation = rotation,
+                Height = height,
+                LineSpacingFactor = lineSpacing,
+                LineSpacingStyle = lineSpacingStyle,
+                RectangleWidth = rectangleWidth,
+                AttachmentPoint = attachmentPoint,
+                Style = (TextStyle) style.Clone(),
+                Value = text
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

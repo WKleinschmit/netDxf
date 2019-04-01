@@ -95,14 +95,14 @@ namespace netDxf.Entities
         public Vertex(Vector3 position)
             : base(DxfObjectCode.Vertex)
         {
-            this.flags = VertexTypeFlags.PolylineVertex;
+            flags = VertexTypeFlags.PolylineVertex;
             this.position = position;
-            this.layer = Layer.Default;
-            this.color = AciColor.ByLayer;
-            this.linetype = Linetype.ByLayer;
-            this.bulge = 0.0;
-            this.startWidth = 0.0;
-            this.endWidth = 0.0;
+            layer = Layer.Default;
+            color = AciColor.ByLayer;
+            linetype = Linetype.ByLayer;
+            bulge = 0.0;
+            startWidth = 0.0;
+            endWidth = 0.0;
         }
 
         #endregion
@@ -114,14 +114,14 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         public short[] VertexIndexes
         {
-            get { return this.vertexIndexes; }
-            set { this.vertexIndexes = value; }
+            get { return vertexIndexes; }
+            set { vertexIndexes = value; }
         }
 
         /// <summary>
@@ -129,12 +129,12 @@ namespace netDxf.Entities
         /// </summary>
         public double StartWidth
         {
-            get { return this.startWidth; }
+            get { return startWidth; }
             set
             {
                 if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Vertex width must be equals or greater than zero.");
-                this.startWidth = value;
+                startWidth = value;
             }
         }
 
@@ -143,12 +143,12 @@ namespace netDxf.Entities
         /// </summary>
         public double EndWidth
         {
-            get { return this.endWidth; }
+            get { return endWidth; }
             set
             {
                 if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Vertex width must be equals or greater than zero.");
-                this.endWidth = value;
+                endWidth = value;
             }
         }
 
@@ -162,12 +162,12 @@ namespace netDxf.Entities
         /// </remarks>
         public double Bulge
         {
-            get { return this.bulge; }
+            get { return bulge; }
             set
             {
-                if (this.bulge < 0.0 || this.bulge > 1.0f)
+                if (bulge < 0.0 || bulge > 1.0f)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The bulge must be a value between zero and one");
-                this.bulge = value;
+                bulge = value;
             }
         }
 
@@ -176,8 +176,8 @@ namespace netDxf.Entities
         /// </summary>
         public VertexTypeFlags Flags
         {
-            get { return this.flags; }
-            set { this.flags = value; }
+            get { return flags; }
+            set { flags = value; }
         }
 
         /// <summary>
@@ -185,12 +185,12 @@ namespace netDxf.Entities
         /// </summary>
         public AciColor Color
         {
-            get { return this.color; }
+            get { return color; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.color = value;
+                color = value;
             }
         }
 
@@ -199,12 +199,12 @@ namespace netDxf.Entities
         /// </summary>
         public Layer Layer
         {
-            get { return this.layer; }
+            get { return layer; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.layer = value;
+                layer = value;
             }
         }
 
@@ -213,12 +213,12 @@ namespace netDxf.Entities
         /// </summary>
         public Linetype Linetype
         {
-            get { return this.linetype; }
+            get { return linetype; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.linetype = value;
+                linetype = value;
             }
         }
 
@@ -228,7 +228,7 @@ namespace netDxf.Entities
 
         public override string ToString()
         {
-            return this.CodeName;
+            return CodeName;
         }
 
         #endregion

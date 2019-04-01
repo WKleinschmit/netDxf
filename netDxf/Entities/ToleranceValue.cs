@@ -45,9 +45,9 @@ namespace netDxf.Entities
         /// </summary>
         public ToleranceValue()
         {
-            this.showDiameterSymbol = false;
-            this.tolerance = string.Empty;
-            this.materialCondition = ToleranceMaterialCondition.None;
+            showDiameterSymbol = false;
+            tolerance = string.Empty;
+            materialCondition = ToleranceMaterialCondition.None;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace netDxf.Entities
         public ToleranceValue(bool showDiameterSymbol, string value, ToleranceMaterialCondition materialCondition)
         {
             this.showDiameterSymbol = showDiameterSymbol;
-            this.tolerance = value;
+            tolerance = value;
             this.materialCondition = materialCondition;
         }
 
@@ -72,8 +72,8 @@ namespace netDxf.Entities
         /// </summary>
         public bool ShowDiameterSymbol
         {
-            get { return this.showDiameterSymbol; }
-            set { this.showDiameterSymbol = value; }
+            get { return showDiameterSymbol; }
+            set { showDiameterSymbol = value; }
         }
 
         /// <summary>
@@ -81,8 +81,8 @@ namespace netDxf.Entities
         /// </summary>
         public string Value
         {
-            get { return this.tolerance; }
-            set { this.tolerance = value; }
+            get { return tolerance; }
+            set { tolerance = value; }
         }
 
         /// <summary>
@@ -90,8 +90,8 @@ namespace netDxf.Entities
         /// </summary>
         public ToleranceMaterialCondition MaterialCondition
         {
-            get { return this.materialCondition; }
-            set { this.materialCondition = value; }
+            get { return materialCondition; }
+            set { materialCondition = value; }
         }
 
         #endregion
@@ -106,9 +106,9 @@ namespace netDxf.Entities
         {
             return new ToleranceValue
             {
-                ShowDiameterSymbol = this.showDiameterSymbol,
-                Value = this.tolerance,
-                MaterialCondition = this.materialCondition
+                ShowDiameterSymbol = showDiameterSymbol,
+                Value = tolerance,
+                MaterialCondition = materialCondition
             };
         }
 

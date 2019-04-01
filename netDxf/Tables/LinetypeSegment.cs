@@ -59,7 +59,7 @@ namespace netDxf.Tables
         /// </summary>
         public LinetypeSegmentType Type
         {
-            get { return this.type; }
+            get { return type; }
         }
 
         /// <summary>
@@ -72,8 +72,8 @@ namespace netDxf.Tables
         /// </remarks>
         public double Length
         {
-            get { return this.length; }
-            set { this.length = value; }
+            get { return length; }
+            set { length = value; }
         }
 
         #endregion

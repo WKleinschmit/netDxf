@@ -89,12 +89,12 @@ namespace netDxf.Entities
         {
             this.name = string.IsNullOrEmpty(name) ? string.Empty : name;
             this.description = string.IsNullOrEmpty(description) ? string.Empty : description;
-            this.style = HatchStyle.Normal;
-            this.fill = this.name == "SOLID" ? HatchFillType.SolidFill : HatchFillType.PatternFill;
-            this.type = HatchType.UserDefined;
-            this.origin = Vector2.Zero;
-            this.angle = 0.0;
-            this.scale = 1.0;
+            style = HatchStyle.Normal;
+            fill = this.name == "SOLID" ? HatchFillType.SolidFill : HatchFillType.PatternFill;
+            type = HatchType.UserDefined;
+            origin = Vector2.Zero;
+            angle = 0.0;
+            scale = 1.0;
             this.lineDefinitions = lineDefinitions == null ? new List<HatchPatternLineDefinition>() : new List<HatchPatternLineDefinition>(lineDefinitions);
         }
 
@@ -205,7 +205,7 @@ namespace netDxf.Entities
         /// </summary>
         public string Name
         {
-            get { return this.name; }
+            get { return name; }
         }
 
         /// <summary>
@@ -213,8 +213,8 @@ namespace netDxf.Entities
         /// </summary>
         public string Description
         {
-            get { return this.description; }
-            set { this.description = value; }
+            get { return description; }
+            set { description = value; }
         }
 
         /// <summary>
@@ -223,8 +223,8 @@ namespace netDxf.Entities
         /// <remarks>Only normal style is implemented.</remarks>
         public HatchStyle Style
         {
-            get { return this.style; }
-            internal set { this.style = value; }
+            get { return style; }
+            internal set { style = value; }
         }
 
         /// <summary>
@@ -232,8 +232,8 @@ namespace netDxf.Entities
         /// </summary>
         public HatchType Type
         {
-            get { return this.type; }
-            set { this.type = value; }
+            get { return type; }
+            set { type = value; }
         }
 
         /// <summary>
@@ -241,8 +241,8 @@ namespace netDxf.Entities
         /// </summary>
         public HatchFillType Fill
         {
-            get { return this.fill; }
-            internal set { this.fill = value; }
+            get { return fill; }
+            internal set { fill = value; }
         }
 
         /// <summary>
@@ -250,8 +250,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector2 Origin
         {
-            get { return this.origin; }
-            set { this.origin = value; }
+            get { return origin; }
+            set { origin = value; }
         }
 
         /// <summary>
@@ -259,8 +259,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Angle
         {
-            get { return this.angle; }
-            set { this.angle = MathHelper.NormalizeAngle(value); }
+            get { return angle; }
+            set { angle = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -268,12 +268,12 @@ namespace netDxf.Entities
         /// </summary>
         public double Scale
         {
-            get { return this.scale; }
+            get { return scale; }
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The scale can not be zero or less.");
-                this.scale = value;
+                scale = value;
             }
         }
 
@@ -282,7 +282,7 @@ namespace netDxf.Entities
         /// </summary>
         public List<HatchPatternLineDefinition> LineDefinitions
         {
-            get { return this.lineDefinitions; }
+            get { return lineDefinitions; }
         }
 
         #endregion
@@ -411,9 +411,9 @@ namespace netDxf.Entities
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(string.Format("*{0},{1}", this.Name, this.description));
+            sb.AppendLine(string.Format("*{0},{1}", Name, description));
             
-            foreach (HatchPatternLineDefinition def in this.lineDefinitions)
+            foreach (HatchPatternLineDefinition def in lineDefinitions)
             {
                 sb.Append(string.Format("{0},{1},{2},{3},{4}",
                     def.Angle.ToString(CultureInfo.InvariantCulture),
@@ -437,17 +437,17 @@ namespace netDxf.Entities
 
         public virtual object Clone()
         {
-            HatchPattern copy = new HatchPattern(this.name, this.description)
+            HatchPattern copy = new HatchPattern(name, description)
             {
-                Style = this.style,
-                Fill = this.fill,
-                Type = this.type,
-                Origin = this.origin,
-                Angle = this.angle,
-                Scale = this.scale,
+                Style = style,
+                Fill = fill,
+                Type = type,
+                Origin = origin,
+                Angle = angle,
+                Scale = scale,
             };
 
-            foreach (HatchPatternLineDefinition def in this.lineDefinitions)
+            foreach (HatchPatternLineDefinition def in lineDefinitions)
                 copy.LineDefinitions.Add((HatchPatternLineDefinition) def.Clone());
 
             return copy;

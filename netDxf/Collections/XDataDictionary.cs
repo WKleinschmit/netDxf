@@ -39,7 +39,7 @@ namespace netDxf.Collections
         public event AddAppRegEventHandler AddAppReg;
         private void OnAddAppRegEvent(ApplicationRegistry item)
         {
-            AddAppRegEventHandler ae = this.AddAppReg;
+            AddAppRegEventHandler ae = AddAppReg;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
         }
@@ -48,7 +48,7 @@ namespace netDxf.Collections
         public event RemoveAppRegEventHandler RemoveAppReg;
         private void OnRemoveAppRegEvent(ApplicationRegistry item)
         {
-            RemoveAppRegEventHandler ae = this.RemoveAppReg;
+            RemoveAppRegEventHandler ae = RemoveAppReg;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
         }
@@ -68,7 +68,7 @@ namespace netDxf.Collections
         /// </summary>
         public XDataDictionary()
         {
-            this.innerDictionary = new Dictionary<string, XData>(StringComparer.OrdinalIgnoreCase);
+            innerDictionary = new Dictionary<string, XData>(StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -77,8 +77,8 @@ namespace netDxf.Collections
         /// <param name="items">The list of <see cref="XData">extended data</see> items initially stored.</param>
         public XDataDictionary(IEnumerable<XData> items)
         {
-            this.innerDictionary = new Dictionary<string, XData>(StringComparer.OrdinalIgnoreCase);
-            this.AddRange(items);
+            innerDictionary = new Dictionary<string, XData>(StringComparer.OrdinalIgnoreCase);
+            AddRange(items);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace netDxf.Collections
         /// <param name="capacity">The number of items the collection can initially store.</param>
         public XDataDictionary(int capacity)
         {
-            this.innerDictionary = new Dictionary<string, XData>(capacity, StringComparer.OrdinalIgnoreCase);
+            innerDictionary = new Dictionary<string, XData>(capacity, StringComparer.OrdinalIgnoreCase);
         }
 
         #endregion
@@ -101,7 +101,7 @@ namespace netDxf.Collections
         /// <returns>The <see cref="XData">extended data</see> of the application registry.</returns>
         public XData this[string appId]
         {
-            get { return this.innerDictionary[appId]; }
+            get { return innerDictionary[appId]; }
             set
             {
                 if (value == null)
@@ -109,7 +109,7 @@ namespace netDxf.Collections
                 if (!string.Equals(value.ApplicationRegistry.Name, appId, StringComparison.OrdinalIgnoreCase))
                     throw new ArgumentException(string.Format("The extended data application registry name {0} must be equal to the specified appId {1}.", value.ApplicationRegistry.Name, appId));
 
-                this.innerDictionary[appId] = value;
+                innerDictionary[appId] = value;
             }
         }
 
@@ -118,7 +118,7 @@ namespace netDxf.Collections
         /// </summary>
         public ICollection<string> AppIds
         {
-            get { return this.innerDictionary.Keys; }
+            get { return innerDictionary.Keys; }
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace netDxf.Collections
         /// </summary>
         public ICollection<XData> Values
         {
-            get { return this.innerDictionary.Values; }
+            get { return innerDictionary.Values; }
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace netDxf.Collections
         /// </summary>
         public int Count
         {
-            get { return this.innerDictionary.Count; }
+            get { return innerDictionary.Count; }
         }
 
         /// <summary>
@@ -162,15 +162,15 @@ namespace netDxf.Collections
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
             XData xdata;
-            if (this.innerDictionary.TryGetValue(item.ApplicationRegistry.Name, out xdata))
+            if (innerDictionary.TryGetValue(item.ApplicationRegistry.Name, out xdata))
             {
                 xdata.XDataRecord.AddRange(item.XDataRecord);
             }
             else
             {
-                this.innerDictionary.Add(item.ApplicationRegistry.Name, item);
-                item.ApplicationRegistry.NameChanged += this.ApplicationRegistry_NameChanged;
-                this.OnAddAppRegEvent(item.ApplicationRegistry);
+                innerDictionary.Add(item.ApplicationRegistry.Name, item);
+                item.ApplicationRegistry.NameChanged += ApplicationRegistry_NameChanged;
+                OnAddAppRegEvent(item.ApplicationRegistry);
             }
         }
 
@@ -185,7 +185,7 @@ namespace netDxf.Collections
 
             foreach (XData data in items)
             {
-                this.Add(data);
+                Add(data);
             }
         }
 
@@ -196,12 +196,12 @@ namespace netDxf.Collections
         /// <returns>True if the <see cref="XData">extended data</see> is successfully removed; otherwise, false.</returns>
         public bool Remove(string appId)
         {
-            if (!this.innerDictionary.ContainsKey(appId))
+            if (!innerDictionary.ContainsKey(appId))
                 return false;
-            XData xdata = this.innerDictionary[appId];
-            xdata.ApplicationRegistry.NameChanged -= this.ApplicationRegistry_NameChanged;
-            this.innerDictionary.Remove(appId);
-            this.OnRemoveAppRegEvent(xdata.ApplicationRegistry);
+            XData xdata = innerDictionary[appId];
+            xdata.ApplicationRegistry.NameChanged -= ApplicationRegistry_NameChanged;
+            innerDictionary.Remove(appId);
+            OnRemoveAppRegEvent(xdata.ApplicationRegistry);
             return true;
         }
 
@@ -210,11 +210,11 @@ namespace netDxf.Collections
         /// </summary>
         public void Clear()
         {
-            string[] ids = new string[this.innerDictionary.Count];
-            this.innerDictionary.Keys.CopyTo(ids, 0);
+            string[] ids = new string[innerDictionary.Count];
+            innerDictionary.Keys.CopyTo(ids, 0);
             foreach (string appId in ids)
             {
-                this.Remove(appId);
+                Remove(appId);
             }
         }
 
@@ -225,7 +225,7 @@ namespace netDxf.Collections
         /// <returns>True if the current dictionary contains an <see cref="XData">extended data</see> with the application registry name; otherwise, false.</returns>
         public bool ContainsAppId(string appId)
         {
-            return this.innerDictionary.ContainsKey(appId);
+            return innerDictionary.ContainsKey(appId);
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace netDxf.Collections
         /// <returns>True if the current dictionary contains the <see cref="XData">extended data</see>; otherwise, false.</returns>
         public bool ContainsValue(XData value)
         {
-            return this.innerDictionary.ContainsValue(value);
+            return innerDictionary.ContainsValue(value);
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace netDxf.Collections
         /// <returns>True if the current dictionary contains an <see cref="XData">extended data</see> with the specified application registry name; otherwise, false.</returns>
         public bool TryGetValue(string appId, out XData value)
         {
-            return this.innerDictionary.TryGetValue(appId, out value);
+            return innerDictionary.TryGetValue(appId, out value);
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace netDxf.Collections
         /// <returns>An enumerator that can be used to iterate through the dictionary.</returns>
         public IEnumerator<KeyValuePair<string, XData>> GetEnumerator()
         {
-            return this.innerDictionary.GetEnumerator();
+            return innerDictionary.GetEnumerator();
         }
 
         #endregion
@@ -265,7 +265,7 @@ namespace netDxf.Collections
 
         ICollection<string> IDictionary<string, XData>.Keys
         {
-            get { return this.innerDictionary.Keys; }
+            get { return innerDictionary.Keys; }
         }
 
         #endregion
@@ -274,39 +274,39 @@ namespace netDxf.Collections
 
         bool IDictionary<string, XData>.ContainsKey(string tag)
         {
-            return this.innerDictionary.ContainsKey(tag);
+            return innerDictionary.ContainsKey(tag);
         }
 
         void IDictionary<string, XData>.Add(string key, XData value)
         {
-            this.Add(value);
+            Add(value);
         }
 
         void ICollection<KeyValuePair<string, XData>>.Add(KeyValuePair<string, XData> item)
         {
-            this.Add(item.Value);
+            Add(item.Value);
         }
 
         bool ICollection<KeyValuePair<string, XData>>.Remove(KeyValuePair<string, XData> item)
         {
-            if (ReferenceEquals(item.Value, this.innerDictionary[item.Key]) && this.Remove(item.Key))
+            if (ReferenceEquals(item.Value, innerDictionary[item.Key]) && Remove(item.Key))
                 return true;
             return false;
         }
 
         bool ICollection<KeyValuePair<string, XData>>.Contains(KeyValuePair<string, XData> item)
         {
-            return ((IDictionary<string, XData>) this.innerDictionary).Contains(item);
+            return ((IDictionary<string, XData>) innerDictionary).Contains(item);
         }
 
         void ICollection<KeyValuePair<string, XData>>.CopyTo(KeyValuePair<string, XData>[] array, int arrayIndex)
         {
-            ((IDictionary<string, XData>) this.innerDictionary).CopyTo(array, arrayIndex);
+            ((IDictionary<string, XData>) innerDictionary).CopyTo(array, arrayIndex);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         #endregion
@@ -315,9 +315,9 @@ namespace netDxf.Collections
 
         private void ApplicationRegistry_NameChanged(TableObject sender, TableObjectChangedEventArgs<string> e)
         {
-            XData xdata = this.innerDictionary[e.OldValue];
-            this.innerDictionary.Remove(e.OldValue);
-            this.innerDictionary.Add(e.NewValue, xdata);
+            XData xdata = innerDictionary[e.OldValue];
+            innerDictionary.Remove(e.OldValue);
+            innerDictionary.Add(e.NewValue, xdata);
         }
 
         #endregion

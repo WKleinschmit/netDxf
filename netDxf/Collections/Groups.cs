@@ -44,7 +44,7 @@ namespace netDxf.Collections
         internal Groups(DxfDocument document, string handle)
             : base(document, DxfObjectCode.GroupDictionary, handle)
         {
-            this.MaxCapacity = int.MaxValue;
+            MaxCapacity = int.MaxValue;
         }
 
         #endregion
@@ -63,47 +63,47 @@ namespace netDxf.Collections
         /// </returns>
         internal override Group Add(Group group, bool assignHandle)
         {
-            if (this.list.Count >= this.MaxCapacity)
-                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
+            if (list.Count >= MaxCapacity)
+                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", CodeName, MaxCapacity));
             if (group == null)
                 throw new ArgumentNullException(nameof(group));
 
             // if no name has been given to the group a generic name will be created
             if (group.IsUnnamed && string.IsNullOrEmpty(group.Name))
-                group.SetName("*A" + this.Owner.GroupNamesIndex++, false);
+                group.SetName("*A" + Owner.GroupNamesIndex++, false);
 
             Group add;
-            if (this.list.TryGetValue(group.Name, out add))
+            if (list.TryGetValue(group.Name, out add))
                 return add;
 
             if (assignHandle || string.IsNullOrEmpty(group.Handle))
-                this.Owner.NumHandles = group.AsignHandle(this.Owner.NumHandles);
+                Owner.NumHandles = group.AsignHandle(Owner.NumHandles);
 
-            this.list.Add(group.Name, group);
-            this.references.Add(group.Name, new List<DxfObject>());
+            list.Add(group.Name, group);
+            references.Add(group.Name, new List<DxfObject>());
             foreach (EntityObject entity in group.Entities)
             {
                 if (entity.Owner != null)
                 {
                     // the group and its entities must belong to the same document
-                    if (!ReferenceEquals(entity.Owner.Owner.Owner.Owner, this.Owner))
+                    if (!ReferenceEquals(entity.Owner.Owner.Owner.Owner, Owner))
                         throw new ArgumentException("The group and their entities must belong to the same document. Clone them instead.");
                 }
                 else
                 {
                     // only entities not owned by anyone need to be added
-                    this.Owner.AddEntity(entity);
+                    Owner.AddEntity(entity);
                 }
-                this.references[group.Name].Add(entity);
+                references[group.Name].Add(entity);
             }
 
             group.Owner = this;
 
-            group.NameChanged += this.Item_NameChanged;
-            group.EntityAdded += this.Group_EntityAdded;
-            group.EntityRemoved += this.Group_EntityRemoved;
+            group.NameChanged += Item_NameChanged;
+            group.EntityAdded += Group_EntityAdded;
+            group.EntityRemoved += Group_EntityRemoved;
 
-            this.Owner.AddedObjects.Add(group.Handle, group);
+            Owner.AddedObjects.Add(group.Handle, group);
 
             return group;
         }
@@ -116,7 +116,7 @@ namespace netDxf.Collections
         /// <remarks>Removing a group only deletes it from the collection, the entities that once belonged to the group are not deleted.</remarks>
         public override bool Remove(string name)
         {
-            return this.Remove(this[name]);
+            return Remove(this[name]);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace netDxf.Collections
             if (item == null)
                 return false;
 
-            if (!this.Contains(item))
+            if (!Contains(item))
                 return false;
 
             if (item.IsReserved)
@@ -141,16 +141,16 @@ namespace netDxf.Collections
                 entity.RemoveReactor(item);
             }
 
-            this.Owner.AddedObjects.Remove(item.Handle);
-            this.references.Remove(item.Name);
-            this.list.Remove(item.Name);
+            Owner.AddedObjects.Remove(item.Handle);
+            references.Remove(item.Name);
+            list.Remove(item.Name);
 
             item.Handle = null;
             item.Owner = null;
 
-            item.NameChanged -= this.Item_NameChanged;
-            item.EntityAdded -= this.Group_EntityAdded;
-            item.EntityRemoved -= this.Group_EntityRemoved;
+            item.NameChanged -= Item_NameChanged;
+            item.EntityAdded -= Group_EntityAdded;
+            item.EntityRemoved -= Group_EntityRemoved;
 
             return true;
         }
@@ -161,15 +161,15 @@ namespace netDxf.Collections
 
         private void Item_NameChanged(TableObject sender, TableObjectChangedEventArgs<string> e)
         {
-            if (this.Contains(e.NewValue))
+            if (Contains(e.NewValue))
                 throw new ArgumentException("There is already another dimension style with the same name.");
 
-            this.list.Remove(sender.Name);
-            this.list.Add(e.NewValue, (Group) sender);
+            list.Remove(sender.Name);
+            list.Add(e.NewValue, (Group) sender);
 
-            List<DxfObject> refs = this.references[sender.Name];
-            this.references.Remove(sender.Name);
-            this.references.Add(e.NewValue, refs);
+            List<DxfObject> refs = references[sender.Name];
+            references.Remove(sender.Name);
+            references.Add(e.NewValue, refs);
         }
 
         void Group_EntityAdded(Group sender, GroupEntityChangeEventArgs e)
@@ -177,21 +177,21 @@ namespace netDxf.Collections
             if (e.Item.Owner != null)
             {
                 // the group and its entities must belong to the same document
-                if (!ReferenceEquals(e.Item.Owner.Owner.Owner.Owner, this.Owner))
+                if (!ReferenceEquals(e.Item.Owner.Owner.Owner.Owner, Owner))
                     throw new ArgumentException("The group and the entity must belong to the same document. Clone it instead.");
             }
             else
             {
                 // only entities not owned by anyone will be added
-                this.Owner.AddEntity(e.Item);
+                Owner.AddEntity(e.Item);
             }
 
-            this.references[sender.Name].Add(e.Item);
+            references[sender.Name].Add(e.Item);
         }
 
         void Group_EntityRemoved(Group sender, GroupEntityChangeEventArgs e)
         {
-            this.references[sender.Name].Remove(e.Item);
+            references[sender.Name].Remove(e.Item);
         }
 
         #endregion

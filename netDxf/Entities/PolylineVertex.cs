@@ -65,7 +65,7 @@ namespace netDxf.Entities
         public PolylineVertex(Vector3 position)
             : base(DxfObjectCode.Vertex)
         {
-            this.flags = VertexTypeFlags.Polyline3dVertex;
+            flags = VertexTypeFlags.Polyline3dVertex;
             this.position = position;
         }
 
@@ -78,8 +78,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         /// <summary>
@@ -87,8 +87,8 @@ namespace netDxf.Entities
         /// </summary>
         internal VertexTypeFlags Flags
         {
-            get { return this.flags; }
-            set { this.flags = value; }
+            get { return flags; }
+            set { flags = value; }
         }
 
         #endregion
@@ -101,7 +101,7 @@ namespace netDxf.Entities
         /// <returns>The string representation.</returns>
         public override string ToString()
         {
-            return string.Format("{0}: ({1})", "PolylineVertex", this.position);
+            return string.Format("{0}: ({1})", "PolylineVertex", position);
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace netDxf.Entities
         /// <returns>A new PolylineVertex that is a copy of this instance.</returns>
         public object Clone()
         {
-            return new PolylineVertex(this.position);
+            return new PolylineVertex(position);
         }
 
         #endregion

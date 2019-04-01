@@ -44,7 +44,7 @@ namespace netDxf.Entities
 
         protected virtual DimensionStyle OnDimensionStyleChangedEvent(DimensionStyle oldStyle, DimensionStyle newStyle)
         {
-            DimensionStyleChangedEventHandler ae = this.DimensionStyleChanged;
+            DimensionStyleChangedEventHandler ae = DimensionStyleChanged;
             if (ae != null)
             {
                 TableObjectChangedEventArgs<DimensionStyle> eventArgs = new TableObjectChangedEventArgs<DimensionStyle>(oldStyle, newStyle);
@@ -60,7 +60,7 @@ namespace netDxf.Entities
 
         protected virtual Block OnDimensionBlockChangedEvent(Block oldBlock, Block newBlock)
         {
-            DimensionBlockChangedEventHandler ae = this.DimensionBlockChanged;
+            DimensionBlockChangedEventHandler ae = DimensionBlockChanged;
             if (ae != null)
             {
                 TableObjectChangedEventArgs<Block> eventArgs = new TableObjectChangedEventArgs<Block>(oldBlock, newBlock);
@@ -80,7 +80,7 @@ namespace netDxf.Entities
 
         protected virtual void OnDimensionStyleOverrideAddedEvent(DimensionStyleOverride item)
         {
-            DimensionStyleOverrideAddedEventHandler ae = this.DimensionStyleOverrideAdded;
+            DimensionStyleOverrideAddedEventHandler ae = DimensionStyleOverrideAdded;
             if (ae != null)
                 ae(this, new DimensionStyleOverrideChangeEventArgs(item));
         }
@@ -91,7 +91,7 @@ namespace netDxf.Entities
 
         protected virtual void OnDimensionStyleOverrideRemovedEvent(DimensionStyleOverride item)
         {
-            DimensionStyleOverrideRemovedEventHandler ae = this.DimensionStyleOverrideRemoved;
+            DimensionStyleOverrideRemovedEventHandler ae = DimensionStyleOverrideRemoved;
             if (ae != null)
                 ae(this, new DimensionStyleOverrideChangeEventArgs(item));
         }
@@ -124,22 +124,22 @@ namespace netDxf.Entities
         protected Dimension(DimensionType type)
             : base(EntityType.Dimension, DxfObjectCode.Dimension)
         {
-            this.defPoint = Vector2.Zero;
-            this.textRefPoint = Vector2.Zero;
-            this.dimensionType = type;
-            this.attachmentPoint = MTextAttachmentPoint.MiddleCenter;
-            this.lineSpacingStyle = MTextLineSpacingStyle.AtLeast;
-            this.lineSpacing = 1.0;
-            this.block = null;
-            this.style = DimensionStyle.Default;
-            this.textRotation = 0.0;
-            this.userText = null;
-            this.elevation = 0.0;
-            this.styleOverrides = new DimensionStyleOverrideDictionary();
-            this.styleOverrides.BeforeAddItem += this.StyleOverrides_BeforeAddItem;
-            this.styleOverrides.AddItem += this.StyleOverrides_AddItem;
-            this.styleOverrides.BeforeRemoveItem += this.StyleOverrides_BeforeRemoveItem;
-            this.styleOverrides.RemoveItem += this.StyleOverrides_RemoveItem;
+            defPoint = Vector2.Zero;
+            textRefPoint = Vector2.Zero;
+            dimensionType = type;
+            attachmentPoint = MTextAttachmentPoint.MiddleCenter;
+            lineSpacingStyle = MTextLineSpacingStyle.AtLeast;
+            lineSpacing = 1.0;
+            block = null;
+            style = DimensionStyle.Default;
+            textRotation = 0.0;
+            userText = null;
+            elevation = 0.0;
+            styleOverrides = new DimensionStyleOverrideDictionary();
+            styleOverrides.BeforeAddItem += StyleOverrides_BeforeAddItem;
+            styleOverrides.AddItem += StyleOverrides_AddItem;
+            styleOverrides.BeforeRemoveItem += StyleOverrides_BeforeRemoveItem;
+            styleOverrides.RemoveItem += StyleOverrides_RemoveItem;
         }
 
         #endregion
@@ -151,8 +151,8 @@ namespace netDxf.Entities
         /// </summary>
         internal Vector2 DefinitionPoint
         {
-            get { return this.defPoint; }
-            set { this.defPoint = value; }
+            get { return defPoint; }
+            set { defPoint = value; }
         }
 
         #endregion
@@ -164,8 +164,8 @@ namespace netDxf.Entities
         /// </summary>
         public bool TextPositionManuallySet
         {
-            get { return this.userTextPosition; }
-            set { this.userTextPosition = value; }
+            get { return userTextPosition; }
+            set { userTextPosition = value; }
         }
 
         /// <summary>
@@ -179,11 +179,11 @@ namespace netDxf.Entities
         /// </remarks>
         public Vector2 TextReferencePoint
         {
-            get { return this.textRefPoint; }
+            get { return textRefPoint; }
             set
             {
-                this.userTextPosition = true;
-                this.textRefPoint = value;
+                userTextPosition = true;
+                textRefPoint = value;
             }
         }
 
@@ -192,12 +192,12 @@ namespace netDxf.Entities
         /// </summary>
         public DimensionStyle Style
         {
-            get { return this.style; }
+            get { return style; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.style = this.OnDimensionStyleChangedEvent(this.style, value);
+                style = OnDimensionStyleChangedEvent(style, value);
             }
         }
 
@@ -207,7 +207,7 @@ namespace netDxf.Entities
         /// <remarks>Any dimension style value stored in this list will override its corresponding value in the assigned style to the dimension.</remarks>
         public DimensionStyleOverrideDictionary StyleOverrides
         {
-            get { return this.styleOverrides; }
+            get { return styleOverrides; }
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace netDxf.Entities
         /// </summary>
         public DimensionType DimensionType
         {
-            get { return this.dimensionType; }
+            get { return dimensionType; }
         }
 
         /// <summary>
@@ -228,8 +228,8 @@ namespace netDxf.Entities
         /// </summary>
         public MTextAttachmentPoint AttachmentPoint
         {
-            get { return this.attachmentPoint; }
-            set { this.attachmentPoint = value; }
+            get { return attachmentPoint; }
+            set { attachmentPoint = value; }
         }
 
         /// <summary>
@@ -237,8 +237,8 @@ namespace netDxf.Entities
         /// </summary>
         public MTextLineSpacingStyle LineSpacingStyle
         {
-            get { return this.lineSpacingStyle; }
-            set { this.lineSpacingStyle = value; }
+            get { return lineSpacingStyle; }
+            set { lineSpacingStyle = value; }
         }
 
         /// <summary>
@@ -249,12 +249,12 @@ namespace netDxf.Entities
         /// </remarks>
         public double LineSpacingFactor
         {
-            get { return this.lineSpacing; }
+            get { return lineSpacing; }
             set
             {
                 if (value < 0.25 || value > 4.0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The line spacing factor valid values range from 0.25 to 4.00");
-                this.lineSpacing = value;
+                lineSpacing = value;
             }
         }
 
@@ -270,8 +270,8 @@ namespace netDxf.Entities
         /// </remarks>
         public Block Block
         {
-            get { return this.block; }
-            set { this.block = this.OnDimensionBlockChangedEvent(this.block, value); }
+            get { return block; }
+            set { block = OnDimensionBlockChangedEvent(block, value); }
         }
 
         /// <summary>
@@ -279,8 +279,8 @@ namespace netDxf.Entities
         /// </summary>
         public double TextRotation
         {
-            get { return this.textRotation; }
-            set { this.textRotation = MathHelper.NormalizeAngle(value); }
+            get { return textRotation; }
+            set { textRotation = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -293,8 +293,8 @@ namespace netDxf.Entities
         /// </remarks>
         public string UserText
         {
-            get { return this.userText; }
-            set { this.userText = value; }
+            get { return userText; }
+            set { userText = value; }
         }
 
         /// <summary>
@@ -302,8 +302,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Elevation
         {
-            get { return this.elevation; }
-            set { this.elevation = value; }
+            get { return elevation; }
+            set { elevation = value; }
         }
 
         #endregion
@@ -334,12 +334,12 @@ namespace netDxf.Entities
         /// </remarks>
         public void Update()
         {
-            this.CalculteReferencePoints();
+            CalculteReferencePoints();
 
-            if (this.block != null)
+            if (block != null)
             {
-                Block newBlock = this.BuildBlock(this.block.Name);
-                this.block = this.OnDimensionBlockChangedEvent(this.block, newBlock);
+                Block newBlock = BuildBlock(block.Name);
+                block = OnDimensionBlockChangedEvent(block, newBlock);
             }
         }
 
@@ -357,7 +357,7 @@ namespace netDxf.Entities
 
         private void StyleOverrides_AddItem(DimensionStyleOverrideDictionary sender, DimensionStyleOverrideDictionaryEventArgs e)
         {
-            this.OnDimensionStyleOverrideAddedEvent(e.Item);
+            OnDimensionStyleOverrideAddedEvent(e.Item);
         }
 
         private void StyleOverrides_BeforeRemoveItem(DimensionStyleOverrideDictionary sender, DimensionStyleOverrideDictionaryEventArgs e)
@@ -366,7 +366,7 @@ namespace netDxf.Entities
 
         private void StyleOverrides_RemoveItem(DimensionStyleOverrideDictionary sender, DimensionStyleOverrideDictionaryEventArgs e)
         {
-            this.OnDimensionStyleOverrideRemovedEvent(e.Item);
+            OnDimensionStyleOverrideRemovedEvent(e.Item);
         }
 
         #endregion

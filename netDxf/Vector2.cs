@@ -47,9 +47,9 @@ namespace netDxf
         /// <param name="value">X, Y component.</param>
         public Vector2(double value)
         {
-            this.x = value;
-            this.y = value;
-            this.isNormalized = false;
+            x = value;
+            y = value;
+            isNormalized = false;
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace netDxf
         {
             this.x = x;
             this.y = y;
-            this.isNormalized = false;
+            isNormalized = false;
         }
 
         /// <summary>
@@ -75,9 +75,9 @@ namespace netDxf
 
             if (array.Length != 2)
                 throw new ArgumentOutOfRangeException(nameof(array), array.Length, "The dimension of the array must be two");
-            this.x = array[0];
-            this.y = array[1];
-            this.isNormalized = false;
+            x = array[0];
+            y = array[1];
+            isNormalized = false;
         }
 
         #endregion
@@ -125,11 +125,11 @@ namespace netDxf
         /// </summary>
         public double X
         {
-            get { return this.x; }
+            get { return x; }
             set
             {
-                this.isNormalized = false;
-                this.x = value;
+                isNormalized = false;
+                x = value;
             }
         }
 
@@ -138,11 +138,11 @@ namespace netDxf
         /// </summary>
         public double Y
         {
-            get { return this.y; }
+            get { return y; }
             set
             {
-                this.isNormalized = false;
-                this.y = value;
+                isNormalized = false;
+                y = value;
             }
         }
 
@@ -157,23 +157,23 @@ namespace netDxf
                 switch (index)
                 {
                     case 0:
-                        return this.x;
+                        return x;
                     case 1:
-                        return this.y;
+                        return y;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(index));
                 }
             }
             set
             {
-                this.isNormalized = false;
+                isNormalized = false;
                 switch (index)
                 {
                     case 0:
-                        this.x = value;
+                        x = value;
                         break;
                     case 1:
-                        this.y = value;
+                        y = value;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(index));
@@ -186,7 +186,7 @@ namespace netDxf
         /// </summary>
         public bool IsNormalized
         {
-            get { return this.isNormalized; }
+            get { return isNormalized; }
         }
 
         #endregion
@@ -644,18 +644,18 @@ namespace netDxf
         /// </summary>
         public void Normalize()
         {
-            if (this.isNormalized) return;
+            if (isNormalized) return;
 
-            double mod = this.Modulus();
+            double mod = Modulus();
             if (MathHelper.IsZero(mod))
                 this = NaN;
             else
             {
                 double modInv = 1/mod;
-                this.x *= modInv;
-                this.y *= modInv;
+                x *= modInv;
+                y *= modInv;
             }
-            this.isNormalized = true;
+            isNormalized = true;
         }
 
         /// <summary>
@@ -664,7 +664,7 @@ namespace netDxf
         /// <returns>Vector modulus.</returns>
         public double Modulus()
         {
-            if (this.isNormalized) return 1.0;
+            if (isNormalized) return 1.0;
 
             return Math.Sqrt(DotProduct(this, this));
         }
@@ -675,7 +675,7 @@ namespace netDxf
         /// <returns>Array.</returns>
         public double[] ToArray()
         {
-            return new[] {this.x, this.y};
+            return new[] {x, y};
         }
 
         #endregion
@@ -712,7 +712,7 @@ namespace netDxf
         /// <returns>True if the three components are almost equal or false in any other case.</returns>
         public bool Equals(Vector2 other)
         {
-            return this.Equals(other, MathHelper.Epsilon);
+            return Equals(other, MathHelper.Epsilon);
         }
 
         /// <summary>
@@ -723,7 +723,7 @@ namespace netDxf
         /// <returns>True if the three components are almost equal or false in any other case.</returns>
         public bool Equals(Vector2 other, double threshold)
         {
-            return MathHelper.IsEqual(other.X, this.x, threshold) && MathHelper.IsEqual(other.Y, this.y, threshold);
+            return MathHelper.IsEqual(other.X, x, threshold) && MathHelper.IsEqual(other.Y, y, threshold);
         }
 
         /// <summary>
@@ -734,7 +734,7 @@ namespace netDxf
         public override bool Equals(object other)
         {
             if (other is Vector2)
-                return this.Equals((Vector2) other);
+                return Equals((Vector2) other);
             return false;
         }
 
@@ -744,7 +744,7 @@ namespace netDxf
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
-            return this.X.GetHashCode() ^ this.Y.GetHashCode();
+            return X.GetHashCode() ^ Y.GetHashCode();
         }
 
         #endregion
@@ -757,7 +757,7 @@ namespace netDxf
         /// <returns>A string text.</returns>
         public override string ToString()
         {
-            return string.Format("{0}{2} {1}", this.x, this.y, Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator);
+            return string.Format("{0}{2} {1}", x, y, Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator);
         }
 
         /// <summary>
@@ -767,7 +767,7 @@ namespace netDxf
         /// <returns>A string text.</returns>
         public string ToString(IFormatProvider provider)
         {
-            return string.Format("{0}{2} {1}", this.x.ToString(provider), this.y.ToString(provider), Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator);
+            return string.Format("{0}{2} {1}", x.ToString(provider), y.ToString(provider), Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator);
         }
 
         #endregion

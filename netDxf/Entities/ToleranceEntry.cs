@@ -51,12 +51,12 @@ namespace netDxf.Entities
         /// </summary>
         public ToleranceEntry()
         {
-            this.geometricSymbol = ToleranceGeometricSymbol.None;
-            this.tolerance1 = null;
-            this.tolerance2 = null;
-            this.datum1 = null;
-            this.datum2 = null;
-            this.datum3 = null;
+            geometricSymbol = ToleranceGeometricSymbol.None;
+            tolerance1 = null;
+            tolerance2 = null;
+            datum1 = null;
+            datum2 = null;
+            datum3 = null;
         }
 
         #endregion
@@ -68,8 +68,8 @@ namespace netDxf.Entities
         /// </summary>
         public ToleranceGeometricSymbol GeometricSymbol
         {
-            get { return this.geometricSymbol; }
-            set { this.geometricSymbol = value; }
+            get { return geometricSymbol; }
+            set { geometricSymbol = value; }
         }
 
         /// <summary>
@@ -77,8 +77,8 @@ namespace netDxf.Entities
         /// </summary>
         public ToleranceValue Tolerance1
         {
-            get { return this.tolerance1; }
-            set { this.tolerance1 = value; }
+            get { return tolerance1; }
+            set { tolerance1 = value; }
         }
 
         /// <summary>
@@ -86,8 +86,8 @@ namespace netDxf.Entities
         /// </summary>
         public ToleranceValue Tolerance2
         {
-            get { return this.tolerance2; }
-            set { this.tolerance2 = value; }
+            get { return tolerance2; }
+            set { tolerance2 = value; }
         }
 
         /// <summary>
@@ -95,8 +95,8 @@ namespace netDxf.Entities
         /// </summary>
         public DatumReferenceValue Datum1
         {
-            get { return this.datum1; }
-            set { this.datum1 = value; }
+            get { return datum1; }
+            set { datum1 = value; }
         }
 
         /// <summary>
@@ -104,8 +104,8 @@ namespace netDxf.Entities
         /// </summary>
         public DatumReferenceValue Datum2
         {
-            get { return this.datum2; }
-            set { this.datum2 = value; }
+            get { return datum2; }
+            set { datum2 = value; }
         }
 
         /// <summary>
@@ -113,8 +113,8 @@ namespace netDxf.Entities
         /// </summary>
         public DatumReferenceValue Datum3
         {
-            get { return this.datum3; }
-            set { this.datum3 = value; }
+            get { return datum3; }
+            set { datum3 = value; }
         }
 
         #endregion
@@ -129,12 +129,12 @@ namespace netDxf.Entities
         {
             return new ToleranceEntry
             {
-                GeometricSymbol = this.geometricSymbol,
-                Tolerance1 = (ToleranceValue) this.tolerance1.Clone(),
-                Tolerance2 = (ToleranceValue) this.tolerance1.Clone(),
-                Datum1 = (DatumReferenceValue) this.datum1.Clone(),
-                Datum2 = (DatumReferenceValue) this.datum1.Clone(),
-                Datum3 = (DatumReferenceValue) this.datum1.Clone(),
+                GeometricSymbol = geometricSymbol,
+                Tolerance1 = (ToleranceValue) tolerance1.Clone(),
+                Tolerance2 = (ToleranceValue) tolerance1.Clone(),
+                Datum1 = (DatumReferenceValue) datum1.Clone(),
+                Datum2 = (DatumReferenceValue) datum1.Clone(),
+                Datum3 = (DatumReferenceValue) datum1.Clone(),
             };
         }
 

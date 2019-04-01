@@ -112,8 +112,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         /// <summary>
@@ -121,12 +121,12 @@ namespace netDxf.Entities
         /// </summary>
         public double Weight
         {
-            get { return this.weight; }
+            get { return weight; }
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The spline vertex weight must be greater than zero.");
-                this.weight = value;
+                weight = value;
             }
         }
 
@@ -140,7 +140,7 @@ namespace netDxf.Entities
         /// <returns>A string text.</returns>
         public override string ToString()
         {
-            return string.Format("{0}: ({1}) w={2}", "SplineVertex", this.Position, this.Weight);
+            return string.Format("{0}: ({1}) w={2}", "SplineVertex", Position, Weight);
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace netDxf.Entities
         /// <returns>A new Spline that is a copy of this instance.</returns>
         public object Clone()
         {
-            return new SplineVertex(this.position, this.weight);
+            return new SplineVertex(position, weight);
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace netDxf.Entities
         /// <returns>A string text.</returns>
         public string ToString(IFormatProvider provider)
         {
-            return string.Format("{0}: ({1}) w={2}", "SplineVertex", this.Position.ToString(provider), this.Weight.ToString(provider));
+            return string.Format("{0}: ({1}) w={2}", "SplineVertex", Position.ToString(provider), Weight.ToString(provider));
         }
 
         #endregion

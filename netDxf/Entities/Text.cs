@@ -40,7 +40,7 @@ namespace netDxf.Entities
 
         protected virtual TextStyle OnTextStyleChangedEvent(TextStyle oldTextStyle, TextStyle newTextStyle)
         {
-            TextStyleChangedEventHandler ae = this.TextStyleChanged;
+            TextStyleChangedEventHandler ae = TextStyleChanged;
             if (ae != null)
             {
                 TableObjectChangedEventArgs<TextStyle> eventArgs = new TableObjectChangedEventArgs<TextStyle>(oldTextStyle, newTextStyle);
@@ -122,17 +122,17 @@ namespace netDxf.Entities
         {
             this.text = text;
             this.position = position;
-            this.alignment = TextAlignment.BaselineLeft;
-            this.Normal = Vector3.UnitZ;
+            alignment = TextAlignment.BaselineLeft;
+            Normal = Vector3.UnitZ;
             if (style == null)
                 throw new ArgumentNullException(nameof(style));
             this.style = style;
             if (height <= 0)
                 throw new ArgumentOutOfRangeException(nameof(height), this.text, "The Text height must be greater than zero.");
             this.height = height;
-            this.widthFactor = style.WidthFactor;
-            this.obliqueAngle = style.ObliqueAngle;
-            this.rotation = 0.0;
+            widthFactor = style.WidthFactor;
+            obliqueAngle = style.ObliqueAngle;
+            rotation = 0.0;
         }
 
         #endregion
@@ -144,8 +144,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         /// <summary>
@@ -153,8 +153,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Rotation
         {
-            get { return this.rotation; }
-            set { this.rotation = MathHelper.NormalizeAngle(value); }
+            get { return rotation; }
+            set { rotation = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -163,12 +163,12 @@ namespace netDxf.Entities
         /// <remarks>Valid values must be greater than zero. Default: 1.0.</remarks>
         public double Height
         {
-            get { return this.height; }
+            get { return height; }
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Text height must be greater than zero.");
-                this.height = value;
+                height = value;
             }
         }
 
@@ -178,12 +178,12 @@ namespace netDxf.Entities
         /// <remarks>Valid values range from 0.01 to 100. Default: 1.0.</remarks>
         public double WidthFactor
         {
-            get { return this.widthFactor; }
+            get { return widthFactor; }
             set
             {
                 if (value < 0.01 || value > 100.0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Text width factor valid values range from 0.01 to 100.");
-                this.widthFactor = value;
+                widthFactor = value;
             }
         }
 
@@ -193,12 +193,12 @@ namespace netDxf.Entities
         /// <remarks>Valid values range from -85 to 85. Default: 0.0.</remarks>
         public double ObliqueAngle
         {
-            get { return this.obliqueAngle; }
+            get { return obliqueAngle; }
             set
             {
                 if (value < -85.0 || value > 85.0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Text oblique angle valid values range from -85 to 85.");
-                this.obliqueAngle = value;
+                obliqueAngle = value;
             }
         }
 
@@ -207,8 +207,8 @@ namespace netDxf.Entities
         /// </summary>
         public TextAlignment Alignment
         {
-            get { return this.alignment; }
-            set { this.alignment = value; }
+            get { return alignment; }
+            set { alignment = value; }
         }
 
         /// <summary>
@@ -216,12 +216,12 @@ namespace netDxf.Entities
         /// </summary>
         public TextStyle Style
         {
-            get { return this.style; }
+            get { return style; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.style = this.OnTextStyleChangedEvent(this.style, value);
+                style = OnTextStyleChangedEvent(style, value);
             }
         }
 
@@ -230,8 +230,8 @@ namespace netDxf.Entities
         /// </summary>
         public string Value
         {
-            get { return this.text; }
-            set { this.text = value; }
+            get { return text; }
+            set { text = value; }
         }
 
         #endregion
@@ -257,16 +257,16 @@ namespace netDxf.Entities
             double newRotation;
             double newObliqueAngle;
 
-            newPosition = transformation * this.Position + translation;
-            newNormal = transformation * this.Normal;
+            newPosition = transformation * Position + translation;
+            newNormal = transformation * Normal;
 
-            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
+            Matrix3 transOW = MathHelper.ArbitraryAxis(Normal);
 
             Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal);
             transWO = transWO.Transpose();
 
-            IList<Vector2> uv = MathHelper.Transform(new List<Vector2> { this.WidthFactor * this.Height * Vector2.UnitX, this.Height * Vector2.UnitY },
-                this.Rotation * MathHelper.DegToRad,
+            IList<Vector2> uv = MathHelper.Transform(new List<Vector2> { WidthFactor * Height * Vector2.UnitX, Height * Vector2.UnitY },
+                Rotation * MathHelper.DegToRad,
                 CoordinateSystem.Object, CoordinateSystem.World);
 
 
@@ -304,12 +304,12 @@ namespace netDxf.Entities
             else if (newWidthFactor > 100)
                 newWidthFactor = 100;
 
-            this.Position = newPosition;
-            this.Normal = newNormal;
-            this.Rotation = newRotation;
-            this.Height = newHeight;
-            this.WidthFactor = newWidthFactor;
-            this.ObliqueAngle = newObliqueAngle;         
+            Position = newPosition;
+            Normal = newNormal;
+            Rotation = newRotation;
+            Height = newHeight;
+            WidthFactor = newWidthFactor;
+            ObliqueAngle = newObliqueAngle;         
         }
 
         /// <summary>
@@ -321,26 +321,26 @@ namespace netDxf.Entities
             Text entity = new Text
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //Text properties
-                Position = this.position,
-                Rotation = this.rotation,
-                Height = this.height,
-                WidthFactor = this.widthFactor,
-                ObliqueAngle = this.obliqueAngle,
-                Alignment = this.alignment,
-                Style = (TextStyle) this.style.Clone(),
-                Value = this.text
+                Position = position,
+                Rotation = rotation,
+                Height = height,
+                WidthFactor = widthFactor,
+                ObliqueAngle = obliqueAngle,
+                Alignment = alignment,
+                Style = (TextStyle) style.Clone(),
+                Value = text
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

@@ -62,8 +62,8 @@ namespace netDxf.Objects
         /// </summary>
         public double Left
         {
-            get { return this.left; }
-            set { this.left = value; }
+            get { return left; }
+            set { left = value; }
         }
 
         /// <summary>
@@ -71,8 +71,8 @@ namespace netDxf.Objects
         /// </summary>
         public double Bottom
         {
-            get { return this.bottom; }
-            set { this.bottom = value; }
+            get { return bottom; }
+            set { bottom = value; }
         }
 
         /// <summary>
@@ -80,8 +80,8 @@ namespace netDxf.Objects
         /// </summary>
         public double Right
         {
-            get { return this.right; }
-            set { this.right = value; }
+            get { return right; }
+            set { right = value; }
         }
 
         /// <summary>
@@ -89,8 +89,8 @@ namespace netDxf.Objects
         /// </summary>
         public double Top
         {
-            get { return this.top; }
-            set { this.top = value; }
+            get { return top; }
+            set { top = value; }
         }
         #endregion      
     }

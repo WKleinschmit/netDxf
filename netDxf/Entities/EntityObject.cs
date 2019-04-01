@@ -42,7 +42,7 @@ namespace netDxf.Entities
         public event LayerChangedEventHandler LayerChanged;
         protected virtual Layer OnLayerChangedEvent(Layer oldLayer, Layer newLayer)
         {
-            LayerChangedEventHandler ae = this.LayerChanged;
+            LayerChangedEventHandler ae = LayerChanged;
             if (ae != null)
             {
                 TableObjectChangedEventArgs<Layer> eventArgs = new TableObjectChangedEventArgs<Layer>(oldLayer, newLayer);
@@ -56,7 +56,7 @@ namespace netDxf.Entities
         public event LinetypeChangedEventHandler LinetypeChanged;
         protected virtual Linetype OnLinetypeChangedEvent(Linetype oldLinetype, Linetype newLinetype)
         {
-            LinetypeChangedEventHandler ae = this.LinetypeChanged;
+            LinetypeChangedEventHandler ae = LinetypeChanged;
             if (ae != null)
             {
                 TableObjectChangedEventArgs<Linetype> eventArgs = new TableObjectChangedEventArgs<Linetype>(oldLinetype, newLinetype);
@@ -69,7 +69,7 @@ namespace netDxf.Entities
         public event XDataAddAppRegEventHandler XDataAddAppReg;
         protected virtual void OnXDataAddAppRegEvent(ApplicationRegistry item)
         {
-            XDataAddAppRegEventHandler ae = this.XDataAddAppReg;
+            XDataAddAppRegEventHandler ae = XDataAddAppReg;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
         }
@@ -77,7 +77,7 @@ namespace netDxf.Entities
         public event XDataRemoveAppRegEventHandler XDataRemoveAppReg;
         protected virtual void OnXDataRemoveAppRegEvent(ApplicationRegistry item)
         {
-            XDataRemoveAppRegEventHandler ae = this.XDataRemoveAppReg;
+            XDataRemoveAppRegEventHandler ae = XDataRemoveAppReg;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
         }
@@ -106,18 +106,18 @@ namespace netDxf.Entities
             : base(dxfCode)
         {
             this.type = type;
-            this.color = AciColor.ByLayer;
-            this.layer = Layer.Default;
-            this.linetype = Linetype.ByLayer;
-            this.lineweight = Lineweight.ByLayer;
-            this.transparency = Transparency.ByLayer;
-            this.linetypeScale = 1.0;
-            this.isVisible = true;
-            this.normal = Vector3.UnitZ;
-            this.reactors = new List<DxfObject>();
-            this.xData = new XDataDictionary();
-            this.xData.AddAppReg += this.XData_AddAppReg;
-            this.xData.RemoveAppReg += this.XData_RemoveAppReg;
+            color = AciColor.ByLayer;
+            layer = Layer.Default;
+            linetype = Linetype.ByLayer;
+            lineweight = Lineweight.ByLayer;
+            transparency = Transparency.ByLayer;
+            linetypeScale = 1.0;
+            isVisible = true;
+            normal = Vector3.UnitZ;
+            reactors = new List<DxfObject>();
+            xData = new XDataDictionary();
+            xData.AddAppReg += XData_AddAppReg;
+            xData.RemoveAppReg += XData_RemoveAppReg;
         }
 
         #endregion
@@ -129,7 +129,7 @@ namespace netDxf.Entities
         /// </summary>
         public IReadOnlyList<DxfObject> Reactors
         {
-            get { return this.reactors; }
+            get { return reactors; }
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace netDxf.Entities
         /// </summary>
         public EntityType Type
         {
-            get { return this.type; }
+            get { return type; }
         }
 
         /// <summary>
@@ -145,12 +145,12 @@ namespace netDxf.Entities
         /// </summary>
         public AciColor Color
         {
-            get { return this.color; }
+            get { return color; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.color = value;
+                color = value;
             }
         }
 
@@ -159,12 +159,12 @@ namespace netDxf.Entities
         /// </summary>
         public Layer Layer
         {
-            get { return this.layer; }
+            get { return layer; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.layer = this.OnLayerChangedEvent(this.layer, value);
+                layer = OnLayerChangedEvent(layer, value);
             }
         }
 
@@ -173,12 +173,12 @@ namespace netDxf.Entities
         /// </summary>
         public Linetype Linetype
         {
-            get { return this.linetype; }
+            get { return linetype; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
+                linetype = OnLinetypeChangedEvent(linetype, value);
             }
         }
 
@@ -187,8 +187,8 @@ namespace netDxf.Entities
         /// </summary>
         public Lineweight Lineweight
         {
-            get { return this.lineweight; }
-            set { this.lineweight = value; }
+            get { return lineweight; }
+            set { lineweight = value; }
         }
 
         /// <summary>
@@ -196,12 +196,12 @@ namespace netDxf.Entities
         /// </summary>
         public Transparency Transparency
         {
-            get { return this.transparency; }
+            get { return transparency; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.transparency = value;
+                transparency = value;
             }
         }
 
@@ -210,12 +210,12 @@ namespace netDxf.Entities
         /// </summary>
         public double LinetypeScale
         {
-            get { return this.linetypeScale; }
+            get { return linetypeScale; }
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The line type scale must be greater than zero.");
-                this.linetypeScale = value;
+                linetypeScale = value;
             }
         }
 
@@ -224,8 +224,8 @@ namespace netDxf.Entities
         /// </summary>
         public bool IsVisible
         {
-            get { return this.isVisible; }
-            set { this.isVisible = value; }
+            get { return isVisible; }
+            set { isVisible = value; }
         }
 
         /// <summary>
@@ -233,11 +233,11 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Normal
         {
-            get { return this.normal; }
+            get { return normal; }
             set
             {
-                this.normal = Vector3.Normalize(value);
-                if (Vector3.IsNaN(this.normal))
+                normal = Vector3.Normalize(value);
+                if (Vector3.IsNaN(normal))
                     throw new ArgumentException("The normal can not be the zero vector.", nameof(value));
             }
         }
@@ -256,7 +256,7 @@ namespace netDxf.Entities
         /// </summary>
         public XDataDictionary XData
         {
-            get { return this.xData; }
+            get { return xData; }
         }
 
         #endregion
@@ -265,12 +265,12 @@ namespace netDxf.Entities
 
         internal void AddReactor(DxfObject o)
         {
-            this.reactors.Add(o);
+            reactors.Add(o);
         }
 
         internal bool RemoveReactor(DxfObject o)
         {
-            return this.reactors.Remove(o);
+            return reactors.Remove(o);
         }
 
         #endregion
@@ -294,7 +294,7 @@ namespace netDxf.Entities
         /// <returns>The string representation.</returns>
         public override string ToString()
         {
-            return this.type.ToString();
+            return type.ToString();
         }
 
         #endregion
@@ -313,12 +313,12 @@ namespace netDxf.Entities
 
         private void XData_AddAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
         {
-            this.OnXDataAddAppRegEvent(e.Item);
+            OnXDataAddAppRegEvent(e.Item);
         }
 
         private void XData_RemoveAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
         {
-            this.OnXDataRemoveAppRegEvent(e.Item);
+            OnXDataRemoveAppRegEvent(e.Item);
         }
 
         #endregion

@@ -86,7 +86,7 @@ namespace netDxf.Entities
             if (clippingBoundary == null)
                 throw new ArgumentNullException(nameof(clippingBoundary));
             this.clippingBoundary = clippingBoundary;
-            this.elevation = 0.0;
+            elevation = 0.0;
         }
 
         #endregion
@@ -98,12 +98,12 @@ namespace netDxf.Entities
         /// </summary>
         public ClippingBoundary ClippingBoundary
         {
-            get { return this.clippingBoundary; }
+            get { return clippingBoundary; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.clippingBoundary = value;
+                clippingBoundary = value;
             }
         }
 
@@ -113,8 +113,8 @@ namespace netDxf.Entities
         /// <remarks>This is the distance from the origin to the plane of the wipeout boundary.</remarks>
         public double Elevation
         {
-            get { return this.elevation; }
-            set { this.elevation = value; }
+            get { return elevation; }
+            set { elevation = value; }
         }
 
         #endregion
@@ -129,31 +129,31 @@ namespace netDxf.Entities
         public override void TransformBy(Matrix3 transformation, Vector3 translation)
         {
             Vector3 newNormal;
-            double newElevation = this.Elevation;
+            double newElevation = Elevation;
 
-            newNormal = transformation * this.Normal;
+            newNormal = transformation * Normal;
 
-            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
+            Matrix3 transOW = MathHelper.ArbitraryAxis(Normal);
             Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
 
             List<Vector2> vertexes = new List<Vector2>();
 
-            foreach (Vector2 vertex in this.ClippingBoundary.Vertexes)
+            foreach (Vector2 vertex in ClippingBoundary.Vertexes)
             {
-                Vector3 v = transOW * new Vector3(vertex.X, vertex.Y, this.Elevation);
+                Vector3 v = transOW * new Vector3(vertex.X, vertex.Y, Elevation);
                 v = transformation * v + translation;
                 v = transWO * v;
                 vertexes.Add(new Vector2(v.X, v.Y));
                 newElevation = v.Z;
             }
 
-            ClippingBoundary newClipping = this.ClippingBoundary.Type == ClippingBoundaryType.Rectangular
+            ClippingBoundary newClipping = ClippingBoundary.Type == ClippingBoundaryType.Rectangular
                 ? new ClippingBoundary(vertexes[0], vertexes[1])
                 : new ClippingBoundary(vertexes);
 
-            this.Normal = newNormal;
-            this.Elevation = newElevation;
-            this.ClippingBoundary = newClipping;
+            Normal = newNormal;
+            Elevation = newElevation;
+            ClippingBoundary = newClipping;
         }
 
         /// <summary>
@@ -162,22 +162,22 @@ namespace netDxf.Entities
         /// <returns>A new Wipeout that is a copy of this instance.</returns>
         public override object Clone()
         {
-            Wipeout entity = new Wipeout((ClippingBoundary) this.ClippingBoundary.Clone())
+            Wipeout entity = new Wipeout((ClippingBoundary) ClippingBoundary.Clone())
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //Wipeout properties
-                Elevation = this.elevation
+                Elevation = elevation
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

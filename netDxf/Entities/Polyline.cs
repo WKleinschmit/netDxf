@@ -72,17 +72,17 @@ namespace netDxf.Entities
             if (vertexes == null)
                 throw new ArgumentNullException(nameof(vertexes));
             this.vertexes = new ObservableCollection<PolylineVertex>();
-            this.vertexes.BeforeAddItem += this.Vertexes_BeforeAddItem;
-            this.vertexes.AddItem += this.Vertexes_AddItem;
-            this.vertexes.BeforeRemoveItem += this.Vertexes_BeforeRemoveItem;
-            this.vertexes.RemoveItem += this.Vertexes_RemoveItem;
+            this.vertexes.BeforeAddItem += Vertexes_BeforeAddItem;
+            this.vertexes.AddItem += Vertexes_AddItem;
+            this.vertexes.BeforeRemoveItem += Vertexes_BeforeRemoveItem;
+            this.vertexes.RemoveItem += Vertexes_RemoveItem;
 
             foreach (Vector3 vertex in vertexes)
                 this.vertexes.Add(new PolylineVertex(vertex));
 
-            this.flags = isClosed ? PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM | PolylinetypeFlags.Polyline3D : PolylinetypeFlags.Polyline3D;
-            this.smoothType = PolylineSmoothType.NoSmooth;
-            this.endSequence = new EndSequence(this);
+            flags = isClosed ? PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM | PolylinetypeFlags.Polyline3D : PolylinetypeFlags.Polyline3D;
+            smoothType = PolylineSmoothType.NoSmooth;
+            endSequence = new EndSequence(this);
         }
 
 
@@ -106,16 +106,16 @@ namespace netDxf.Entities
             if (vertexes == null)
                 throw new ArgumentNullException(nameof(vertexes));
             this.vertexes = new ObservableCollection<PolylineVertex>();
-            this.vertexes.BeforeAddItem += this.Vertexes_BeforeAddItem;
-            this.vertexes.AddItem += this.Vertexes_AddItem;
-            this.vertexes.BeforeRemoveItem += this.Vertexes_BeforeRemoveItem;
-            this.vertexes.RemoveItem += this.Vertexes_RemoveItem;
+            this.vertexes.BeforeAddItem += Vertexes_BeforeAddItem;
+            this.vertexes.AddItem += Vertexes_AddItem;
+            this.vertexes.BeforeRemoveItem += Vertexes_BeforeRemoveItem;
+            this.vertexes.RemoveItem += Vertexes_RemoveItem;
 
             this.vertexes.AddRange(vertexes);
 
-            this.flags = isClosed ? PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM | PolylinetypeFlags.Polyline3D : PolylinetypeFlags.Polyline3D;
-            this.smoothType = PolylineSmoothType.NoSmooth;
-            this.endSequence = new EndSequence(this);
+            flags = isClosed ? PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM | PolylinetypeFlags.Polyline3D : PolylinetypeFlags.Polyline3D;
+            smoothType = PolylineSmoothType.NoSmooth;
+            endSequence = new EndSequence(this);
         }
 
         #endregion
@@ -127,7 +127,7 @@ namespace netDxf.Entities
         /// </summary>
         public ObservableCollection<PolylineVertex> Vertexes
         {
-            get { return this.vertexes; }
+            get { return vertexes; }
         }
 
         /// <summary>
@@ -135,13 +135,13 @@ namespace netDxf.Entities
         /// </summary>
         public bool IsClosed
         {
-            get { return this.flags.HasFlag(PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM); }
+            get { return flags.HasFlag(PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM); }
             set
             {
                 if (value)
-                    this.flags |= PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM;
+                    flags |= PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM;
                 else
-                    this.flags &= ~PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM;
+                    flags &= ~PolylinetypeFlags.ClosedPolylineOrClosedPolygonMeshInM;
             }
         }
 
@@ -150,13 +150,13 @@ namespace netDxf.Entities
         /// </summary>
         public bool LinetypeGeneration
         {
-            get { return this.flags.HasFlag(PolylinetypeFlags.ContinuousLinetypePattern); }
+            get { return flags.HasFlag(PolylinetypeFlags.ContinuousLinetypePattern); }
             set
             {
                 if (value)
-                    this.flags |= PolylinetypeFlags.ContinuousLinetypePattern;
+                    flags |= PolylinetypeFlags.ContinuousLinetypePattern;
                 else
-                    this.flags &= ~PolylinetypeFlags.ContinuousLinetypePattern;
+                    flags &= ~PolylinetypeFlags.ContinuousLinetypePattern;
             }
         }
 
@@ -169,8 +169,8 @@ namespace netDxf.Entities
         /// </summary>
         internal PolylineSmoothType SmoothType
         {
-            get { return this.smoothType; }
-            set { this.smoothType = value; }
+            get { return smoothType; }
+            set { smoothType = value; }
         }
 
         /// <summary>
@@ -178,8 +178,8 @@ namespace netDxf.Entities
         /// </summary>
         internal PolylinetypeFlags Flags
         {
-            get { return this.flags; }
-            set { this.flags = value; }
+            get { return flags; }
+            set { flags = value; }
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace netDxf.Entities
         /// </summary>
         internal EndSequence EndSequence
         {
-            get { return this.endSequence; }
+            get { return endSequence; }
         }
 
         #endregion
@@ -199,7 +199,7 @@ namespace netDxf.Entities
         /// </summary>
         public void Reverse()
         {
-            this.vertexes.Reverse();
+            vertexes.Reverse();
         }
 
         /// <summary>
@@ -210,33 +210,33 @@ namespace netDxf.Entities
         {
             List<EntityObject> entities = new List<EntityObject>();
             int index = 0;
-            foreach (PolylineVertex vertex in this.Vertexes)
+            foreach (PolylineVertex vertex in Vertexes)
             {
                 Vector3 start;
                 Vector3 end;
 
-                if (index == this.Vertexes.Count - 1)
+                if (index == Vertexes.Count - 1)
                 {
-                    if (!this.IsClosed)
+                    if (!IsClosed)
                         break;
                     start = vertex.Position;
-                    end = this.vertexes[0].Position;
+                    end = vertexes[0].Position;
                 }
                 else
                 {
                     start = vertex.Position;
-                    end = this.vertexes[index + 1].Position;
+                    end = vertexes[index + 1].Position;
                 }
 
                 entities.Add(new Line
                 {
-                    Layer = (Layer) this.Layer.Clone(),
-                    Linetype = (Linetype) this.Linetype.Clone(),
-                    Color = (AciColor) this.Color.Clone(),
-                    Lineweight = this.Lineweight,
-                    Transparency = (Transparency) this.Transparency.Clone(),
-                    LinetypeScale = this.LinetypeScale,
-                    Normal = this.Normal,
+                    Layer = (Layer) Layer.Clone(),
+                    Linetype = (Linetype) Linetype.Clone(),
+                    Color = (AciColor) Color.Clone(),
+                    Lineweight = Lineweight,
+                    Transparency = (Transparency) Transparency.Clone(),
+                    LinetypeScale = LinetypeScale,
+                    Normal = Normal,
                     StartPoint = start,
                     EndPoint = end,
                 });
@@ -258,12 +258,12 @@ namespace netDxf.Entities
         /// <param name="translation">Translation vector.</param>
         public override void TransformBy(Matrix3 transformation, Vector3 translation)
         {
-            foreach (PolylineVertex point in this.Vertexes)
+            foreach (PolylineVertex point in Vertexes)
             {
                 point.Position = transformation * point.Position + translation;
             }
 
-            this.Normal = transformation * this.Normal;
+            Normal = transformation * Normal;
         }
 
         /// <summary>
@@ -277,11 +277,11 @@ namespace netDxf.Entities
         /// </remarks>
         internal override long AsignHandle(long entityNumber)
         {
-            foreach (PolylineVertex v in this.vertexes)
+            foreach (PolylineVertex v in vertexes)
             {
                 entityNumber = v.AsignHandle(entityNumber);
             }
-            entityNumber = this.endSequence.AsignHandle(entityNumber);
+            entityNumber = endSequence.AsignHandle(entityNumber);
 
             return base.AsignHandle(entityNumber);
         }
@@ -295,22 +295,22 @@ namespace netDxf.Entities
             Polyline entity = new Polyline
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //Polyline properties
-                Flags = this.flags
+                Flags = flags
             };
 
-            foreach (PolylineVertex vertex in this.vertexes)
+            foreach (PolylineVertex vertex in vertexes)
                 entity.Vertexes.Add((PolylineVertex) vertex.Clone());
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;
@@ -334,10 +334,10 @@ namespace netDxf.Entities
         private void Vertexes_AddItem(ObservableCollection<PolylineVertex> sender, ObservableCollectionEventArgs<PolylineVertex> e)
         {
             // if the polyline already belongs to a document
-            if (this.Owner != null)
+            if (Owner != null)
             {
                 // get the document
-                DxfDocument doc = this.Owner.Record.Owner.Owner;
+                DxfDocument doc = Owner.Record.Owner.Owner;
                 doc.NumHandles = e.Item.AsignHandle(doc.NumHandles);
             }
             e.Item.Owner = this;

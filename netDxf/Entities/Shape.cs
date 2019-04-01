@@ -74,9 +74,9 @@ namespace netDxf.Entities
             this.position = position;
             this.size = size;
             this.rotation = rotation;
-            this.obliqueAngle = 0.0;
-            this.widthFactor = 1.0;
-            this.thickness = 0.0;
+            obliqueAngle = 0.0;
+            widthFactor = 1.0;
+            thickness = 0.0;
         }
 
         #endregion
@@ -88,7 +88,7 @@ namespace netDxf.Entities
         /// </summary>
         public string Name
         {
-            get { return this.name; }
+            get { return name; }
         }
 
         /// <summary>
@@ -96,12 +96,12 @@ namespace netDxf.Entities
         /// </summary>
         public ShapeStyle Style
         {
-            get { return this.style; }
+            get { return style; }
             internal set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                this.style = value;
+                style = value;
             }
         }
 
@@ -110,8 +110,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         /// <summary>
@@ -125,12 +125,12 @@ namespace netDxf.Entities
         /// </remarks>
         public double Size
         {
-            get { return this.size; }
+            get { return size; }
             set
             {
                 if (MathHelper.IsZero(value))
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The shape cannot be zero.");
-                this.size = value;
+                size = value;
             }
         }
 
@@ -139,8 +139,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Rotation
         {
-            get { return this.rotation; }
-            set { this.rotation = MathHelper.NormalizeAngle(value); }
+            get { return rotation; }
+            set { rotation = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -148,8 +148,8 @@ namespace netDxf.Entities
         /// </summary>
         public double ObliqueAngle
         {
-            get { return this.obliqueAngle; }
-            set { this.obliqueAngle = MathHelper.NormalizeAngle(value); }
+            get { return obliqueAngle; }
+            set { obliqueAngle = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -158,12 +158,12 @@ namespace netDxf.Entities
         /// <remarks>Valid values must be greater than zero. Default: 1.0.</remarks>
         public double WidthFactor
         {
-            get { return this.widthFactor; }
+            get { return widthFactor; }
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The shape width factor must be greater than zero.");
-                this.widthFactor = value;
+                widthFactor = value;
             }
         }
 
@@ -172,8 +172,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Thickness
         {
-            get { return this.thickness; }
-            set { this.thickness = value; }
+            get { return thickness; }
+            set { thickness = value; }
         }
 
         #endregion
@@ -192,51 +192,51 @@ namespace netDxf.Entities
             double newSize;
             double newRotation;
 
-            newPosition = transformation * this.Position + translation;
-            newNormal = transformation * this.Normal;
+            newPosition = transformation * Position + translation;
+            newNormal = transformation * Normal;
 
-            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
+            Matrix3 transOW = MathHelper.ArbitraryAxis(Normal);
             Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
 
-            Vector2 refAxis = Vector2.Rotate(new Vector2(this.Size, 0.0), this.Rotation * MathHelper.DegToRad);
+            Vector2 refAxis = Vector2.Rotate(new Vector2(Size, 0.0), Rotation * MathHelper.DegToRad);
             Vector3 v = transOW * new Vector3(refAxis.X, refAxis.Y, 0.0);
             v = transformation * v;
             v = transWO * v;
             Vector2 axis = new Vector2(v.X, v.Y);
 
-            newSize = Math.Sign(this.Size) * axis.Modulus();
+            newSize = Math.Sign(Size) * axis.Modulus();
             if (MathHelper.IsZero(newSize)) newSize = MathHelper.Epsilon;
 
             newRotation = Vector2.Angle(axis) * MathHelper.RadToDeg;
 
-            this.Position = newPosition;
-            this.Normal = newNormal;
-            this.Size = newSize;
-            this.Rotation = newRotation;
+            Position = newPosition;
+            Normal = newNormal;
+            Size = newSize;
+            Rotation = newRotation;
         }
 
         public override object Clone()
         {
-            Shape entity = new Shape(this.name, (ShapeStyle)this.style.Clone())
+            Shape entity = new Shape(name, (ShapeStyle)style.Clone())
             {
                 //EntityObject properties
-                Layer = (Layer)this.Layer.Clone(),
-                Linetype = (Linetype)this.Linetype.Clone(),
-                Color = (AciColor)this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency)this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer)Layer.Clone(),
+                Linetype = (Linetype)Linetype.Clone(),
+                Color = (AciColor)Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency)Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //Shape properties
-                Position = this.position,
-                Size = this.size,
-                Rotation = this.rotation,
-                ObliqueAngle = this.obliqueAngle,
-                Thickness = this.thickness
+                Position = position,
+                Size = size,
+                Rotation = rotation,
+                ObliqueAngle = obliqueAngle,
+                Thickness = thickness
         };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData)data.Clone());
 
             return entity;

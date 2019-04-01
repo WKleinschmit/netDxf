@@ -70,7 +70,7 @@ namespace netDxf.IO
         /// </summary>
         public DxfVersion Version
         {
-            get { return this.version; }
+            get { return version; }
         }
 
         #endregion

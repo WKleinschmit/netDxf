@@ -128,9 +128,9 @@ namespace netDxf.Objects
                 throw new ArgumentOutOfRangeException(nameof(verticalResolution), verticalResolution, "The ImageDefinition vertical resolution must be greater than zero.");
             this.verticalResolution = verticalResolution;
 
-            this.resolutionUnits = units;
+            resolutionUnits = units;
 
-            this.reactors = new Dictionary<string, ImageDefinitionReactor>();
+            reactors = new Dictionary<string, ImageDefinitionReactor>();
         }
 
         ///  <summary>
@@ -195,12 +195,12 @@ namespace netDxf.Objects
             {
                 using (Image bitmap = Image.FromFile(file))
                 {
-                    this.width = bitmap.Width;
-                    this.height = bitmap.Height;
-                    this.horizontalResolution = bitmap.HorizontalResolution;
-                    this.verticalResolution = bitmap.VerticalResolution;
+                    width = bitmap.Width;
+                    height = bitmap.Height;
+                    horizontalResolution = bitmap.HorizontalResolution;
+                    verticalResolution = bitmap.VerticalResolution;
                     // the System.Drawing.Image stores the image resolution in inches
-                    this.resolutionUnits = ImageResolutionUnits.Inches;
+                    resolutionUnits = ImageResolutionUnits.Inches;
                 }
             }
             catch (Exception)
@@ -208,7 +208,7 @@ namespace netDxf.Objects
                 throw new ArgumentException("Image file not supported.", file);
             }
 
-            this.reactors = new Dictionary<string, ImageDefinitionReactor>();
+            reactors = new Dictionary<string, ImageDefinitionReactor>();
         }
 
         #endregion
@@ -220,7 +220,7 @@ namespace netDxf.Objects
         /// </summary>
         public string File
         {
-            get { return this.file; }
+            get { return file; }
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace netDxf.Objects
         /// </summary>
         public int Width
         {
-            get { return this.width; }
+            get { return width; }
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace netDxf.Objects
         /// </summary>
         public int Height
         {
-            get { return this.height; }
+            get { return height; }
         }
 
         /// <summary>
@@ -244,26 +244,26 @@ namespace netDxf.Objects
         /// </summary>
         public ImageResolutionUnits ResolutionUnits
         {
-            get { return this.resolutionUnits; }
+            get { return resolutionUnits; }
             set
             {
-                if (this.resolutionUnits != value)
+                if (resolutionUnits != value)
                 {
                     switch (value)
                     {
                         case ImageResolutionUnits.Centimeters:
-                            this.horizontalResolution /= 2.54;
-                            this.verticalResolution /= 2.54;
+                            horizontalResolution /= 2.54;
+                            verticalResolution /= 2.54;
                             break;
                         case ImageResolutionUnits.Inches:
-                            this.horizontalResolution *= 2.54;
-                            this.verticalResolution *= 2.54;
+                            horizontalResolution *= 2.54;
+                            verticalResolution *= 2.54;
                             break;
                         case ImageResolutionUnits.Unitless:
                             break;
                     }
                 }
-                this.resolutionUnits = value;
+                resolutionUnits = value;
             }
         }
 
@@ -272,7 +272,7 @@ namespace netDxf.Objects
         /// </summary>
         public double HorizontalResolution
         {
-            get { return this.horizontalResolution; }
+            get { return horizontalResolution; }
         }
 
         /// <summary>
@@ -280,7 +280,7 @@ namespace netDxf.Objects
         /// </summary>
         public double VerticalResolution
         {
-            get { return this.verticalResolution; }
+            get { return verticalResolution; }
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace netDxf.Objects
 
         internal Dictionary<string, ImageDefinitionReactor> Reactors
         {
-            get { return this.reactors; }
+            get { return reactors; }
         }
 
         #endregion
@@ -312,9 +312,9 @@ namespace netDxf.Objects
         /// <returns>A new ImageDefinition that is a copy of this instance.</returns>
         public override TableObject Clone(string newName)
         {
-            ImageDefinition copy = new ImageDefinition(newName, this.file, this.width, this.horizontalResolution, this.height, this.verticalResolution, this.resolutionUnits);
+            ImageDefinition copy = new ImageDefinition(newName, file, width, horizontalResolution, height, verticalResolution, resolutionUnits);
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 copy.XData.Add((XData)data.Clone());
 
             return copy;
@@ -326,7 +326,7 @@ namespace netDxf.Objects
         /// <returns>A new ImageDefinition that is a copy of this instance.</returns>
         public override object Clone()
         {
-            return this.Clone(this.Name);
+            return Clone(Name);
         }
 
         #endregion

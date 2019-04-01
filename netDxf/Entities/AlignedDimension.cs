@@ -102,18 +102,18 @@ namespace netDxf.Entities
 
             IList<Vector3> ocsPoints = MathHelper.Transform(
                 new List<Vector3> { referenceLine.StartPoint, referenceLine.EndPoint }, normal, CoordinateSystem.World, CoordinateSystem.Object);
-            this.firstRefPoint = new Vector2(ocsPoints[0].X, ocsPoints[0].Y);
-            this.secondRefPoint = new Vector2(ocsPoints[1].X, ocsPoints[1].Y);
+            firstRefPoint = new Vector2(ocsPoints[0].X, ocsPoints[0].Y);
+            secondRefPoint = new Vector2(ocsPoints[1].X, ocsPoints[1].Y);
 
             if (offset < 0)
                 throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
             this.offset = offset;
             if (style == null)
                 throw new ArgumentNullException(nameof(style));
-            this.Style = style;
-            this.Normal = normal;
-            this.Elevation = ocsPoints[0].Z;
-            this.Update();
+            Style = style;
+            Normal = normal;
+            Elevation = ocsPoints[0].Z;
+            Update();
         }
 
         /// <summary>
@@ -139,15 +139,15 @@ namespace netDxf.Entities
         public AlignedDimension(Vector2 firstPoint, Vector2 secondPoint, double offset, DimensionStyle style)
             : base(DimensionType.Aligned)
         {
-            this.firstRefPoint = firstPoint;
-            this.secondRefPoint = secondPoint;
+            firstRefPoint = firstPoint;
+            secondRefPoint = secondPoint;
             if (offset < 0)
                 throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
             this.offset = offset;
             if (style == null)
                 throw new ArgumentNullException(nameof(style));
-            this.Style = style;
-            this.Update();
+            Style = style;
+            Update();
         }
 
         #endregion
@@ -159,8 +159,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector2 FirstReferencePoint
         {
-            get { return this.firstRefPoint; }
-            set { this.firstRefPoint = value; }
+            get { return firstRefPoint; }
+            set { firstRefPoint = value; }
         }
 
         /// <summary>
@@ -168,8 +168,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector2 SecondReferencePoint
         {
-            get { return this.secondRefPoint; }
-            set { this.secondRefPoint = value; }
+            get { return secondRefPoint; }
+            set { secondRefPoint = value; }
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace netDxf.Entities
         /// </summary>
         public Vector2 DimLinePosition
         {
-            get { return this.defPoint; }
+            get { return defPoint; }
         }
 
         /// <summary>
@@ -189,12 +189,12 @@ namespace netDxf.Entities
         /// </remarks>
         public double Offset
         {
-            get { return this.offset; }
+            get { return offset; }
             set
             {
                 if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(value), "The offset value must be equal or greater than zero.");
-                this.offset = value;
+                offset = value;
             }
         }
 
@@ -204,7 +204,7 @@ namespace netDxf.Entities
         /// <remarks>The dimension is always measured in the plane defined by the normal.</remarks>
         public override double Measurement
         {
-            get { return Vector2.Distance(this.firstRefPoint, this.secondRefPoint); }
+            get { return Vector2.Distance(firstRefPoint, secondRefPoint); }
         }
 
         #endregion
@@ -217,38 +217,38 @@ namespace netDxf.Entities
         /// <param name="point">Point along the dimension line.</param>
         public void SetDimensionLinePosition(Vector2 point)
         {
-            Vector2 refDir = Vector2.Normalize(this.secondRefPoint - this.firstRefPoint);
-            Vector2 offsetDir = point - this.firstRefPoint;
+            Vector2 refDir = Vector2.Normalize(secondRefPoint - firstRefPoint);
+            Vector2 offsetDir = point - firstRefPoint;
 
             double cross = Vector2.CrossProduct(refDir, offsetDir);
             if (cross < 0)
             {
-                Vector2 tmp = this.firstRefPoint;
-                this.firstRefPoint = this.secondRefPoint;
-                this.secondRefPoint = tmp;
+                Vector2 tmp = firstRefPoint;
+                firstRefPoint = secondRefPoint;
+                secondRefPoint = tmp;
                 refDir *= -1;
             }
 
             Vector2 vec = Vector2.Perpendicular(refDir);
-            this.offset = MathHelper.PointLineDistance(point, this.firstRefPoint, refDir);
-            this.defPoint = this.secondRefPoint + this.offset * vec;
+            offset = MathHelper.PointLineDistance(point, firstRefPoint, refDir);
+            defPoint = secondRefPoint + offset * vec;
 
-            if (!this.TextPositionManuallySet)
+            if (!TextPositionManuallySet)
             {
                 DimensionStyleOverride styleOverride;
-                double textGap = this.Style.TextOffset;
-                if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.TextOffset, out styleOverride))
+                double textGap = Style.TextOffset;
+                if (StyleOverrides.TryGetValue(DimensionStyleOverrideType.TextOffset, out styleOverride))
                 {
                     textGap = (double)styleOverride.Value;
                 }
-                double scale = this.Style.DimScaleOverall;
-                if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.DimScaleOverall, out styleOverride))
+                double scale = Style.DimScaleOverall;
+                if (StyleOverrides.TryGetValue(DimensionStyleOverrideType.DimScaleOverall, out styleOverride))
                 {
                     scale = (double)styleOverride.Value;
                 }
 
-                double gap = this.offset + textGap * scale;
-                this.textRefPoint = Vector2.MidPoint(this.firstRefPoint, this.secondRefPoint) + gap * vec;
+                double gap = offset + textGap * scale;
+                textRefPoint = Vector2.MidPoint(firstRefPoint, secondRefPoint) + gap * vec;
             }
         }
 
@@ -269,38 +269,38 @@ namespace netDxf.Entities
             double newElevation;
             double newScale;
 
-            newNormal = transformation * this.Normal;
+            newNormal = transformation * Normal;
             newScale = newNormal.Modulus();
 
-            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
+            Matrix3 transOW = MathHelper.ArbitraryAxis(Normal);
             Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
 
-            Vector3 v = transOW * new Vector3(this.FirstReferencePoint.X, this.FirstReferencePoint.Y, this.Elevation);
+            Vector3 v = transOW * new Vector3(FirstReferencePoint.X, FirstReferencePoint.Y, Elevation);
             v = transformation * v + translation;
             v = transWO * v;
             newStart = new Vector2(v.X, v.Y);
             newElevation = v.Z;
 
-            v = transOW * new Vector3(this.SecondReferencePoint.X, this.SecondReferencePoint.Y, this.Elevation);
+            v = transOW * new Vector3(SecondReferencePoint.X, SecondReferencePoint.Y, Elevation);
             v = transformation * v + translation;
             v = transWO * v;
             newEnd = new Vector2(v.X, v.Y);
 
-            v = transOW * new Vector3(this.textRefPoint.X, this.textRefPoint.Y, this.Elevation);
+            v = transOW * new Vector3(textRefPoint.X, textRefPoint.Y, Elevation);
             v = transformation * v + translation;
             v = transWO * v;
-            this.textRefPoint = new Vector2(v.X, v.Y);
+            textRefPoint = new Vector2(v.X, v.Y);
 
-            v = transOW * new Vector3(this.defPoint.X, this.defPoint.Y, this.Elevation);
+            v = transOW * new Vector3(defPoint.X, defPoint.Y, Elevation);
             v = transformation * v + translation;
             v = transWO * v;
-            this.defPoint = new Vector2(v.X, v.Y);
+            defPoint = new Vector2(v.X, v.Y);
 
-            this.Offset *= newScale;
-            this.FirstReferencePoint = newStart;
-            this.SecondReferencePoint = newEnd;
-            this.Elevation = newElevation;
-            this.Normal = newNormal;
+            Offset *= newScale;
+            FirstReferencePoint = newStart;
+            SecondReferencePoint = newEnd;
+            Elevation = newElevation;
+            Normal = newNormal;
         }
 
         /// <summary>
@@ -310,44 +310,44 @@ namespace netDxf.Entities
         {
             DimensionStyleOverride styleOverride;
 
-            Vector2 ref1 = this.FirstReferencePoint;
-            Vector2 ref2 = this.SecondReferencePoint;
+            Vector2 ref1 = FirstReferencePoint;
+            Vector2 ref2 = SecondReferencePoint;
             Vector2 dirRef = ref2 - ref1;
             Vector2 dirDesp = Vector2.Normalize(Vector2.Perpendicular(dirRef));
-            Vector2 vec = this.offset* dirDesp;
+            Vector2 vec = offset* dirDesp;
             Vector2 dimRef1 = ref1 + vec;
             Vector2 dimRef2 = ref2 + vec;
 
-            this.defPoint = dimRef2;
+            defPoint = dimRef2;
 
-            if (this.TextPositionManuallySet)
+            if (TextPositionManuallySet)
             {
-                DimensionStyleFitTextMove moveText = this.Style.FitTextMove;
-                if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.FitTextMove, out styleOverride))
+                DimensionStyleFitTextMove moveText = Style.FitTextMove;
+                if (StyleOverrides.TryGetValue(DimensionStyleOverrideType.FitTextMove, out styleOverride))
                 {
                     moveText = (DimensionStyleFitTextMove) styleOverride.Value;
                 }
 
                 if (moveText == DimensionStyleFitTextMove.BesideDimLine)
                 {
-                    this.SetDimensionLinePosition(this.textRefPoint);
+                    SetDimensionLinePosition(textRefPoint);
                 }
             }
             else
             {
-                double textGap = this.Style.TextOffset;
-                if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.TextOffset, out styleOverride))
+                double textGap = Style.TextOffset;
+                if (StyleOverrides.TryGetValue(DimensionStyleOverrideType.TextOffset, out styleOverride))
                 {
                     textGap = (double) styleOverride.Value;
                 }
-                double scale = this.Style.DimScaleOverall;
-                if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.DimScaleOverall, out styleOverride))
+                double scale = Style.DimScaleOverall;
+                if (StyleOverrides.TryGetValue(DimensionStyleOverrideType.DimScaleOverall, out styleOverride))
                 {
                     scale = (double) styleOverride.Value;
                 }
 
                 double gap = textGap*scale;
-                this.textRefPoint = Vector2.MidPoint(dimRef1, dimRef2) + gap*dirDesp;
+                textRefPoint = Vector2.MidPoint(dimRef1, dimRef2) + gap*dirDesp;
             }
         }
 
@@ -370,32 +370,32 @@ namespace netDxf.Entities
             AlignedDimension entity = new AlignedDimension
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //Dimension properties
-                Style = (DimensionStyle) this.Style.Clone(),
-                DefinitionPoint = this.DefinitionPoint,
-                TextReferencePoint = this.TextReferencePoint,
-                TextPositionManuallySet = this.TextPositionManuallySet,
-                TextRotation = this.TextRotation,
-                AttachmentPoint = this.AttachmentPoint,
-                LineSpacingStyle = this.LineSpacingStyle,
-                LineSpacingFactor = this.LineSpacingFactor,
-                UserText = this.UserText,
-                Elevation = this.Elevation,
+                Style = (DimensionStyle) Style.Clone(),
+                DefinitionPoint = DefinitionPoint,
+                TextReferencePoint = TextReferencePoint,
+                TextPositionManuallySet = TextPositionManuallySet,
+                TextRotation = TextRotation,
+                AttachmentPoint = AttachmentPoint,
+                LineSpacingStyle = LineSpacingStyle,
+                LineSpacingFactor = LineSpacingFactor,
+                UserText = UserText,
+                Elevation = Elevation,
                 //AlignedDimension properties
-                FirstReferencePoint = this.firstRefPoint,
-                SecondReferencePoint = this.secondRefPoint,
-                Offset = this.offset
+                FirstReferencePoint = firstRefPoint,
+                SecondReferencePoint = secondRefPoint,
+                Offset = offset
             };
 
-            foreach (DimensionStyleOverride styleOverride in this.StyleOverrides.Values)
+            foreach (DimensionStyleOverride styleOverride in StyleOverrides.Values)
             {
                 ICloneable value = styleOverride.Value as ICloneable;
                 object copy = value != null ? value.Clone() : styleOverride.Value;
@@ -403,7 +403,7 @@ namespace netDxf.Entities
                 entity.StyleOverrides.Add(new DimensionStyleOverride(styleOverride.Type, copy));
             }
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

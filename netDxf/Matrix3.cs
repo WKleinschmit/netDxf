@@ -76,7 +76,7 @@ namespace netDxf
             this.m32 = m32;
             this.m33 = m33;
 
-            this.isIdentity = false;
+            isIdentity = false;
         }
 
         /// <summary>
@@ -90,19 +90,19 @@ namespace netDxf
 
             if (array.Length != 9)
                 throw new ArgumentException("The array must contain 9 elements.");
-            this.m11 = array[0];
-            this.m12 = array[1];
-            this.m13 = array[2];
+            m11 = array[0];
+            m12 = array[1];
+            m13 = array[2];
 
-            this.m21 = array[3];
-            this.m22 = array[4];
-            this.m23 = array[5];
+            m21 = array[3];
+            m22 = array[4];
+            m23 = array[5];
 
-            this.m31 = array[6];
-            this.m32 = array[7];
-            this.m33 = array[8];
+            m31 = array[6];
+            m32 = array[7];
+            m33 = array[8];
 
-            this.isIdentity = false;
+            isIdentity = false;
         }
 
         #endregion
@@ -134,11 +134,11 @@ namespace netDxf
         /// </summary>
         public double M11
         {
-            get { return this.m11; }
+            get { return m11; }
             set
             {
-                this.isIdentity = false;
-                this.m11 = value;
+                isIdentity = false;
+                m11 = value;
             }
         }
 
@@ -147,11 +147,11 @@ namespace netDxf
         /// </summary>
         public double M12
         {
-            get { return this.m12; }
+            get { return m12; }
             set
             {
-                this.isIdentity = false;
-                this.m12 = value;
+                isIdentity = false;
+                m12 = value;
             }
         }
 
@@ -160,11 +160,11 @@ namespace netDxf
         /// </summary>
         public double M13
         {
-            get { return this.m13; }
+            get { return m13; }
             set
             {
-                this.isIdentity = false;
-                this.m13 = value;
+                isIdentity = false;
+                m13 = value;
             }
         }
 
@@ -173,11 +173,11 @@ namespace netDxf
         /// </summary>
         public double M21
         {
-            get { return this.m21; }
+            get { return m21; }
             set
             {
-                this.isIdentity = false;
-                this.m21 = value;
+                isIdentity = false;
+                m21 = value;
             }
         }
 
@@ -186,11 +186,11 @@ namespace netDxf
         /// </summary>
         public double M22
         {
-            get { return this.m22; }
+            get { return m22; }
             set
             {
-                this.isIdentity = false;
-                this.m22 = value;
+                isIdentity = false;
+                m22 = value;
             }
         }
 
@@ -199,11 +199,11 @@ namespace netDxf
         /// </summary>
         public double M23
         {
-            get { return this.m23; }
+            get { return m23; }
             set
             {
-                this.isIdentity = false;
-                this.m23 = value;
+                isIdentity = false;
+                m23 = value;
             }
         }
 
@@ -212,11 +212,11 @@ namespace netDxf
         /// </summary>
         public double M31
         {
-            get { return this.m31; }
+            get { return m31; }
             set
             {
-                this.isIdentity = false;
-                this.m31 = value;
+                isIdentity = false;
+                m31 = value;
             }
         }
 
@@ -225,8 +225,8 @@ namespace netDxf
         /// </summary>
         public double M32
         {
-            get { return this.m32; }
-            set { this.m32 = value; }
+            get { return m32; }
+            set { m32 = value; }
         }
 
         /// <summary>
@@ -234,11 +234,11 @@ namespace netDxf
         /// </summary>
         public double M33
         {
-            get { return this.m33; }
+            get { return m33; }
             set
             {
-                this.isIdentity = false;
-                this.m33 = value;
+                isIdentity = false;
+                m33 = value;
             }
         }
 
@@ -247,7 +247,7 @@ namespace netDxf
         /// </summary>
         public bool IsIdentity
         {
-            get { return this.isIdentity; }
+            get { return isIdentity; }
         }
 
         #endregion
@@ -412,14 +412,14 @@ namespace netDxf
         /// <returns>Determinant.</returns>
         public double Determinant()
         {
-            if (this.IsIdentity) return 1.0;
+            if (IsIdentity) return 1.0;
 
-            return this.m11*this.m22*this.m33 +
-                   this.m12*this.m23*this.m31 +
-                   this.m13*this.m21*this.m32 -
-                   this.m13*this.m22*this.m31 -
-                   this.m11*this.m23*this.m32 -
-                   this.m12*this.m21*this.m33;
+            return m11*m22*m33 +
+                   m12*m23*m31 +
+                   m13*m21*m32 -
+                   m13*m22*m31 -
+                   m11*m23*m32 -
+                   m12*m21*m33;
         }
 
         /// <summary>
@@ -428,24 +428,24 @@ namespace netDxf
         /// <returns>Inverse Matrix3.</returns>
         public Matrix3 Inverse()
         {
-            if (this.IsIdentity) return Identity;
+            if (IsIdentity) return Identity;
 
-            double det = this.Determinant();
+            double det = Determinant();
             if (MathHelper.IsZero(det))
                 throw new ArithmeticException("The matrix is not invertible.");
 
             det = 1/det;
 
             return new Matrix3(
-                det*(this.m22*this.m33 - this.m23*this.m32),
-                det*(this.m13*this.m32 - this.m12*this.m33),
-                det*(this.m12*this.m23 - this.m13*this.m22),
-                det*(this.m23*this.m31 - this.m21*this.m33),
-                det*(this.m11*this.m33 - this.m13*this.m31),
-                det*(this.m13*this.m21 - this.m11*this.m23),
-                det*(this.m21*this.m32 - this.m22*this.m31),
-                det*(this.m12*this.m31 - this.m11*this.m32),
-                det*(this.m11*this.m22 - this.m12*this.m21)
+                det*(m22*m33 - m23*m32),
+                det*(m13*m32 - m12*m33),
+                det*(m12*m23 - m13*m22),
+                det*(m23*m31 - m21*m33),
+                det*(m11*m33 - m13*m31),
+                det*(m13*m21 - m11*m23),
+                det*(m21*m32 - m22*m31),
+                det*(m12*m31 - m11*m32),
+                det*(m11*m22 - m12*m21)
                 );
         }
 
@@ -455,9 +455,9 @@ namespace netDxf
         /// <returns>Transpose matrix.</returns>
         public Matrix3 Transpose()
         {
-            if (this.IsIdentity) return Identity;
+            if (IsIdentity) return Identity;
 
-            return new Matrix3(this.m11, this.m21, this.m31, this.m12, this.m22, this.m32, this.m13, this.m23, this.m33);
+            return new Matrix3(m11, m21, m31, m12, m22, m32, m13, m23, m33);
         }
 
         #endregion
@@ -569,7 +569,7 @@ namespace netDxf
         /// <returns>True if the matrix components are almost equal or false in any other case.</returns>
         public bool Equals(Matrix3 other)
         {
-            return this.Equals(other, MathHelper.Epsilon);
+            return Equals(other, MathHelper.Epsilon);
         }
 
         /// <summary>
@@ -581,15 +581,15 @@ namespace netDxf
         public bool Equals(Matrix3 obj, double threshold)
         {
             return
-                MathHelper.IsEqual(obj.M11, this.M11, threshold) &&
-                MathHelper.IsEqual(obj.M12, this.M12, threshold) &&
-                MathHelper.IsEqual(obj.M13, this.M13, threshold) &&
-                MathHelper.IsEqual(obj.M21, this.M21, threshold) &&
-                MathHelper.IsEqual(obj.M22, this.M22, threshold) &&
-                MathHelper.IsEqual(obj.M23, this.M23, threshold) &&
-                MathHelper.IsEqual(obj.M31, this.M31, threshold) &&
-                MathHelper.IsEqual(obj.M32, this.M32, threshold) &&
-                MathHelper.IsEqual(obj.M33, this.M33, threshold);
+                MathHelper.IsEqual(obj.M11, M11, threshold) &&
+                MathHelper.IsEqual(obj.M12, M12, threshold) &&
+                MathHelper.IsEqual(obj.M13, M13, threshold) &&
+                MathHelper.IsEqual(obj.M21, M21, threshold) &&
+                MathHelper.IsEqual(obj.M22, M22, threshold) &&
+                MathHelper.IsEqual(obj.M23, M23, threshold) &&
+                MathHelper.IsEqual(obj.M31, M31, threshold) &&
+                MathHelper.IsEqual(obj.M32, M32, threshold) &&
+                MathHelper.IsEqual(obj.M33, M33, threshold);
         }
 
         /// <summary>
@@ -600,7 +600,7 @@ namespace netDxf
         public override bool Equals(object obj)
         {
             if (obj is Matrix3)
-                return this.Equals((Matrix3) obj);
+                return Equals((Matrix3) obj);
             return false;
         }
 
@@ -611,9 +611,9 @@ namespace netDxf
         public override int GetHashCode()
         {
             return
-                this.M11.GetHashCode() ^ this.M12.GetHashCode() ^ this.M13.GetHashCode() ^
-                this.M21.GetHashCode() ^ this.M22.GetHashCode() ^ this.M23.GetHashCode() ^
-                this.M31.GetHashCode() ^ this.M32.GetHashCode() ^ this.M33.GetHashCode();
+                M11.GetHashCode() ^ M12.GetHashCode() ^ M13.GetHashCode() ^
+                M21.GetHashCode() ^ M22.GetHashCode() ^ M23.GetHashCode() ^
+                M31.GetHashCode() ^ M32.GetHashCode() ^ M33.GetHashCode();
         }
 
         #endregion
@@ -627,9 +627,9 @@ namespace netDxf
         public override string ToString()
         {
             StringBuilder s = new StringBuilder();
-            s.Append(string.Format("|{0}{3} {1}{3} {2}|" + Environment.NewLine, this.m11, this.m12, this.m13, Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator));
-            s.Append(string.Format("|{0}{3} {1}{3} {2}|" + Environment.NewLine, this.m21, this.m22, this.m23, Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator));
-            s.Append(string.Format("|{0}{3} {1}{3} {2}|" + Environment.NewLine, this.m31, this.m32, this.m33, Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator));
+            s.Append(string.Format("|{0}{3} {1}{3} {2}|" + Environment.NewLine, m11, m12, m13, Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator));
+            s.Append(string.Format("|{0}{3} {1}{3} {2}|" + Environment.NewLine, m21, m22, m23, Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator));
+            s.Append(string.Format("|{0}{3} {1}{3} {2}|" + Environment.NewLine, m31, m32, m33, Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator));
             return s.ToString();
         }
 
@@ -642,9 +642,9 @@ namespace netDxf
         {
             string separator = Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator;
             StringBuilder s = new StringBuilder();
-            s.Append(string.Format("|{0}{3}{1}{3}{2}|" + Environment.NewLine, this.m11.ToString(provider), this.m12.ToString(provider), this.m13.ToString(provider), separator));
-            s.Append(string.Format("|{0}{3}{1}{3}{2}|" + Environment.NewLine, this.m21.ToString(provider), this.m22.ToString(provider), this.m23.ToString(provider), separator));
-            s.Append(string.Format("|{0}{3}{1}{3}{2}|" + Environment.NewLine, this.m31.ToString(provider), this.m32.ToString(provider), this.m33.ToString(provider), separator));
+            s.Append(string.Format("|{0}{3}{1}{3}{2}|" + Environment.NewLine, m11.ToString(provider), m12.ToString(provider), m13.ToString(provider), separator));
+            s.Append(string.Format("|{0}{3}{1}{3}{2}|" + Environment.NewLine, m21.ToString(provider), m22.ToString(provider), m23.ToString(provider), separator));
+            s.Append(string.Format("|{0}{3}{1}{3}{2}|" + Environment.NewLine, m31.ToString(provider), m32.ToString(provider), m33.ToString(provider), separator));
             return s.ToString();
         }
 

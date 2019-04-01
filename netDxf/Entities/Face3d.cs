@@ -104,7 +104,7 @@ namespace netDxf.Entities
             this.secondVertex = secondVertex;
             this.thirdVertex = thirdVertex;
             this.fourthVertex = fourthVertex;
-            this.edgeFlags = Face3dEdgeFlags.Visibles;
+            edgeFlags = Face3dEdgeFlags.Visibles;
         }
 
         #endregion
@@ -116,8 +116,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 FirstVertex
         {
-            get { return this.firstVertex; }
-            set { this.firstVertex = value; }
+            get { return firstVertex; }
+            set { firstVertex = value; }
         }
 
         /// <summary>
@@ -125,8 +125,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 SecondVertex
         {
-            get { return this.secondVertex; }
-            set { this.secondVertex = value; }
+            get { return secondVertex; }
+            set { secondVertex = value; }
         }
 
         /// <summary>
@@ -134,8 +134,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 ThirdVertex
         {
-            get { return this.thirdVertex; }
-            set { this.thirdVertex = value; }
+            get { return thirdVertex; }
+            set { thirdVertex = value; }
         }
 
         /// <summary>
@@ -143,8 +143,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 FourthVertex
         {
-            get { return this.fourthVertex; }
-            set { this.fourthVertex = value; }
+            get { return fourthVertex; }
+            set { fourthVertex = value; }
         }
 
         /// <summary>
@@ -152,8 +152,8 @@ namespace netDxf.Entities
         /// </summary>
         public Face3dEdgeFlags EdgeFlags
         {
-            get { return this.edgeFlags; }
-            set { this.edgeFlags = value; }
+            get { return edgeFlags; }
+            set { edgeFlags = value; }
         }
 
         #endregion
@@ -167,10 +167,10 @@ namespace netDxf.Entities
         /// <param name="translation">Translation vector.</param>
         public override void TransformBy(Matrix3 transformation, Vector3 translation)
         {
-            this.FirstVertex = transformation * this.FirstVertex + translation;
-            this.SecondVertex = transformation * this.SecondVertex + translation;
-            this.ThirdVertex = transformation * this.ThirdVertex + translation;
-            this.FourthVertex = transformation * this.FourthVertex + translation;
+            FirstVertex = transformation * FirstVertex + translation;
+            SecondVertex = transformation * SecondVertex + translation;
+            ThirdVertex = transformation * ThirdVertex + translation;
+            FourthVertex = transformation * FourthVertex + translation;
         }
 
         /// <summary>
@@ -182,23 +182,23 @@ namespace netDxf.Entities
             Face3d entity = new Face3d
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //Face3d properties
-                FirstVertex = this.firstVertex,
-                SecondVertex = this.secondVertex,
-                ThirdVertex = this.thirdVertex,
-                FourthVertex = this.fourthVertex,
-                EdgeFlags = this.edgeFlags
+                FirstVertex = firstVertex,
+                SecondVertex = secondVertex,
+                ThirdVertex = thirdVertex,
+                FourthVertex = fourthVertex,
+                EdgeFlags = edgeFlags
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

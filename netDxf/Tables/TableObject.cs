@@ -43,7 +43,7 @@ namespace netDxf.Tables
         public event NameChangedEventHandler NameChanged;
         protected virtual void OnNameChangedEvent(string oldName, string newName)
         {
-            NameChangedEventHandler ae = this.NameChanged;
+            NameChangedEventHandler ae = NameChanged;
             if (ae != null)
             {
                 TableObjectChangedEventArgs<string> eventArgs = new TableObjectChangedEventArgs<string>(oldName, newName);
@@ -54,7 +54,7 @@ namespace netDxf.Tables
         public event XDataAddAppRegEventHandler XDataAddAppReg;
         protected virtual void OnXDataAddAppRegEvent(ApplicationRegistry item)
         {
-            XDataAddAppRegEventHandler ae = this.XDataAddAppReg;
+            XDataAddAppRegEventHandler ae = XDataAddAppReg;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
         }
@@ -62,7 +62,7 @@ namespace netDxf.Tables
         public event XDataRemoveAppRegEventHandler XDataRemoveAppReg;
         protected virtual void OnXDataRemoveAppRegEvent(ApplicationRegistry item)
         {
-            XDataRemoveAppRegEventHandler ae = this.XDataRemoveAppReg;
+            XDataRemoveAppRegEventHandler ae = XDataRemoveAppReg;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
         }
@@ -96,10 +96,10 @@ namespace netDxf.Tables
             }
 
             this.name = name;
-            this.reserved = false;
-            this.xData = new XDataDictionary();
-            this.xData.AddAppReg += this.XData_AddAppReg;
-            this.xData.RemoveAppReg += this.XData_RemoveAppReg;
+            reserved = false;
+            xData = new XDataDictionary();
+            xData.AddAppReg += XData_AddAppReg;
+            xData.RemoveAppReg += XData_RemoveAppReg;
         }
 
         #endregion
@@ -112,8 +112,8 @@ namespace netDxf.Tables
         /// <remarks>Table object names are case insensitive.</remarks>
         public string Name
         {
-            get { return this.name; }
-            set { this.SetName(value, true); }
+            get { return name; }
+            set { SetName(value, true); }
         }
 
         /// <summary>
@@ -121,8 +121,8 @@ namespace netDxf.Tables
         /// </summary>
         public bool IsReserved
         {
-            get { return this.reserved; }
-            internal set { this.reserved = value; }
+            get { return reserved; }
+            internal set { reserved = value; }
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace netDxf.Tables
         /// </summary>
         public XDataDictionary XData
         {
-            get { return this.xData; }
+            get { return xData; }
         }
 
         #endregion
@@ -180,15 +180,15 @@ namespace netDxf.Tables
         {
             if (string.IsNullOrEmpty(newName))
                 throw new ArgumentNullException(nameof(newName));
-            if (this.IsReserved)
+            if (IsReserved)
                 throw new ArgumentException("Reserved table objects cannot be renamed.", nameof(newName));
-            if (string.Equals(this.name, newName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(name, newName, StringComparison.OrdinalIgnoreCase))
                 return;
             if (checkName)
                 if (!IsValidName(newName))
                     throw new ArgumentException("The following characters \\<>/?\":;*|,=` are not supported for table object names.", nameof(newName));
-            this.OnNameChangedEvent(this.name, newName);
-            this.name = newName;
+            OnNameChangedEvent(name, newName);
+            name = newName;
         }
 
         #endregion
@@ -201,7 +201,7 @@ namespace netDxf.Tables
         /// <returns>The string representation.</returns>
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
 
         #endregion
@@ -220,7 +220,7 @@ namespace netDxf.Tables
         /// <remarks>If both table objects are no of the same type it will return zero. The comparison is made by their names.</remarks>
         public int CompareTo(object other)
         {
-            return this.CompareTo((TableObject) other);
+            return CompareTo((TableObject) other);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace netDxf.Tables
             if (other == null)
                 throw new ArgumentNullException(nameof(other));
 
-            return this.GetType() == other.GetType() ? string.Compare(this.Name, other.Name, StringComparison.OrdinalIgnoreCase) : 0;
+            return GetType() == other.GetType() ? string.Compare(Name, other.Name, StringComparison.OrdinalIgnoreCase) : 0;
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace netDxf.Tables
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
-            return this.Name.GetHashCode();
+            return Name.GetHashCode();
         }
 
         ///// <summary>
@@ -330,10 +330,10 @@ namespace netDxf.Tables
             if (other == null)
                 return false;
 
-            if (this.GetType() != other.GetType())
+            if (GetType() != other.GetType())
                 return false;
 
-            return this.Equals((TableObject) other);
+            return Equals((TableObject) other);
         }
 
         /// <summary>
@@ -350,7 +350,7 @@ namespace netDxf.Tables
             if (other == null)
                 return false;
 
-            return string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase);
         }
 
         #endregion
@@ -376,12 +376,12 @@ namespace netDxf.Tables
 
         private void XData_AddAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
         {
-            this.OnXDataAddAppRegEvent(e.Item);
+            OnXDataAddAppRegEvent(e.Item);
         }
 
         private void XData_RemoveAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
         {
-            this.OnXDataRemoveAppRegEvent(e.Item);
+            OnXDataRemoveAppRegEvent(e.Item);
         }
 
         #endregion

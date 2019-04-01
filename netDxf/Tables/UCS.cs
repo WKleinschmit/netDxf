@@ -58,11 +58,11 @@ namespace netDxf.Tables
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name), "The UCS name should be at least one character long.");
 
-            this.origin = Vector3.Zero;
-            this.xAxis = Vector3.UnitX;
-            this.yAxis = Vector3.UnitY;
-            this.zAxis = Vector3.UnitZ;
-            this.elevation = 0;
+            origin = Vector3.Zero;
+            xAxis = Vector3.UnitX;
+            yAxis = Vector3.UnitY;
+            zAxis = Vector3.UnitZ;
+            elevation = 0;
         }
 
         /// <summary>
@@ -86,12 +86,12 @@ namespace netDxf.Tables
             if (!Vector3.ArePerpendicular(xDirection, yDirection))
                 throw new ArgumentException("X-axis direction and Y-axis direction must be perpendicular.");
             this.origin = origin;
-            this.xAxis = xDirection;
-            this.xAxis.Normalize();
-            this.yAxis = yDirection;
-            this.yAxis.Normalize();
-            this.zAxis = Vector3.CrossProduct(this.xAxis, this.yAxis);
-            this.elevation = 0;
+            xAxis = xDirection;
+            xAxis.Normalize();
+            yAxis = yDirection;
+            yAxis.Normalize();
+            zAxis = Vector3.CrossProduct(xAxis, yAxis);
+            elevation = 0;
         }
 
         #endregion
@@ -103,8 +103,8 @@ namespace netDxf.Tables
         /// </summary>
         public Vector3 Origin
         {
-            get { return this.origin; }
-            set { this.origin = value; }
+            get { return origin; }
+            set { origin = value; }
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace netDxf.Tables
         /// </summary>
         public Vector3 XAxis
         {
-            get { return this.xAxis; }
+            get { return xAxis; }
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace netDxf.Tables
         /// </summary>
         public Vector3 YAxis
         {
-            get { return this.yAxis; }
+            get { return yAxis; }
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace netDxf.Tables
         /// </summary>
         public Vector3 ZAxis
         {
-            get { return this.zAxis; }
+            get { return zAxis; }
         }
 
         /// <summary>
@@ -136,8 +136,8 @@ namespace netDxf.Tables
         /// </summary>
         public double Elevation
         {
-            get { return this.elevation; }
-            set { this.elevation = value; }
+            get { return elevation; }
+            set { elevation = value; }
         }
 
         /// <summary>
@@ -162,11 +162,11 @@ namespace netDxf.Tables
         {
             if (!Vector3.ArePerpendicular(xDirection, yDirection))
                 throw new ArgumentException("X-axis direction and Y-axis direction must be perpendicular.");
-            this.xAxis = xDirection;
-            this.xAxis.Normalize();
-            this.yAxis = yDirection;
-            this.yAxis.Normalize();
-            this.zAxis = Vector3.CrossProduct(this.xAxis, this.yAxis);
+            xAxis = xDirection;
+            xAxis.Normalize();
+            yAxis = yDirection;
+            yAxis.Normalize();
+            zAxis = Vector3.CrossProduct(xAxis, yAxis);
         }
 
         /// <summary>
@@ -224,14 +224,14 @@ namespace netDxf.Tables
         {
             UCS copy = new UCS(newName)
             {
-                Origin = this.origin,
-                xAxis = this.xAxis,
-                yAxis = this.yAxis,
-                zAxis = this.zAxis,
-                Elevation = this.elevation
+                Origin = origin,
+                xAxis = xAxis,
+                yAxis = yAxis,
+                zAxis = zAxis,
+                Elevation = elevation
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 copy.XData.Add((XData)data.Clone());
 
             return copy;
@@ -243,7 +243,7 @@ namespace netDxf.Tables
         /// <returns>A new UCS that is a copy of this instance.</returns>
         public override object Clone()
         {
-            return this.Clone(this.Name);
+            return Clone(Name);
         }
 
         #endregion

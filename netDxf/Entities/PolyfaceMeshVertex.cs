@@ -65,8 +65,8 @@ namespace netDxf.Entities
         public PolyfaceMeshVertex(Vector3 location)
             : base(DxfObjectCode.Vertex)
         {
-            this.flags = VertexTypeFlags.PolyfaceMeshVertex | VertexTypeFlags.Polygon3dMesh;
-            this.position = location;
+            flags = VertexTypeFlags.PolyfaceMeshVertex | VertexTypeFlags.Polygon3dMesh;
+            position = location;
         }
 
         #endregion
@@ -78,8 +78,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace netDxf.Entities
         /// </summary>
         internal VertexTypeFlags Flags
         {
-            get { return this.flags; }
+            get { return flags; }
         }
 
         #endregion
@@ -100,7 +100,7 @@ namespace netDxf.Entities
         /// <returns>The string representation.</returns>
         public override string ToString()
         {
-            return string.Format("{0}: {1}", "PolyfaceMeshVertex", this.position);
+            return string.Format("{0}: {1}", "PolyfaceMeshVertex", position);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace netDxf.Entities
         /// <returns>A new PolyfaceMeshVertex that is a copy of this instance.</returns>
         public object Clone()
         {
-            return new PolyfaceMeshVertex(this.position);
+            return new PolyfaceMeshVertex(position);
         }
 
         #endregion

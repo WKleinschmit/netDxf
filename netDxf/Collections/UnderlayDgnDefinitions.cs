@@ -43,7 +43,7 @@ namespace netDxf.Collections
         internal UnderlayDgnDefinitions(DxfDocument document, string handle)
             : base(document, DxfObjectCode.UnderlayDgnDefinitionDictionary, handle)
         {
-            this.MaxCapacity = int.MaxValue;
+            MaxCapacity = int.MaxValue;
         }
 
         #endregion
@@ -61,26 +61,26 @@ namespace netDxf.Collections
         /// </returns>
         internal override UnderlayDgnDefinition Add(UnderlayDgnDefinition underlayDgnDefinition, bool assignHandle)
         {
-            if (this.list.Count >= this.MaxCapacity)
-                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
+            if (list.Count >= MaxCapacity)
+                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", CodeName, MaxCapacity));
             if (underlayDgnDefinition == null)
                 throw new ArgumentNullException(nameof(underlayDgnDefinition));
 
             UnderlayDgnDefinition add;
-            if (this.list.TryGetValue(underlayDgnDefinition.Name, out add))
+            if (list.TryGetValue(underlayDgnDefinition.Name, out add))
                 return add;
 
             if (assignHandle || string.IsNullOrEmpty(underlayDgnDefinition.Handle))
-                this.Owner.NumHandles = underlayDgnDefinition.AsignHandle(this.Owner.NumHandles);
+                Owner.NumHandles = underlayDgnDefinition.AsignHandle(Owner.NumHandles);
 
-            this.list.Add(underlayDgnDefinition.Name, underlayDgnDefinition);
-            this.references.Add(underlayDgnDefinition.Name, new List<DxfObject>());
+            list.Add(underlayDgnDefinition.Name, underlayDgnDefinition);
+            references.Add(underlayDgnDefinition.Name, new List<DxfObject>());
 
             underlayDgnDefinition.Owner = this;
 
-            underlayDgnDefinition.NameChanged += this.Item_NameChanged;
+            underlayDgnDefinition.NameChanged += Item_NameChanged;
 
-            this.Owner.AddedObjects.Add(underlayDgnDefinition.Handle, underlayDgnDefinition);
+            Owner.AddedObjects.Add(underlayDgnDefinition.Handle, underlayDgnDefinition);
 
             return underlayDgnDefinition;
         }
@@ -93,7 +93,7 @@ namespace netDxf.Collections
         /// <remarks>Any underlay definition referenced by objects cannot be removed.</remarks>
         public override bool Remove(string name)
         {
-            return this.Remove(this[name]);
+            return Remove(this[name]);
         }
 
         /// <summary>
@@ -107,23 +107,23 @@ namespace netDxf.Collections
             if (item == null)
                 return false;
 
-            if (!this.Contains(item))
+            if (!Contains(item))
                 return false;
 
             if (item.IsReserved)
                 return false;
 
-            if (this.references[item.Name].Count != 0)
+            if (references[item.Name].Count != 0)
                 return false;
 
-            this.Owner.AddedObjects.Remove(item.Handle);
-            this.references.Remove(item.Name);
-            this.list.Remove(item.Name);
+            Owner.AddedObjects.Remove(item.Handle);
+            references.Remove(item.Name);
+            list.Remove(item.Name);
 
             item.Handle = null;
             item.Owner = null;
 
-            item.NameChanged -= this.Item_NameChanged;
+            item.NameChanged -= Item_NameChanged;
 
             return true;
         }
@@ -134,15 +134,15 @@ namespace netDxf.Collections
 
         private void Item_NameChanged(TableObject sender, TableObjectChangedEventArgs<string> e)
         {
-            if (this.Contains(e.NewValue))
+            if (Contains(e.NewValue))
                 throw new ArgumentException("There is already another DGN underlay definition with the same name.");
 
-            this.list.Remove(sender.Name);
-            this.list.Add(e.NewValue, (UnderlayDgnDefinition) sender);
+            list.Remove(sender.Name);
+            list.Add(e.NewValue, (UnderlayDgnDefinition) sender);
 
-            List<DxfObject> refs = this.references[sender.Name];
-            this.references.Remove(sender.Name);
-            this.references.Add(e.NewValue, refs);
+            List<DxfObject> refs = references[sender.Name];
+            references.Remove(sender.Name);
+            references.Add(e.NewValue, refs);
         }
 
         #endregion

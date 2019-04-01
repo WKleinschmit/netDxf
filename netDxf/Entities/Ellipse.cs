@@ -83,10 +83,10 @@ namespace netDxf.Entities
             if (minorAxis <= 0)
                 throw new ArgumentOutOfRangeException(nameof(minorAxis), minorAxis, "The minor axis value must be greater than zero.");
             this.minorAxis = minorAxis;
-            this.startAngle = 0.0;
-            this.endAngle = 0.0;
-            this.rotation = 0.0;
-            this.thickness = 0.0;
+            startAngle = 0.0;
+            endAngle = 0.0;
+            rotation = 0.0;
+            thickness = 0.0;
         }
 
         #endregion
@@ -99,8 +99,8 @@ namespace netDxf.Entities
         /// <remarks>The center Z coordinate represents the elevation of the arc along the normal.</remarks>
         public Vector3 Center
         {
-            get { return this.center; }
-            set { this.center = value; }
+            get { return center; }
+            set { center = value; }
         }
 
         /// <summary>
@@ -108,12 +108,12 @@ namespace netDxf.Entities
         /// </summary>
         public double MajorAxis
         {
-            get { return this.majorAxis; }
+            get { return majorAxis; }
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The major axis value must be greater than zero.");
-                this.majorAxis = value;
+                majorAxis = value;
             }
         }
 
@@ -122,12 +122,12 @@ namespace netDxf.Entities
         /// </summary>
         public double MinorAxis
         {
-            get { return this.minorAxis; }
+            get { return minorAxis; }
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The minor axis value must be greater than zero.");
-                this.minorAxis = value;
+                minorAxis = value;
             }
         }
 
@@ -136,8 +136,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Rotation
         {
-            get { return this.rotation; }
-            set { this.rotation = MathHelper.NormalizeAngle(value); }
+            get { return rotation; }
+            set { rotation = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -146,8 +146,8 @@ namespace netDxf.Entities
         /// <remarks>To get a full ellipse set the start angle equal to the end angle.</remarks>
         public double StartAngle
         {
-            get { return this.startAngle; }
-            set { this.startAngle = MathHelper.NormalizeAngle(value); }
+            get { return startAngle; }
+            set { startAngle = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -156,8 +156,8 @@ namespace netDxf.Entities
         /// <remarks>To get a full ellipse set the end angle equal to the start angle.</remarks>
         public double EndAngle
         {
-            get { return this.endAngle; }
-            set { this.endAngle = MathHelper.NormalizeAngle(value); }
+            get { return endAngle; }
+            set { endAngle = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -165,8 +165,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Thickness
         {
-            get { return this.thickness; }
-            set { this.thickness = value; }
+            get { return thickness; }
+            set { thickness = value; }
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace netDxf.Entities
         /// <remarks>An ellipse is considered full when its start and end angles are equal.</remarks>
         public bool IsFullEllipse
         {
-            get { return MathHelper.IsEqual(this.startAngle, this.endAngle); }
+            get { return MathHelper.IsEqual(startAngle, endAngle); }
         }
 
         #endregion
@@ -189,8 +189,8 @@ namespace netDxf.Entities
         /// <returns>A local point on the ellipse for the given angle relative to the center.</returns>
         public Vector2 PolarCoordinateRelativeToCenter(double angle)
         {
-            double a = this.MajorAxis*0.5;
-            double b = this.MinorAxis*0.5;
+            double a = MajorAxis*0.5;
+            double b = MinorAxis*0.5;
             double radians = angle*MathHelper.DegToRad;
 
             double a1 = a*Math.Sin(radians);
@@ -210,11 +210,11 @@ namespace netDxf.Entities
         public List<Vector2> PolygonalVertexes(int precision)
         {
             List<Vector2> points = new List<Vector2>();
-            double beta = this.rotation * MathHelper.DegToRad;
+            double beta = rotation * MathHelper.DegToRad;
             double sinbeta = Math.Sin(beta);
             double cosbeta = Math.Cos(beta);
 
-            if (this.IsFullEllipse)
+            if (IsFullEllipse)
             {
                 double delta = MathHelper.TwoPI/precision;
                 for (int i = 0; i < precision; i++)
@@ -223,21 +223,21 @@ namespace netDxf.Entities
                     double sinalpha = Math.Sin(angle);
                     double cosalpha = Math.Cos(angle);
 
-                    double pointX = 0.5*(this.majorAxis*cosalpha*cosbeta - this.minorAxis*sinalpha*sinbeta);
-                    double pointY = 0.5*(this.majorAxis*cosalpha*sinbeta + this.minorAxis*sinalpha*cosbeta);
+                    double pointX = 0.5*(majorAxis*cosalpha*cosbeta - minorAxis*sinalpha*sinbeta);
+                    double pointY = 0.5*(majorAxis*cosalpha*sinbeta + minorAxis*sinalpha*cosbeta);
 
                     points.Add(new Vector2(pointX, pointY));
                 }
             }
             else
             {
-                double start = this.startAngle;
-                double end = this.endAngle;
+                double start = startAngle;
+                double end = endAngle;
                 if (end < start) end += 360.0;
                 double delta = (end - start) / precision;
                 for (int i = 0; i <= precision; i++)
                 {
-                    Vector2 point = this.PolarCoordinateRelativeToCenter(start + delta*i);
+                    Vector2 point = PolarCoordinateRelativeToCenter(start + delta*i);
                     // we need to apply the ellipse rotation to the local point
                     double pointX = point.X * cosbeta - point.Y * sinbeta;
                     double pointY = point.X * sinbeta + point.Y * cosbeta;
@@ -254,20 +254,20 @@ namespace netDxf.Entities
         /// <returns>A new instance of <see cref="LwPolyline">LightWeightPolyline</see> that represents the ellipse.</returns>
         public LwPolyline ToPolyline(int precision)
         {
-            IEnumerable<Vector2> vertexes = this.PolygonalVertexes(precision);
-            Vector3 ocsCenter = MathHelper.Transform(this.center, this.Normal, CoordinateSystem.World, CoordinateSystem.Object);
+            IEnumerable<Vector2> vertexes = PolygonalVertexes(precision);
+            Vector3 ocsCenter = MathHelper.Transform(center, Normal, CoordinateSystem.World, CoordinateSystem.Object);
             LwPolyline poly = new LwPolyline
             {
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
                 Elevation = ocsCenter.Z,
-                Thickness = this.Thickness,
-                IsClosed = this.IsFullEllipse
+                Thickness = Thickness,
+                IsClosed = IsFullEllipse
             };
 
             foreach (Vector2 v in vertexes)
@@ -296,11 +296,11 @@ namespace netDxf.Entities
             double newRotation;
             double newScale;
 
-            newCenter = transformation * this.Center + translation;
-            newNormal = transformation * this.Normal;
+            newCenter = transformation * Center + translation;
+            newNormal = transformation * Normal;
 
-            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
-            transOW *= Matrix3.RotationZ(this.Rotation * MathHelper.DegToRad);
+            Matrix3 transOW = MathHelper.ArbitraryAxis(Normal);
+            transOW *= Matrix3.RotationZ(Rotation * MathHelper.DegToRad);
 
             Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal);
             transWO = transWO.Transpose();
@@ -346,25 +346,25 @@ namespace netDxf.Entities
 
             newScale = newNormal.Modulus();
 
-            newMajorAxis = this.MajorAxis * newScale;
+            newMajorAxis = MajorAxis * newScale;
             newMajorAxis = MathHelper.IsZero(newMajorAxis) ? MathHelper.Epsilon : newMajorAxis;
 
-            newMinorAxis = this.MinorAxis * newScale;
+            newMinorAxis = MinorAxis * newScale;
             newMinorAxis = MathHelper.IsZero(newMinorAxis) ? MathHelper.Epsilon : newMinorAxis;
 
-            this.Center = newCenter;
-            this.Normal = newNormal;
-            this.Rotation = newRotation;
+            Center = newCenter;
+            Normal = newNormal;
+            Rotation = newRotation;
 
             if (newMinorAxis > newMajorAxis)
             {
-                this.MajorAxis = newMinorAxis;
-                this.MinorAxis = newMajorAxis;
+                MajorAxis = newMinorAxis;
+                MinorAxis = newMajorAxis;
             }
             else
             {
-                this.MajorAxis = newMajorAxis;
-                this.MinorAxis = newMinorAxis;
+                MajorAxis = newMajorAxis;
+                MinorAxis = newMinorAxis;
             }
         }
 
@@ -425,25 +425,25 @@ namespace netDxf.Entities
             Ellipse entity = new Ellipse
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //Ellipse properties
-                Center = this.center,
-                MajorAxis = this.majorAxis,
-                MinorAxis = this.minorAxis,
-                Rotation = this.rotation,
-                StartAngle = this.startAngle,
-                EndAngle = this.endAngle,
-                Thickness = this.thickness
+                Center = center,
+                MajorAxis = majorAxis,
+                MinorAxis = minorAxis,
+                Rotation = rotation,
+                StartAngle = startAngle,
+                EndAngle = endAngle,
+                Thickness = thickness
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

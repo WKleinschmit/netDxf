@@ -62,7 +62,7 @@ namespace netDxf.Entities
             if (radius <= 0)
                 throw new ArgumentOutOfRangeException(nameof(radius), radius, "The circle radius must be greater than zero.");
             this.radius = radius;
-            this.thickness = 0.0;
+            thickness = 0.0;
         }
 
         /// <summary>
@@ -84,8 +84,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Center
         {
-            get { return this.center; }
-            set { this.center = value; }
+            get { return center; }
+            set { center = value; }
         }
 
         /// <summary>
@@ -93,12 +93,12 @@ namespace netDxf.Entities
         /// </summary>
         public double Radius
         {
-            get { return this.radius; }
+            get { return radius; }
             set
             {
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The circle radius must be greater than zero.");
-                this.radius = value;
+                radius = value;
             }
         }
 
@@ -107,8 +107,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Thickness
         {
-            get { return this.thickness; }
-            set { this.thickness = value; }
+            get { return thickness; }
+            set { thickness = value; }
         }
 
         #endregion
@@ -132,8 +132,8 @@ namespace netDxf.Entities
             for (int i = 0; i < precision; i++)
             {
                 double angle = delta*i;
-                double sine = this.radius*Math.Sin(angle);
-                double cosine = this.radius*Math.Cos(angle);
+                double sine = radius*Math.Sin(angle);
+                double cosine = radius*Math.Cos(angle);
                 ocsVertexes.Add(new Vector2(cosine, sine));
             }
             return ocsVertexes;
@@ -146,20 +146,20 @@ namespace netDxf.Entities
         /// <returns>A new instance of <see cref="LwPolyline">LightWeightPolyline</see> that represents the circle.</returns>
         public LwPolyline ToPolyline(int precision)
         {
-            IEnumerable<Vector2> vertexes = this.PolygonalVertexes(precision);
-            Vector3 ocsCenter = MathHelper.Transform(this.Center, this.Normal, CoordinateSystem.World, CoordinateSystem.Object);
+            IEnumerable<Vector2> vertexes = PolygonalVertexes(precision);
+            Vector3 ocsCenter = MathHelper.Transform(Center, Normal, CoordinateSystem.World, CoordinateSystem.Object);
 
             LwPolyline poly = new LwPolyline
             {
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
                 Elevation = ocsCenter.Z,
-                Thickness = this.thickness,
+                Thickness = thickness,
                 IsClosed = true
             };
             foreach (Vector2 v in vertexes)
@@ -186,8 +186,8 @@ namespace netDxf.Entities
             double newRadius;
             double newScale;
 
-            newCenter = transformation * this.Center + translation;
-            newNormal = transformation * this.Normal;
+            newCenter = transformation * Center + translation;
+            newNormal = transformation * Normal;
 
             //Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
             //Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
@@ -201,12 +201,12 @@ namespace netDxf.Entities
             //newRadius = axisPoint.Modulus();
 
             newScale = newNormal.Modulus();
-            newRadius = this.Radius * newScale;
+            newRadius = Radius * newScale;
             newRadius = MathHelper.IsZero(newRadius) ? MathHelper.Epsilon : newRadius;
 
-            this.Normal = newNormal;
-            this.Center = newCenter;
-            this.Radius = newRadius;
+            Normal = newNormal;
+            Center = newCenter;
+            Radius = newRadius;
         }
 
         /// <summary>
@@ -218,21 +218,21 @@ namespace netDxf.Entities
             Circle entity = new Circle
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //Circle properties
-                Center = this.center,
-                Radius = this.radius,
-                Thickness = this.thickness
+                Center = center,
+                Radius = radius,
+                Thickness = thickness
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

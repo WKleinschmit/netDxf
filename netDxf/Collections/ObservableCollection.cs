@@ -50,14 +50,14 @@ namespace netDxf.Collections
 
         protected virtual void OnAddItemEvent(T item)
         {
-            AddItemEventHandler ae = this.AddItem;
+            AddItemEventHandler ae = AddItem;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<T>(item));
         }
 
         protected virtual bool OnBeforeAddItemEvent(T item)
         {
-            BeforeAddItemEventHandler ae = this.BeforeAddItem;
+            BeforeAddItemEventHandler ae = BeforeAddItem;
             if (ae != null)
             {
                 ObservableCollectionEventArgs<T> e = new ObservableCollectionEventArgs<T>(item);
@@ -69,7 +69,7 @@ namespace netDxf.Collections
 
         protected virtual bool OnBeforeRemoveItemEvent(T item)
         {
-            BeforeRemoveItemEventHandler ae = this.BeforeRemoveItem;
+            BeforeRemoveItemEventHandler ae = BeforeRemoveItem;
             if (ae != null)
             {
                 ObservableCollectionEventArgs<T> e = new ObservableCollectionEventArgs<T>(item);
@@ -81,7 +81,7 @@ namespace netDxf.Collections
 
         protected virtual void OnRemoveItemEvent(T item)
         {
-            RemoveItemEventHandler ae = this.RemoveItem;
+            RemoveItemEventHandler ae = RemoveItem;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<T>(item));
         }
@@ -101,7 +101,7 @@ namespace netDxf.Collections
         /// </summary>
         public ObservableCollection()
         {
-            this.innerArray = new List<T>();
+            innerArray = new List<T>();
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace netDxf.Collections
         {
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException(nameof(capacity), "The collection capacity cannot be negative.");
-            this.innerArray = new List<T>(capacity);
+            innerArray = new List<T>(capacity);
         }
 
         #endregion
@@ -126,19 +126,19 @@ namespace netDxf.Collections
         /// <returns>The object at the specified index.</returns>
         public T this[int index]
         {
-            get { return this.innerArray[index]; }
+            get { return innerArray[index]; }
             set
             {
-                T remove = this.innerArray[index];
+                T remove = innerArray[index];
                 T add = value;
 
-                if (this.OnBeforeRemoveItemEvent(remove))
+                if (OnBeforeRemoveItemEvent(remove))
                     return;
-                if (this.OnBeforeAddItemEvent(add))
+                if (OnBeforeAddItemEvent(add))
                     return;
-                this.innerArray[index] = value;
-                this.OnAddItemEvent(add);
-                this.OnRemoveItemEvent(remove);
+                innerArray[index] = value;
+                OnAddItemEvent(add);
+                OnRemoveItemEvent(remove);
             }
         }
 
@@ -147,7 +147,7 @@ namespace netDxf.Collections
         /// </summary>
         public int Count
         {
-            get { return this.innerArray.Count; }
+            get { return innerArray.Count; }
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace netDxf.Collections
         /// </summary>
         public void Reverse()
         {
-            this.innerArray.Reverse();
+            innerArray.Reverse();
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace netDxf.Collections
         /// <param name="comparision">The System.Comparison&lt;T&gt; to use when comparing elements.</param>
         public void Sort(Comparison<T> comparision)
         {
-            this.innerArray.Sort(comparision);
+            innerArray.Sort(comparision);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace netDxf.Collections
         /// <param name="comparer">The System.Collections.Generic.IComparer&lt;T&gt; implementation to use when comparing elements, or null to use the default comparer System.Collections.Generic.Comparer&lt;T&gt;.Default.</param>
         public void Sort(int index, int count, IComparer<T> comparer)
         {
-            this.innerArray.Sort(index, count, comparer);
+            innerArray.Sort(index, count, comparer);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace netDxf.Collections
         /// <param name="comparer">The System.Collections.Generic.IComparer&lt;T&gt; implementation to use when comparing elements, or null to use the default comparer System.Collections.Generic.Comparer&lt;T&gt;.Default.</param>
         public void Sort(IComparer<T> comparer)
         {
-            this.innerArray.Sort(comparer);
+            innerArray.Sort(comparer);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace netDxf.Collections
         /// </summary>
         public void Sort()
         {
-            this.innerArray.Sort();
+            innerArray.Sort();
         }
 
         /// <summary>
@@ -214,10 +214,10 @@ namespace netDxf.Collections
         /// <returns>True if the object has been added to the collection, or false otherwise.</returns>
         public void Add(T item)
         {
-            if (this.OnBeforeAddItemEvent(item))
+            if (OnBeforeAddItemEvent(item))
                 throw new ArgumentException("The item cannot be added to the collection.", nameof(item));
-            this.innerArray.Add(item);
-            this.OnAddItemEvent(item);
+            innerArray.Add(item);
+            OnAddItemEvent(item);
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace netDxf.Collections
                 throw new ArgumentNullException(nameof(collection));
 
             foreach (T item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -241,15 +241,15 @@ namespace netDxf.Collections
         /// <returns>True if the object has been inserted to the collection; otherwise, false.</returns>
         public void Insert(int index, T item)
         {
-            if (index < 0 || index >= this.innerArray.Count)
-                throw new ArgumentOutOfRangeException(string.Format("The parameter index {0} must be in between {1} and {2}.", index, 0, this.innerArray.Count));
-            if (this.OnBeforeRemoveItemEvent(this.innerArray[index]))
+            if (index < 0 || index >= innerArray.Count)
+                throw new ArgumentOutOfRangeException(string.Format("The parameter index {0} must be in between {1} and {2}.", index, 0, innerArray.Count));
+            if (OnBeforeRemoveItemEvent(innerArray[index]))
                 return;
-            if (this.OnBeforeAddItemEvent(item))
+            if (OnBeforeAddItemEvent(item))
                 throw new ArgumentException("The item cannot be added to the collection.", nameof(item));
-            this.OnRemoveItemEvent(this.innerArray[index]);
-            this.innerArray.Insert(index, item);
-            this.OnAddItemEvent(item);
+            OnRemoveItemEvent(innerArray[index]);
+            innerArray.Insert(index, item);
+            OnAddItemEvent(item);
         }
 
         /// <summary>
@@ -259,12 +259,12 @@ namespace netDxf.Collections
         /// <returns>True if object is successfully removed; otherwise, false.</returns>
         public bool Remove(T item)
         {
-            if (!this.innerArray.Contains(item))
+            if (!innerArray.Contains(item))
                 return false;
-            if (this.OnBeforeRemoveItemEvent(item))
+            if (OnBeforeRemoveItemEvent(item))
                 return false;
-            this.innerArray.Remove(item);
-            this.OnRemoveItemEvent(item);
+            innerArray.Remove(item);
+            OnRemoveItemEvent(item);
             return true;
         }
 
@@ -280,12 +280,12 @@ namespace netDxf.Collections
 
             foreach (T item in items)
             {
-                if (!this.innerArray.Contains(item))
+                if (!innerArray.Contains(item))
                     return;
-                if (this.OnBeforeRemoveItemEvent(item))
+                if (OnBeforeRemoveItemEvent(item))
                     return;
-                this.innerArray.Remove(item);
-                this.OnRemoveItemEvent(item);
+                innerArray.Remove(item);
+                OnRemoveItemEvent(item);
             }
         }
 
@@ -295,13 +295,13 @@ namespace netDxf.Collections
         /// <param name="index">The zero-based index of the object to remove.</param>
         public void RemoveAt(int index)
         {
-            if (index < 0 || index >= this.innerArray.Count)
-                throw new ArgumentOutOfRangeException(string.Format("The parameter index {0} must be in between {1} and {2}.", index, 0, this.innerArray.Count));
-            T remove = this.innerArray[index];
-            if (this.OnBeforeRemoveItemEvent(remove))
+            if (index < 0 || index >= innerArray.Count)
+                throw new ArgumentOutOfRangeException(string.Format("The parameter index {0} must be in between {1} and {2}.", index, 0, innerArray.Count));
+            T remove = innerArray[index];
+            if (OnBeforeRemoveItemEvent(remove))
                 return;
-            this.innerArray.RemoveAt(index);
-            this.OnRemoveItemEvent(remove);
+            innerArray.RemoveAt(index);
+            OnRemoveItemEvent(remove);
         }
 
         /// <summary>
@@ -309,11 +309,11 @@ namespace netDxf.Collections
         /// </summary>
         public void Clear()
         {
-            T[] items = new T[this.innerArray.Count];
-            this.innerArray.CopyTo(items, 0);
+            T[] items = new T[innerArray.Count];
+            innerArray.CopyTo(items, 0);
             foreach (T item in items)
             {
-                this.Remove(item);
+                Remove(item);
             }
         }
 
@@ -324,7 +324,7 @@ namespace netDxf.Collections
         /// <returns>The zero-based index of the first occurrence of item within the entire collection, if found; otherwise, –1.</returns>
         public int IndexOf(T item)
         {
-            return this.innerArray.IndexOf(item);
+            return innerArray.IndexOf(item);
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace netDxf.Collections
         /// <returns>True if item is found in the collection; otherwise, false.</returns>
         public bool Contains(T item)
         {
-            return this.innerArray.Contains(item);
+            return innerArray.Contains(item);
         }
 
         /// <summary>
@@ -344,7 +344,7 @@ namespace netDxf.Collections
         /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
         public void CopyTo(T[] array, int arrayIndex)
         {
-            this.innerArray.CopyTo(array, arrayIndex);
+            innerArray.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace netDxf.Collections
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<T> GetEnumerator()
         {
-            return this.innerArray.GetEnumerator();
+            return innerArray.GetEnumerator();
         }
 
         #endregion
@@ -362,17 +362,17 @@ namespace netDxf.Collections
 
         void ICollection<T>.Add(T item)
         {
-            this.Add(item);
+            Add(item);
         }
 
         void IList<T>.Insert(int index, T item)
         {
-            this.Insert(index, item);
+            Insert(index, item);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         #endregion

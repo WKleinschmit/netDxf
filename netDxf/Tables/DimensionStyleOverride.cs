@@ -420,7 +420,7 @@ namespace netDxf.Tables
         /// <returns>A string text.</returns>
         public override string ToString()
         {
-            return string.Format("{0} : {1}", this.type, this.value);
+            return string.Format("{0} : {1}", type, value);
         }
 
         #endregion
@@ -439,7 +439,7 @@ namespace netDxf.Tables
         /// </summary>
         public DimensionStyleOverrideType Type
         {
-            get { return this.type; }
+            get { return type; }
         }
 
         /// <summary>
@@ -447,7 +447,7 @@ namespace netDxf.Tables
         /// </summary>
         public object Value
         {
-            get { return this.value; }
+            get { return value; }
         }
 
         #endregion

@@ -50,8 +50,8 @@ namespace netDxf.Collections
         internal Layouts(DxfDocument document, string handle)
             : base(document, DxfObjectCode.LayoutDictionary, handle)
         {
-            this.MaxCapacity = short.MaxValue;
-            this.references = null;
+            MaxCapacity = short.MaxValue;
+            references = null;
         }
 
         #endregion
@@ -69,9 +69,9 @@ namespace netDxf.Collections
         /// </remarks>
         public new List<DxfObject> GetReferences(string name)
         {
-            if (!this.Contains(name))
+            if (!Contains(name))
                 return new List<DxfObject>();
-            return this.GetReferences(this[name]);
+            return GetReferences(this[name]);
         }
 
         /// <summary>
@@ -103,14 +103,14 @@ namespace netDxf.Collections
         /// </returns>
         internal override Layout Add(Layout layout, bool assignHandle)
         {
-            if (this.list.Count >= this.MaxCapacity)
-                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
+            if (list.Count >= MaxCapacity)
+                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", CodeName, MaxCapacity));
             if (layout == null)
                 throw new ArgumentNullException(nameof(layout));
 
             Layout add;
 
-            if (this.list.TryGetValue(layout.Name, out add))
+            if (list.TryGetValue(layout.Name, out add))
                 return add;
 
             layout.Owner = this;
@@ -121,29 +121,29 @@ namespace netDxf.Collections
             if (layout.IsPaperSpace && associatadBlock == null)
             {
                 // the PaperSpace block names follow the naming Paper_Space, Paper_Space0, Paper_Space1, ...
-                string spaceName = this.list.Count == 1 ? Block.DefaultPaperSpaceName : string.Concat(Block.DefaultPaperSpaceName, this.list.Count - 2);
+                string spaceName = list.Count == 1 ? Block.DefaultPaperSpaceName : string.Concat(Block.DefaultPaperSpaceName, list.Count - 2);
                 associatadBlock = new Block(spaceName, null, null, false);
                 if (layout.TabOrder == 0)
-                    layout.TabOrder = (short) this.list.Count;
+                    layout.TabOrder = (short) list.Count;
             }
 
-            associatadBlock = this.Owner.Blocks.Add(associatadBlock);
+            associatadBlock = Owner.Blocks.Add(associatadBlock);
 
             layout.AssociatedBlock = associatadBlock;
             associatadBlock.Record.Layout = layout;
-            this.Owner.Blocks.References[associatadBlock.Name].Add(layout);
+            Owner.Blocks.References[associatadBlock.Name].Add(layout);
 
             if (layout.Viewport != null)
                 layout.Viewport.Owner = associatadBlock;
 
             if (assignHandle || string.IsNullOrEmpty(layout.Handle))
-                this.Owner.NumHandles = layout.AsignHandle(this.Owner.NumHandles);
+                Owner.NumHandles = layout.AsignHandle(Owner.NumHandles);
 
-            this.list.Add(layout.Name, layout);
+            list.Add(layout.Name, layout);
 
-            layout.NameChanged += this.Item_NameChanged;
+            layout.NameChanged += Item_NameChanged;
 
-            this.Owner.AddedObjects.Add(layout.Handle, layout);
+            Owner.AddedObjects.Add(layout.Handle, layout);
 
             return layout;
         }
@@ -160,7 +160,7 @@ namespace netDxf.Collections
         /// </remarks>
         public override bool Remove(string name)
         {
-            return this.Remove(this[name]);
+            return Remove(this[name]);
         }
 
         /// <summary>
@@ -174,62 +174,62 @@ namespace netDxf.Collections
             if (item == null)
                 return false;
 
-            if (!this.Contains(item))
+            if (!Contains(item))
                 return false;
 
             if (item.IsReserved)
                 return false;
 
             // remove the entities of the layout
-            List<DxfObject> refObjects = this.references[item.Name];
+            List<DxfObject> refObjects = references[item.Name];
             if (refObjects.Count != 0)
             {
                 DxfObject[] entities = new DxfObject[refObjects.Count];
                 refObjects.CopyTo(entities);
                 foreach (DxfObject e in entities)
-                    this.Owner.RemoveEntity(e as EntityObject);
+                    Owner.RemoveEntity(e as EntityObject);
             }
 
             // When a layout is removed we need to rebuild the PaperSpace block names, to follow the naming Paper_Space, Paper_Space0, Paper_Space1, ...
-            foreach (Layout l in this.list.Values)
+            foreach (Layout l in list.Values)
             {
                 // The ModelSpace block cannot be removed. 
                 if (l.IsPaperSpace)
                 {
-                    this.Owner.Blocks.References[l.AssociatedBlock.Name].Remove(l);
-                    this.Owner.Blocks.Remove(l.AssociatedBlock);
+                    Owner.Blocks.References[l.AssociatedBlock.Name].Remove(l);
+                    Owner.Blocks.Remove(l.AssociatedBlock);
                     l.AssociatedBlock = null;
                 }
             }
 
             // remove the layout
-            this.Owner.AddedObjects.Remove(item.Handle);
-            this.references.Remove(item.Name);
-            this.list.Remove(item.Name);
+            Owner.AddedObjects.Remove(item.Handle);
+            references.Remove(item.Name);
+            list.Remove(item.Name);
 
             item.Handle = null;
             item.Owner = null;
             item.Viewport.Owner = null;
 
-            item.NameChanged -= this.Item_NameChanged;
+            item.NameChanged -= Item_NameChanged;
 
             // When a layout is removed we need to rebuild the PaperSpace block names, to follow the naming Paper_Space, Paper_Space0, Paper_Space1, ...
             int index = 0;
-            foreach (Layout l in this.list.Values)
+            foreach (Layout l in list.Values)
             {
                 // Create and add the corresponding PaperSpace block
                 if (l.IsPaperSpace)
                 {
                     string spaceName = index == 0 ? Block.PaperSpace.Name : string.Concat(Block.PaperSpace.Name, index - 1);
-                    Block associatadBlock = this.Owner.Blocks.Add(new Block(spaceName, null, null, false));
-                    this.Owner.Blocks.References[associatadBlock.Name].Add(l);
+                    Block associatadBlock = Owner.Blocks.Add(new Block(spaceName, null, null, false));
+                    Owner.Blocks.References[associatadBlock.Name].Add(l);
                     l.AssociatedBlock = associatadBlock;
                     associatadBlock.Record.Layout = l;
                     index += 1;
 
                     // we need to redefine the owner of the layout entities
                     l.Viewport.Owner = l.AssociatedBlock;
-                    foreach (DxfObject o in this.references[l.Name])
+                    foreach (DxfObject o in references[l.Name])
                         o.Owner = l.AssociatedBlock;
                 }
             }
@@ -242,15 +242,15 @@ namespace netDxf.Collections
 
         private void Item_NameChanged(TableObject sender, TableObjectChangedEventArgs<string> e)
         {
-            if (this.Contains(e.NewValue))
+            if (Contains(e.NewValue))
                 throw new ArgumentException("There is already another layout with the same name.");
 
-            this.list.Remove(sender.Name);
-            this.list.Add(e.NewValue, (Layout) sender);
+            list.Remove(sender.Name);
+            list.Add(e.NewValue, (Layout) sender);
 
-            List<DxfObject> refs = this.references[sender.Name];
-            this.references.Remove(sender.Name);
-            this.references.Add(e.NewValue, refs);
+            List<DxfObject> refs = references[sender.Name];
+            references.Remove(sender.Name);
+            references.Add(e.NewValue, refs);
         }
 
         #endregion

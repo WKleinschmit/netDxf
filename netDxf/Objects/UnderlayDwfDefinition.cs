@@ -77,9 +77,9 @@ namespace netDxf.Objects
         /// <returns>A new UnderlayDwfDefinition that is a copy of this instance.</returns>
         public override TableObject Clone(string newName)
         {
-            UnderlayDwfDefinition copy = new UnderlayDwfDefinition(newName, this.File);
+            UnderlayDwfDefinition copy = new UnderlayDwfDefinition(newName, File);
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 copy.XData.Add((XData)data.Clone());
 
             return copy;
@@ -91,7 +91,7 @@ namespace netDxf.Objects
         /// <returns>A new UnderlayDwfDefinition that is a copy of this instance.</returns>
         public override object Clone()
         {
-            return this.Clone(this.Name);
+            return Clone(Name);
         }
 
         #endregion

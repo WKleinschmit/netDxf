@@ -57,7 +57,7 @@ namespace netDxf.Objects
         public UnderlayDgnDefinition(string name, string file)
             : base(name, file, UnderlayType.DGN)
         {
-            this.layout = "Model";
+            layout = "Model";
         }
 
         #endregion
@@ -69,8 +69,8 @@ namespace netDxf.Objects
         /// </summary>
         public string Layout
         {
-            get { return this.layout; }
-            set { this.layout = value; }
+            get { return layout; }
+            set { layout = value; }
         }
 
         /// <summary>
@@ -93,12 +93,12 @@ namespace netDxf.Objects
         /// <returns>A new UnderlayDgnDefinition that is a copy of this instance.</returns>
         public override TableObject Clone(string newName)
         {
-            UnderlayDgnDefinition copy = new UnderlayDgnDefinition(newName, this.File)
+            UnderlayDgnDefinition copy = new UnderlayDgnDefinition(newName, File)
             {
-                Layout = this.layout
+                Layout = layout
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 copy.XData.Add((XData)data.Clone());
 
             return copy;
@@ -110,7 +110,7 @@ namespace netDxf.Objects
         /// <returns>A new UnderlayDgnDefinition that is a copy of this instance.</returns>
         public override object Clone()
         {
-            return this.Clone(this.Name);
+            return Clone(Name);
         }
 
         #endregion

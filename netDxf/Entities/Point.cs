@@ -48,8 +48,8 @@ namespace netDxf.Entities
             : base(EntityType.Point, DxfObjectCode.Point)
         {
             this.position = position;
-            this.thickness = 0.0f;
-            this.rotation = 0.0;
+            thickness = 0.0f;
+            rotation = 0.0;
         }
 
         /// <summary>
@@ -89,8 +89,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         /// <summary>
@@ -98,8 +98,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Thickness
         {
-            get { return this.thickness; }
-            set { this.thickness = value; }
+            get { return thickness; }
+            set { thickness = value; }
         }
 
         /// <summary>
@@ -107,8 +107,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Rotation
         {
-            get { return this.rotation; }
-            set { this.rotation = MathHelper.NormalizeAngle(value); }
+            get { return rotation; }
+            set { rotation = MathHelper.NormalizeAngle(value); }
         }
 
         #endregion
@@ -126,21 +126,21 @@ namespace netDxf.Entities
             Vector3 newNormal;
             double newRotation;
 
-            newPosition = transformation * this.Position + translation;
-            newNormal = transformation * this.Normal;
+            newPosition = transformation * Position + translation;
+            newNormal = transformation * Normal;
 
-            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
+            Matrix3 transOW = MathHelper.ArbitraryAxis(Normal);
             Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
 
-            Vector2 refAxis = Vector2.Rotate(Vector2.UnitX, this.Rotation * MathHelper.DegToRad);
+            Vector2 refAxis = Vector2.Rotate(Vector2.UnitX, Rotation * MathHelper.DegToRad);
             Vector3 v = transOW * new Vector3(refAxis.X, refAxis.Y, 0.0);
             v = transformation * v;
             v = transWO * v;
             newRotation = Vector2.Angle(new Vector2(v.X, v.Y)) * MathHelper.RadToDeg;
 
-            this.Position = newPosition;
-            this.Normal = newNormal;
-            this.Rotation = newRotation;
+            Position = newPosition;
+            Normal = newNormal;
+            Rotation = newRotation;
         }
 
         /// <summary>
@@ -152,21 +152,21 @@ namespace netDxf.Entities
             Point entity = new Point
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //Point properties
-                Position = this.position,
-                Rotation = this.rotation,
-                Thickness = this.thickness
+                Position = position,
+                Rotation = rotation,
+                Thickness = thickness
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

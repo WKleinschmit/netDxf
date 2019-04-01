@@ -64,7 +64,7 @@ namespace netDxf
 
             try
             {
-                Enum type = (Enum)Enum.Parse(this.enumType, valueName);
+                Enum type = (Enum)Enum.Parse(enumType, valueName);
                 stringValue = GetStringValue(type);
             }
             catch
@@ -83,7 +83,7 @@ namespace netDxf
         {
             ArrayList values = new ArrayList();
             //Look for our string value associated with fields in this enum
-            foreach (FieldInfo fi in this.enumType.GetFields())
+            foreach (FieldInfo fi in enumType.GetFields())
             {
                 //Check for our custom attribute
                 StringValueAttribute[] attrs = fi.GetCustomAttributes(typeof (StringValueAttribute), false) as StringValueAttribute[];
@@ -101,18 +101,18 @@ namespace netDxf
         /// <returns>IList for data binding</returns>
         public IList GetListValues()
         {
-            Type underlyingType = Enum.GetUnderlyingType(this.enumType);
+            Type underlyingType = Enum.GetUnderlyingType(enumType);
 
             ArrayList values = new ArrayList();
             //Look for our string value associated with fields in this enum
-            foreach (FieldInfo fi in this.enumType.GetFields())
+            foreach (FieldInfo fi in enumType.GetFields())
             {
                 //Check for our custom attribute
                 StringValueAttribute[] attrs = fi.GetCustomAttributes(typeof (StringValueAttribute), false) as StringValueAttribute[];
                 if (attrs != null)
                     if (attrs.Length > 0)
                     {
-                        object str = Convert.ChangeType(Enum.Parse(this.enumType, fi.Name), underlyingType);
+                        object str = Convert.ChangeType(Enum.Parse(enumType, fi.Name), underlyingType);
                         if (str == null)
                             throw new Exception();
                         values.Add(new DictionaryEntry(str, attrs[0].Value));
@@ -129,7 +129,7 @@ namespace netDxf
         /// <returns>Existence of the string value</returns>
         public bool IsStringDefined(string value)
         {
-            return Parse(this.enumType, value) != null;
+            return Parse(enumType, value) != null;
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace netDxf
         /// <returns>Existence of the string value</returns>
         public bool IsStringDefined(string value, StringComparison comparisonType)
         {
-            return Parse(this.enumType, value, comparisonType) != null;
+            return Parse(enumType, value, comparisonType) != null;
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace netDxf
         /// <value></value>
         public Type EnumType
         {
-            get { return this.enumType; }
+            get { return enumType; }
         }
 
         #endregion
@@ -302,7 +302,7 @@ namespace netDxf
         /// <value></value>
         public string Value
         {
-            get { return this.value; }
+            get { return value; }
         }
     }
 

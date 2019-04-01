@@ -88,8 +88,8 @@ namespace netDxf.Entities
         {
             this.position = position;
             this.bulge = bulge;
-            this.startWidth = 0.0;
-            this.endWidth = 0.0;
+            startWidth = 0.0;
+            endWidth = 0.0;
         }
 
         #endregion
@@ -101,8 +101,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector2 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         /// <summary>
@@ -111,12 +111,12 @@ namespace netDxf.Entities
         /// <remarks>Widths greater than zero produce wide lines.</remarks>
         public double StartWidth
         {
-            get { return this.startWidth; }
+            get { return startWidth; }
             set
             {
                 if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The LwPolylineVertex width must be equals or greater than zero.");
-                this.startWidth = value;
+                startWidth = value;
             }
         }
 
@@ -126,12 +126,12 @@ namespace netDxf.Entities
         /// <remarks>Widths greater than zero produce wide lines.</remarks>
         public double EndWidth
         {
-            get { return this.endWidth; }
+            get { return endWidth; }
             set
             {
                 if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The LwPolylineVertex width must be equals or greater than zero.");
-                this.endWidth = value;
+                endWidth = value;
             }
         }
 
@@ -145,8 +145,8 @@ namespace netDxf.Entities
         /// </remarks>
         public double Bulge
         {
-            get { return this.bulge; }
-            set { this.bulge = value; }
+            get { return bulge; }
+            set { bulge = value; }
         }
 
         #endregion
@@ -159,7 +159,7 @@ namespace netDxf.Entities
         /// <returns>The string representation.</returns>
         public override string ToString()
         {
-            return string.Format("{0}: ({1})", "LwPolylineVertex", this.position);
+            return string.Format("{0}: ({1})", "LwPolylineVertex", position);
         }
 
         /// <summary>
@@ -170,10 +170,10 @@ namespace netDxf.Entities
         {
             return new LwPolylineVertex
             {
-                Position = this.position,
-                Bulge = this.bulge,
-                StartWidth = this.startWidth,
-                EndWidth = this.endWidth
+                Position = position,
+                Bulge = bulge,
+                StartWidth = startWidth,
+                EndWidth = endWidth
             };
         }
 

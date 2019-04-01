@@ -42,18 +42,18 @@ namespace netDxf.Collections
         internal VPorts(DxfDocument document, string handle)
             : base(document, DxfObjectCode.VportTable, handle)
         {
-            this.MaxCapacity = short.MaxValue;
+            MaxCapacity = short.MaxValue;
 
-            if (this.list.Count >= this.MaxCapacity)
-                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
+            if (list.Count >= MaxCapacity)
+                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", CodeName, MaxCapacity));
 
             // add the current document viewport, it is always present
             VPort active = VPort.Active;
-            this.Owner.NumHandles = active.AsignHandle(this.Owner.NumHandles);
+            Owner.NumHandles = active.AsignHandle(Owner.NumHandles);
 
-            this.Owner.AddedObjects.Add(active.Handle, active);
-            this.list.Add(active.Name, active);
-            this.references.Add(active.Name, new List<DxfObject>());
+            Owner.AddedObjects.Add(active.Handle, active);
+            list.Add(active.Name, active);
+            references.Add(active.Name, new List<DxfObject>());
             active.Owner = this;
         }
 

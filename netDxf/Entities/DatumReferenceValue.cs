@@ -44,8 +44,8 @@ namespace netDxf.Entities
         /// </summary>
         public DatumReferenceValue()
         {
-            this.datum = string.Empty;
-            this.materialCondition = ToleranceMaterialCondition.None;
+            datum = string.Empty;
+            materialCondition = ToleranceMaterialCondition.None;
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace netDxf.Entities
         /// <param name="materialCondition">Datum material condition.</param>
         public DatumReferenceValue(string value, ToleranceMaterialCondition materialCondition)
         {
-            this.datum = value;
+            datum = value;
             this.materialCondition = materialCondition;
         }
 
@@ -68,8 +68,8 @@ namespace netDxf.Entities
         /// </summary>
         public string Value
         {
-            get { return this.datum; }
-            set { this.datum = value; }
+            get { return datum; }
+            set { datum = value; }
         }
 
         /// <summary>
@@ -77,8 +77,8 @@ namespace netDxf.Entities
         /// </summary>
         public ToleranceMaterialCondition MaterialCondition
         {
-            get { return this.materialCondition; }
-            set { this.materialCondition = value; }
+            get { return materialCondition; }
+            set { materialCondition = value; }
         }
 
         #endregion
@@ -93,8 +93,8 @@ namespace netDxf.Entities
         {
             return new DatumReferenceValue
             {
-                Value = this.datum,
-                MaterialCondition = this.materialCondition
+                Value = datum,
+                MaterialCondition = materialCondition
             };
         }
 

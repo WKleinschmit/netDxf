@@ -56,18 +56,18 @@ namespace netDxf.Tables
         /// </summary>
         public DimensionStyleAlternateUnits()
         {
-            this.dimalt = false;
-            this.dimaltd = 2;
-            this.dimPrefix = string.Empty;
-            this.dimSuffix = string.Empty;
-            this.dimaltf = 25.4;
-            this.dimaltu = LinearUnitType.Decimal;
-            this.stackedUnits = false;
-            this.suppressLinearLeadingZeros = false;
-            this.suppressLinearTrailingZeros = false;
-            this.suppressZeroFeet = true;
-            this.suppressZeroInches = true;
-            this.dimaltrnd = 0.0;
+            dimalt = false;
+            dimaltd = 2;
+            dimPrefix = string.Empty;
+            dimSuffix = string.Empty;
+            dimaltf = 25.4;
+            dimaltu = LinearUnitType.Decimal;
+            stackedUnits = false;
+            suppressLinearLeadingZeros = false;
+            suppressLinearTrailingZeros = false;
+            suppressZeroFeet = true;
+            suppressZeroInches = true;
+            dimaltrnd = 0.0;
         }
 
         #endregion
@@ -79,8 +79,8 @@ namespace netDxf.Tables
         /// </summary>
         public bool Enabled
         {
-            get { return this.dimalt; }
-            set { this.dimalt = value; }
+            get { return dimalt; }
+            set { dimalt = value; }
         }
 
         /// <summary>
@@ -93,12 +93,12 @@ namespace netDxf.Tables
         /// </remarks>
         public short LengthPrecision
         {
-            get { return this.dimaltd; }
+            get { return dimaltd; }
             set
             {
                 if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The length precision must be equals or greater than zero.");
-                this.dimaltd = value;
+                dimaltd = value;
             }
         }
 
@@ -107,8 +107,8 @@ namespace netDxf.Tables
         /// </summary>
         public string Prefix
         {
-            get { return this.dimPrefix; }
-            set { this.dimPrefix = value ?? string.Empty; }
+            get { return dimPrefix; }
+            set { dimPrefix = value ?? string.Empty; }
         }
 
         /// <summary>
@@ -116,8 +116,8 @@ namespace netDxf.Tables
         /// </summary>
         public string Suffix
         {
-            get { return this.dimSuffix; }
-            set { this.dimSuffix = value ?? string.Empty; }
+            get { return dimSuffix; }
+            set { dimSuffix = value ?? string.Empty; }
         }
 
         /// <summary>
@@ -129,12 +129,12 @@ namespace netDxf.Tables
         /// </remarks>
         public double Multiplier
         {
-            get { return this.dimaltf; }
+            get { return dimaltf; }
             set
             {
                 if (value <= 0.0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The multiplier for alternate units must be greater than zero0.");
-                this.dimaltf = value;
+                dimaltf = value;
             }
         }
 
@@ -150,8 +150,8 @@ namespace netDxf.Tables
         /// </remarks>
         public LinearUnitType LengthUnits
         {
-            get { return this.dimaltu; }
-            set { this.dimaltu = value; }
+            get { return dimaltu; }
+            set { dimaltu = value; }
         }
 
         /// <summary>
@@ -163,8 +163,8 @@ namespace netDxf.Tables
         /// </remarks>
         public bool StackUnits
         {
-            get { return this.stackedUnits; }
-            set { this.stackedUnits = value; }
+            get { return stackedUnits; }
+            set { stackedUnits = value; }
         }
 
         /// <summary>
@@ -173,8 +173,8 @@ namespace netDxf.Tables
         /// <remarks>This value is part of the DIMALTZ variable.</remarks>
         public bool SuppressLinearLeadingZeros
         {
-            get { return this.suppressLinearLeadingZeros; }
-            set { this.suppressLinearLeadingZeros = value; }
+            get { return suppressLinearLeadingZeros; }
+            set { suppressLinearLeadingZeros = value; }
         }
 
         /// <summary>
@@ -183,8 +183,8 @@ namespace netDxf.Tables
         /// <remarks>This value is part of the DIMALTZ variable.</remarks>
         public bool SuppressLinearTrailingZeros
         {
-            get { return this.suppressLinearTrailingZeros; }
-            set { this.suppressLinearTrailingZeros = value; }
+            get { return suppressLinearTrailingZeros; }
+            set { suppressLinearTrailingZeros = value; }
         }
 
         /// <summary>
@@ -193,8 +193,8 @@ namespace netDxf.Tables
         /// <remarks>This value is part of the DIMALTZ variable.</remarks>
         public bool SuppressZeroFeet
         {
-            get { return this.suppressZeroFeet; }
-            set { this.suppressZeroFeet = value; }
+            get { return suppressZeroFeet; }
+            set { suppressZeroFeet = value; }
         }
 
         /// <summary>
@@ -203,8 +203,8 @@ namespace netDxf.Tables
         /// <remarks>This value is part of the DIMALTZ variable.</remarks>
         public bool SuppressZeroInches
         {
-            get { return this.suppressZeroInches; }
-            set { this.suppressZeroInches = value; }
+            get { return suppressZeroInches; }
+            set { suppressZeroInches = value; }
         }
 
         /// <summary>
@@ -219,12 +219,12 @@ namespace netDxf.Tables
         /// </remarks>
         public double Roundoff
         {
-            get { return this.dimaltrnd; }
+            get { return dimaltrnd; }
             set
             {
                 if (value < 0.000001 && !MathHelper.IsZero(value, double.Epsilon)) // ToDo check range of values
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The nearest value to round all distances must be equal or greater than 0.000001 or zero (no rounding off).");
-                this.dimaltrnd = value;
+                dimaltrnd = value;
             }
         }
 
@@ -240,18 +240,18 @@ namespace netDxf.Tables
         {
             DimensionStyleAlternateUnits copy = new DimensionStyleAlternateUnits()
             {
-                Enabled = this.dimalt,
-                LengthUnits = this.dimaltu,
-                StackUnits = this.stackedUnits,
-                LengthPrecision = this.dimaltd,
-                Multiplier = this.dimaltf,
-                Roundoff = this.dimaltrnd,
-                Prefix = this.dimPrefix,
-                Suffix = this.dimSuffix,
-                SuppressLinearLeadingZeros = this.suppressLinearLeadingZeros,
-                SuppressLinearTrailingZeros = this.suppressLinearTrailingZeros,
-                SuppressZeroFeet = this.suppressZeroFeet,
-                SuppressZeroInches = this.suppressZeroInches
+                Enabled = dimalt,
+                LengthUnits = dimaltu,
+                StackUnits = stackedUnits,
+                LengthPrecision = dimaltd,
+                Multiplier = dimaltf,
+                Roundoff = dimaltrnd,
+                Prefix = dimPrefix,
+                Suffix = dimSuffix,
+                SuppressLinearLeadingZeros = suppressLinearLeadingZeros,
+                SuppressLinearTrailingZeros = suppressLinearTrailingZeros,
+                SuppressZeroFeet = suppressZeroFeet,
+                SuppressZeroInches = suppressZeroInches
             };
 
             return copy;

@@ -46,9 +46,9 @@ namespace netDxf.Objects
         public RasterVariables()
             : base(DxfObjectCode.RasterVariables)
         {
-            this.displayFrame = true;
-            this.quality = ImageDisplayQuality.High;
-            this.units = ImageUnits.Unitless;
+            displayFrame = true;
+            quality = ImageDisplayQuality.High;
+            units = ImageUnits.Unitless;
         }
 
         #endregion
@@ -60,8 +60,8 @@ namespace netDxf.Objects
         /// </summary>
         public bool DisplayFrame
         {
-            get { return this.displayFrame; }
-            set { this.displayFrame = value; }
+            get { return displayFrame; }
+            set { displayFrame = value; }
         }
 
         /// <summary>
@@ -69,8 +69,8 @@ namespace netDxf.Objects
         /// </summary>
         public ImageDisplayQuality DisplayQuality
         {
-            get { return this.quality; }
-            set { this.quality = value; }
+            get { return quality; }
+            set { quality = value; }
         }
 
         /// <summary>
@@ -83,8 +83,8 @@ namespace netDxf.Objects
         /// </remarks>
         public ImageUnits Units
         {
-            get { return this.units; }
-            set { this.units = value; }
+            get { return units; }
+            set { units = value; }
         }
 
         #endregion

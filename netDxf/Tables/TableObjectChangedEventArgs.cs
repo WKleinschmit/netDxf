@@ -47,8 +47,8 @@ namespace netDxf.Tables
         /// <param name="newTable">The new table object.</param>
         public TableObjectChangedEventArgs(T oldTable, T newTable)
         {
-            this.oldValue = oldTable;
-            this.newValue = newTable;
+            oldValue = oldTable;
+            newValue = newTable;
         }
 
         #endregion
@@ -60,7 +60,7 @@ namespace netDxf.Tables
         /// </summary>
         public T OldValue
         {
-            get { return this.oldValue; }
+            get { return oldValue; }
         }
 
         /// <summary>
@@ -68,8 +68,8 @@ namespace netDxf.Tables
         /// </summary>
         public T NewValue
         {
-            get { return this.newValue; }
-            set { this.newValue = value; }
+            get { return newValue; }
+            set { newValue = value; }
         }
 
         #endregion

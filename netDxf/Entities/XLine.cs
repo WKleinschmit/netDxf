@@ -82,8 +82,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Origin
         {
-            get { return this.origin; }
-            set { this.origin = value; }
+            get { return origin; }
+            set { origin = value; }
         }
 
         /// <summary>
@@ -91,11 +91,11 @@ namespace netDxf.Entities
         /// </summary>
         public Vector3 Direction
         {
-            get { return this.direction; }
+            get { return direction; }
             set
             {
-                this.direction = Vector3.Normalize(value);
-                if (Vector3.IsNaN(this.direction))
+                direction = Vector3.Normalize(value);
+                if (Vector3.IsNaN(direction))
                     throw new ArgumentException("The direction can not be the zero vector.", nameof(value));
             }
         }
@@ -111,9 +111,9 @@ namespace netDxf.Entities
         /// <param name="translation">Translation vector.</param>
         public override void TransformBy(Matrix3 transformation, Vector3 translation)
         {
-            this.Origin = transformation * this.Origin + translation;
-            this.Direction = transformation * this.Direction;
-            this.Normal = transformation * this.Normal;
+            Origin = transformation * Origin + translation;
+            Direction = transformation * Direction;
+            Normal = transformation * Normal;
         }
 
         /// <summary>
@@ -125,20 +125,20 @@ namespace netDxf.Entities
             XLine entity = new XLine
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //XLine properties
-                Origin = this.origin,
-                Direction = this.direction,
+                Origin = origin,
+                Direction = direction,
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

@@ -66,40 +66,40 @@ namespace netDxf.IO
 
         public void Write(Stream stream, DxfDocument document, bool binary)
         {
-            this.doc = document;
-            this.isBinary = binary;
-            DxfVersion version = this.doc.DrawingVariables.AcadVer;
+            doc = document;
+            isBinary = binary;
+            DxfVersion version = doc.DrawingVariables.AcadVer;
             if (version < DxfVersion.AutoCad2000)
                 throw new DxfVersionNotSupportedException(string.Format("DXF file version not supported : {0}.", version), version);
 
-            if (!Vector3.ArePerpendicular(this.doc.DrawingVariables.UcsXDir, this.doc.DrawingVariables.UcsYDir))
+            if (!Vector3.ArePerpendicular(doc.DrawingVariables.UcsXDir, doc.DrawingVariables.UcsYDir))
                 throw new ArithmeticException("The drawing variables vectors UcsXDir and UcsYDir must be perpendicular.");
 
-            this.encodedStrings = new Dictionary<string, string>();
+            encodedStrings = new Dictionary<string, string>();
 
             // create the default PaperSpace layout in case it does not exist. The ModelSpace layout always exists
-            if (this.doc.Layouts.Count == 1)
-                this.doc.Layouts.Add(new Layout("Layout1"));
+            if (doc.Layouts.Count == 1)
+                doc.Layouts.Add(new Layout("Layout1"));
 
             // create the application registry AcCmTransparency in case it doesn't exists, it is required by the layer transparency
-            this.doc.ApplicationRegistries.Add(new ApplicationRegistry("AcCmTransparency"));
+            doc.ApplicationRegistries.Add(new ApplicationRegistry("AcCmTransparency"));
 
             // create the application registry GradientColor1ACI and GradientColor2ACI in case they don't exists , they are required by the hatch gradient pattern
-            this.doc.ApplicationRegistries.Add(new ApplicationRegistry("GradientColor1ACI"));
-            this.doc.ApplicationRegistries.Add(new ApplicationRegistry("GradientColor2ACI"));
+            doc.ApplicationRegistries.Add(new ApplicationRegistry("GradientColor1ACI"));
+            doc.ApplicationRegistries.Add(new ApplicationRegistry("GradientColor2ACI"));
 
             // dictionaries
             List<DictionaryObject> dictionaries = new List<DictionaryObject>();
 
             // Named dictionary it is always the first to appear in the object section
-            DictionaryObject namedObjectDictionary = new DictionaryObject(this.doc);
-            this.doc.NumHandles = namedObjectDictionary.AsignHandle(this.doc.NumHandles);
+            DictionaryObject namedObjectDictionary = new DictionaryObject(doc);
+            doc.NumHandles = namedObjectDictionary.AsignHandle(doc.NumHandles);
             dictionaries.Add(namedObjectDictionary);
 
             // create the Group dictionary, this dictionary always appear even if there are no groups in the drawing
             DictionaryObject groupDictionary = new DictionaryObject(namedObjectDictionary);
-            this.doc.NumHandles = groupDictionary.AsignHandle(this.doc.NumHandles);
-            foreach (Group group in this.doc.Groups.Items)
+            doc.NumHandles = groupDictionary.AsignHandle(doc.NumHandles);
+            foreach (Group group in doc.Groups.Items)
             {
                 groupDictionary.Entries.Add(group.Handle, group.Name);
             }
@@ -108,10 +108,10 @@ namespace netDxf.IO
 
             // Layout dictionary
             DictionaryObject layoutDictionary = new DictionaryObject(namedObjectDictionary);
-            this.doc.NumHandles = layoutDictionary.AsignHandle(this.doc.NumHandles);
-            if (this.doc.Layouts.Count > 0)
+            doc.NumHandles = layoutDictionary.AsignHandle(doc.NumHandles);
+            if (doc.Layouts.Count > 0)
             {
-                foreach (Layout layout in this.doc.Layouts.Items)
+                foreach (Layout layout in doc.Layouts.Items)
                 {
                     layoutDictionary.Entries.Add(layout.Handle, layout.Name);
                 }
@@ -121,10 +121,10 @@ namespace netDxf.IO
 
             // create the Underlay definitions dictionary
             DictionaryObject dgnDefinitionDictionary = new DictionaryObject(namedObjectDictionary);
-            this.doc.NumHandles = dgnDefinitionDictionary.AsignHandle(this.doc.NumHandles);
-            if (this.doc.UnderlayDgnDefinitions.Count > 0)
+            doc.NumHandles = dgnDefinitionDictionary.AsignHandle(doc.NumHandles);
+            if (doc.UnderlayDgnDefinitions.Count > 0)
             {
-                foreach (UnderlayDgnDefinition underlayDef in this.doc.UnderlayDgnDefinitions.Items)
+                foreach (UnderlayDgnDefinition underlayDef in doc.UnderlayDgnDefinitions.Items)
                 {
                     dgnDefinitionDictionary.Entries.Add(underlayDef.Handle, underlayDef.Name);
                     dictionaries.Add(dgnDefinitionDictionary);
@@ -132,10 +132,10 @@ namespace netDxf.IO
                 }
             }
             DictionaryObject dwfDefinitionDictionary = new DictionaryObject(namedObjectDictionary);
-            this.doc.NumHandles = dwfDefinitionDictionary.AsignHandle(this.doc.NumHandles);
-            if (this.doc.UnderlayDwfDefinitions.Count > 0)
+            doc.NumHandles = dwfDefinitionDictionary.AsignHandle(doc.NumHandles);
+            if (doc.UnderlayDwfDefinitions.Count > 0)
             {
-                foreach (UnderlayDwfDefinition underlayDef in this.doc.UnderlayDwfDefinitions.Items)
+                foreach (UnderlayDwfDefinition underlayDef in doc.UnderlayDwfDefinitions.Items)
                 {
                     dwfDefinitionDictionary.Entries.Add(underlayDef.Handle, underlayDef.Name);
                     dictionaries.Add(dwfDefinitionDictionary);
@@ -143,10 +143,10 @@ namespace netDxf.IO
                 }
             }
             DictionaryObject pdfDefinitionDictionary = new DictionaryObject(namedObjectDictionary);
-            this.doc.NumHandles = pdfDefinitionDictionary.AsignHandle(this.doc.NumHandles);
-            if (this.doc.UnderlayPdfDefinitions.Count > 0)
+            doc.NumHandles = pdfDefinitionDictionary.AsignHandle(doc.NumHandles);
+            if (doc.UnderlayPdfDefinitions.Count > 0)
             {
-                foreach (UnderlayPdfDefinition underlayDef in this.doc.UnderlayPdfDefinitions.Items)
+                foreach (UnderlayPdfDefinition underlayDef in doc.UnderlayPdfDefinitions.Items)
                 {
                     pdfDefinitionDictionary.Entries.Add(underlayDef.Handle, underlayDef.Name);
                     dictionaries.Add(pdfDefinitionDictionary);
@@ -156,10 +156,10 @@ namespace netDxf.IO
 
             // create the MLine style dictionary
             DictionaryObject mLineStyleDictionary = new DictionaryObject(namedObjectDictionary);
-            this.doc.NumHandles = mLineStyleDictionary.AsignHandle(this.doc.NumHandles);
-            if (this.doc.MlineStyles.Count > 0)
+            doc.NumHandles = mLineStyleDictionary.AsignHandle(doc.NumHandles);
+            if (doc.MlineStyles.Count > 0)
             {
-                foreach (MLineStyle mLineStyle in this.doc.MlineStyles.Items)
+                foreach (MLineStyle mLineStyle in doc.MlineStyles.Items)
                 {
                     mLineStyleDictionary.Entries.Add(mLineStyle.Handle, mLineStyle.Name);
                 }
@@ -169,10 +169,10 @@ namespace netDxf.IO
 
             // create the image dictionary
             DictionaryObject imageDefDictionary = new DictionaryObject(namedObjectDictionary);
-            this.doc.NumHandles = imageDefDictionary.AsignHandle(this.doc.NumHandles);
-            if (this.doc.ImageDefinitions.Count > 0)
+            doc.NumHandles = imageDefDictionary.AsignHandle(doc.NumHandles);
+            if (doc.ImageDefinitions.Count > 0)
             {
-                foreach (ImageDefinition imageDef in this.doc.ImageDefinitions.Items)
+                foreach (ImageDefinition imageDef in doc.ImageDefinitions.Items)
                 {
                     imageDefDictionary.Entries.Add(imageDef.Handle, imageDef.Name);
                 }
@@ -180,135 +180,135 @@ namespace netDxf.IO
                 dictionaries.Add(imageDefDictionary);
 
                 namedObjectDictionary.Entries.Add(imageDefDictionary.Handle, DxfObjectCode.ImageDefDictionary);
-                namedObjectDictionary.Entries.Add(this.doc.RasterVariables.Handle, DxfObjectCode.ImageVarsDictionary);
+                namedObjectDictionary.Entries.Add(doc.RasterVariables.Handle, DxfObjectCode.ImageVarsDictionary);
             }
 
-            this.doc.DrawingVariables.HandleSeed = this.doc.NumHandles.ToString("X");
+            doc.DrawingVariables.HandleSeed = doc.NumHandles.ToString("X");
 
-            this.Open(stream, this.doc.DrawingVariables.AcadVer < DxfVersion.AutoCad2007 ? Encoding.ASCII : null);
+            Open(stream, doc.DrawingVariables.AcadVer < DxfVersion.AutoCad2007 ? Encoding.ASCII : null);
 
             //this.Open(stream, this.doc.DrawingVariables.AcadVer < DxfVersion.AutoCad2007 ? Encoding.Default : null);
 
             // The comment group, 999, is not used in binary DXF files.
-            if (!this.isBinary)
+            if (!isBinary)
             {
-                foreach (string comment in this.doc.Comments)
-                    this.WriteComment(comment);
+                foreach (string comment in doc.Comments)
+                    WriteComment(comment);
             }
 
             //HEADER SECTION
-            this.BeginSection(DxfObjectCode.HeaderSection);
-            foreach (HeaderVariable variable in this.doc.DrawingVariables.Values)
+            BeginSection(DxfObjectCode.HeaderSection);
+            foreach (HeaderVariable variable in doc.DrawingVariables.Values)
             {
-                this.WriteSystemVariable(variable);
+                WriteSystemVariable(variable);
             }
             // writing a copy of the active dimension style variables in the header section will avoid to be displayed as <style overrides> in AutoCad
             DimensionStyle activeDimStyle;
-            if (this.doc.DimensionStyles.TryGetValue(this.doc.DrawingVariables.DimStyle, out activeDimStyle))
-                this.WriteActiveDimensionStyleSystemVaribles(activeDimStyle);
-            this.EndSection();
+            if (doc.DimensionStyles.TryGetValue(doc.DrawingVariables.DimStyle, out activeDimStyle))
+                WriteActiveDimensionStyleSystemVaribles(activeDimStyle);
+            EndSection();
 
             //CLASSES SECTION
-            this.BeginSection(DxfObjectCode.ClassesSection);
-            this.WriteRasterVariablesClass(1);
-            if (this.doc.ImageDefinitions.Items.Count > 0)
+            BeginSection(DxfObjectCode.ClassesSection);
+            WriteRasterVariablesClass(1);
+            if (doc.ImageDefinitions.Items.Count > 0)
             {
-                this.WriteImageDefClass(this.doc.ImageDefinitions.Count);
-                this.WriteImageDefRectorClass(this.doc.Images.Count());
-                this.WriteImageClass(this.doc.Images.Count());
+                WriteImageDefClass(doc.ImageDefinitions.Count);
+                WriteImageDefRectorClass(doc.Images.Count());
+                WriteImageClass(doc.Images.Count());
             }
-            this.EndSection();
+            EndSection();
 
             //TABLES SECTION
-            this.BeginSection(DxfObjectCode.TablesSection);
+            BeginSection(DxfObjectCode.TablesSection);
 
             //registered application tables
-            this.BeginTable(this.doc.ApplicationRegistries.CodeName, (short) this.doc.ApplicationRegistries.Count, this.doc.ApplicationRegistries.Handle);
-            foreach (ApplicationRegistry id in this.doc.ApplicationRegistries.Items)
+            BeginTable(doc.ApplicationRegistries.CodeName, (short) doc.ApplicationRegistries.Count, doc.ApplicationRegistries.Handle);
+            foreach (ApplicationRegistry id in doc.ApplicationRegistries.Items)
             {
-                this.WriteApplicationRegistry(id);
+                WriteApplicationRegistry(id);
             }
-            this.EndTable();
+            EndTable();
 
             //viewport tables
-            this.BeginTable(this.doc.VPorts.CodeName, (short) this.doc.VPorts.Count, this.doc.VPorts.Handle);
-            foreach (VPort vport in this.doc.VPorts)
+            BeginTable(doc.VPorts.CodeName, (short) doc.VPorts.Count, doc.VPorts.Handle);
+            foreach (VPort vport in doc.VPorts)
             {
-                this.WriteVPort(vport);
+                WriteVPort(vport);
             }
-            this.EndTable();
+            EndTable();
 
             //line type tables
             //The LTYPE table always precedes the LAYER table. I guess because the layers reference the line types,
             //why this same rule is not applied to DIMSTYLE tables is a mystery, since they also reference text styles and block records
-            this.BeginTable(this.doc.Linetypes.CodeName, (short) this.doc.Linetypes.Count, this.doc.Linetypes.Handle);
-            foreach (Linetype linetype in this.doc.Linetypes.Items)
+            BeginTable(doc.Linetypes.CodeName, (short) doc.Linetypes.Count, doc.Linetypes.Handle);
+            foreach (Linetype linetype in doc.Linetypes.Items)
             {
-                this.WriteLinetype(linetype);
+                WriteLinetype(linetype);
             }
-            this.EndTable();
+            EndTable();
 
             //layer tables
-            this.BeginTable(this.doc.Layers.CodeName, (short) this.doc.Layers.Count, this.doc.Layers.Handle);
-            foreach (Layer layer in this.doc.Layers.Items)
+            BeginTable(doc.Layers.CodeName, (short) doc.Layers.Count, doc.Layers.Handle);
+            foreach (Layer layer in doc.Layers.Items)
             {
-                this.WriteLayer(layer);
+                WriteLayer(layer);
             }
-            this.EndTable();
+            EndTable();
 
             //style tables text and shapes
-            this.BeginTable(this.doc.TextStyles.CodeName, (short) (this.doc.TextStyles.Count + this.doc.ShapeStyles.Count), this.doc.TextStyles.Handle);
-            foreach (TextStyle style in this.doc.TextStyles.Items)
+            BeginTable(doc.TextStyles.CodeName, (short) (doc.TextStyles.Count + doc.ShapeStyles.Count), doc.TextStyles.Handle);
+            foreach (TextStyle style in doc.TextStyles.Items)
             {
-                this.WriteTextStyle(style);
+                WriteTextStyle(style);
             }
-            foreach (ShapeStyle style in this.doc.ShapeStyles)
+            foreach (ShapeStyle style in doc.ShapeStyles)
             {
-                this.WriteShapeStyle(style);
+                WriteShapeStyle(style);
             }
-            this.EndTable();
+            EndTable();
 
             //dimension style tables
-            this.BeginTable(this.doc.DimensionStyles.CodeName, (short) this.doc.DimensionStyles.Count, this.doc.DimensionStyles.Handle);
-            foreach (DimensionStyle style in this.doc.DimensionStyles.Items)
+            BeginTable(doc.DimensionStyles.CodeName, (short) doc.DimensionStyles.Count, doc.DimensionStyles.Handle);
+            foreach (DimensionStyle style in doc.DimensionStyles.Items)
             {
-                this.WriteDimensionStyle(style);
+                WriteDimensionStyle(style);
             }
-            this.EndTable();
+            EndTable();
 
             //view
-            this.BeginTable(this.doc.Views.CodeName, (short) this.doc.Views.Count, this.doc.Views.Handle);
-            this.EndTable();
+            BeginTable(doc.Views.CodeName, (short) doc.Views.Count, doc.Views.Handle);
+            EndTable();
 
             //UCS
-            this.BeginTable(this.doc.UCSs.CodeName, (short) this.doc.UCSs.Count, this.doc.UCSs.Handle);
-            foreach (UCS ucs in this.doc.UCSs.Items)
+            BeginTable(doc.UCSs.CodeName, (short) doc.UCSs.Count, doc.UCSs.Handle);
+            foreach (UCS ucs in doc.UCSs.Items)
             {
-                this.WriteUCS(ucs);
+                WriteUCS(ucs);
             }
-            this.EndTable();
+            EndTable();
 
             //block record table
-            this.BeginTable(this.doc.Blocks.CodeName, (short) this.doc.Blocks.Count, this.doc.Blocks.Handle);
-            foreach (Block block in this.doc.Blocks.Items)
+            BeginTable(doc.Blocks.CodeName, (short) doc.Blocks.Count, doc.Blocks.Handle);
+            foreach (Block block in doc.Blocks.Items)
             {
-                this.WriteBlockRecord(block.Record);
+                WriteBlockRecord(block.Record);
             }
-            this.EndTable();
+            EndTable();
 
-            this.EndSection(); //End section tables
+            EndSection(); //End section tables
 
             //BLOCKS SECTION
-            this.BeginSection(DxfObjectCode.BlocksSection);
-            foreach (Block block in this.doc.Blocks.Items)
+            BeginSection(DxfObjectCode.BlocksSection);
+            foreach (Block block in doc.Blocks.Items)
             {
-                this.WriteBlock(block);
+                WriteBlock(block);
             }
-            this.EndSection(); //End section blocks
+            EndSection(); //End section blocks
 
             //ENTITIES SECTION
-            this.BeginSection(DxfObjectCode.EntitiesSection);
-            foreach (Layout layout in this.doc.Layouts)
+            BeginSection(DxfObjectCode.EntitiesSection);
+            foreach (Layout layout in doc.Layouts)
             {
                 if (layout.IsPaperSpace)
                 {
@@ -316,16 +316,16 @@ namespace netDxf.IO
                     string index = layout.AssociatedBlock.Name.Remove(0, 12);
                     if (string.IsNullOrEmpty(index))
                     {
-                        this.WriteEntity(layout.Viewport, layout);
+                        WriteEntity(layout.Viewport, layout);
 
                         foreach (AttributeDefinition attDef in layout.AssociatedBlock.AttributeDefinitions.Values)
                         {
-                            this.WriteAttributeDefinition(attDef, layout);
+                            WriteAttributeDefinition(attDef, layout);
                         }
 
                         foreach (EntityObject entity in layout.AssociatedBlock.Entities)
                         {
-                            this.WriteEntity(entity, layout);
+                            WriteEntity(entity, layout);
                         }
                     }                  
                 }
@@ -334,70 +334,70 @@ namespace netDxf.IO
                     // ModelSpace
                     foreach (AttributeDefinition attDef in layout.AssociatedBlock.AttributeDefinitions.Values)
                     {
-                        this.WriteAttributeDefinition(attDef, layout);
+                        WriteAttributeDefinition(attDef, layout);
                     }
 
                     foreach (EntityObject entity in layout.AssociatedBlock.Entities)
                     {
-                        this.WriteEntity(entity, layout);
+                        WriteEntity(entity, layout);
                     }
                 }
             }
-            this.EndSection(); //End section entities
+            EndSection(); //End section entities
 
             //OBJECTS SECTION
-            this.BeginSection(DxfObjectCode.ObjectsSection);
+            BeginSection(DxfObjectCode.ObjectsSection);
 
             foreach (DictionaryObject dictionary in dictionaries)
             {
-                this.WriteDictionary(dictionary);
+                WriteDictionary(dictionary);
             }
 
-            foreach (Group group in this.doc.Groups.Items)
+            foreach (Group group in doc.Groups.Items)
             {
-                this.WriteGroup(group, groupDictionary.Handle);
+                WriteGroup(group, groupDictionary.Handle);
             }
 
-            foreach (Layout layout in this.doc.Layouts)
+            foreach (Layout layout in doc.Layouts)
             {
-                this.WriteLayout(layout, layoutDictionary.Handle);
+                WriteLayout(layout, layoutDictionary.Handle);
             }
 
-            foreach (MLineStyle style in this.doc.MlineStyles.Items)
+            foreach (MLineStyle style in doc.MlineStyles.Items)
             {
-                this.WriteMLineStyle(style, mLineStyleDictionary.Handle);
+                WriteMLineStyle(style, mLineStyleDictionary.Handle);
             }
 
-            foreach (UnderlayDgnDefinition underlayDef in this.doc.UnderlayDgnDefinitions.Items)
+            foreach (UnderlayDgnDefinition underlayDef in doc.UnderlayDgnDefinitions.Items)
             {
-                this.WriteUnderlayDefinition(underlayDef, dgnDefinitionDictionary.Handle);
+                WriteUnderlayDefinition(underlayDef, dgnDefinitionDictionary.Handle);
             }
-            foreach (UnderlayDwfDefinition underlayDef in this.doc.UnderlayDwfDefinitions.Items)
+            foreach (UnderlayDwfDefinition underlayDef in doc.UnderlayDwfDefinitions.Items)
             {
-                this.WriteUnderlayDefinition(underlayDef, dwfDefinitionDictionary.Handle);
+                WriteUnderlayDefinition(underlayDef, dwfDefinitionDictionary.Handle);
             }
-            foreach (UnderlayPdfDefinition underlayDef in this.doc.UnderlayPdfDefinitions.Items)
+            foreach (UnderlayPdfDefinition underlayDef in doc.UnderlayPdfDefinitions.Items)
             {
-                this.WriteUnderlayDefinition(underlayDef, pdfDefinitionDictionary.Handle);
+                WriteUnderlayDefinition(underlayDef, pdfDefinitionDictionary.Handle);
             }
 
             // the raster variables dictionary is only needed when the drawing has image entities
-            if (this.doc.ImageDefinitions.Count > 0)
+            if (doc.ImageDefinitions.Count > 0)
             {
-                this.WriteRasterVariables(this.doc.RasterVariables, imageDefDictionary.Handle);
-                foreach (ImageDefinition imageDef in this.doc.ImageDefinitions.Items)
+                WriteRasterVariables(doc.RasterVariables, imageDefDictionary.Handle);
+                foreach (ImageDefinition imageDef in doc.ImageDefinitions.Items)
                 {
                     foreach (ImageDefinitionReactor reactor in imageDef.Reactors.Values)
                     {
-                        this.WriteImageDefReactor(reactor);
+                        WriteImageDefReactor(reactor);
                     }
-                    this.WriteImageDef(imageDef, imageDefDictionary.Handle);
+                    WriteImageDef(imageDef, imageDefDictionary.Handle);
                 }
             }
 
-            this.EndSection(); //End section objects
+            EndSection(); //End section objects
 
-            this.Close();
+            Close();
 
         }
 
@@ -410,10 +410,10 @@ namespace netDxf.IO
         /// </summary>
         private void Open(Stream stream, Encoding encoding)
         {
-            if (this.isBinary)
-                this.chunk = new BinaryCodeValueWriter(encoding == null ? new BinaryWriter(stream, new UTF8Encoding(false)) : new BinaryWriter(stream, encoding));
+            if (isBinary)
+                chunk = new BinaryCodeValueWriter(encoding == null ? new BinaryWriter(stream, new UTF8Encoding(false)) : new BinaryWriter(stream, encoding));
             else
-                this.chunk = new TextCodeValueWriter(encoding == null ? new StreamWriter(stream, new UTF8Encoding(false)) : new StreamWriter(stream, encoding));
+                chunk = new TextCodeValueWriter(encoding == null ? new StreamWriter(stream, new UTF8Encoding(false)) : new StreamWriter(stream, encoding));
         }
 
         /// <summary>
@@ -421,8 +421,8 @@ namespace netDxf.IO
         /// </summary>
         private void Close()
         {
-            this.chunk.Write(0, DxfObjectCode.EndOfFile);
-            this.chunk.Flush();
+            chunk.Write(0, DxfObjectCode.EndOfFile);
+            chunk.Flush();
         }
 
         /// <summary>
@@ -432,11 +432,11 @@ namespace netDxf.IO
         /// <remarks>There can be only one type section.</remarks>
         private void BeginSection(string section)
         {
-            Debug.Assert(this.activeSection == DxfObjectCode.Unknown);
+            Debug.Assert(activeSection == DxfObjectCode.Unknown);
 
-            this.chunk.Write(0, DxfObjectCode.BeginSection);
-            this.chunk.Write(2, section);
-            this.activeSection = section;
+            chunk.Write(0, DxfObjectCode.BeginSection);
+            chunk.Write(2, section);
+            activeSection = section;
         }
 
         /// <summary>
@@ -444,10 +444,10 @@ namespace netDxf.IO
         /// </summary>
         private void EndSection()
         {
-            Debug.Assert(this.activeSection != DxfObjectCode.Unknown);
+            Debug.Assert(activeSection != DxfObjectCode.Unknown);
 
-            this.chunk.Write(0, DxfObjectCode.EndSection);
-            this.activeSection = DxfObjectCode.Unknown;
+            chunk.Write(0, DxfObjectCode.EndSection);
+            activeSection = DxfObjectCode.Unknown;
         }
 
         /// <summary>
@@ -457,20 +457,20 @@ namespace netDxf.IO
         /// <param name="handle">Handle assigned to this table</param>
         private void BeginTable(string table, short numEntries, string handle)
         {
-            Debug.Assert(this.activeSection == DxfObjectCode.TablesSection);
+            Debug.Assert(activeSection == DxfObjectCode.TablesSection);
 
-            this.chunk.Write(0, DxfObjectCode.Table);
-            this.chunk.Write(2, table);
-            this.chunk.Write(5, handle);
-            this.chunk.Write(330, "0");
+            chunk.Write(0, DxfObjectCode.Table);
+            chunk.Write(2, table);
+            chunk.Write(5, handle);
+            chunk.Write(330, "0");
 
-            this.chunk.Write(100, SubclassMarker.Table);
-            this.chunk.Write(70, numEntries);
+            chunk.Write(100, SubclassMarker.Table);
+            chunk.Write(70, numEntries);
 
             if (table == DxfObjectCode.DimensionStyleTable)
-                this.chunk.Write(100, SubclassMarker.DimensionStyleTable);
+                chunk.Write(100, SubclassMarker.DimensionStyleTable);
 
-            this.activeTable = table;
+            activeTable = table;
         }
 
         /// <summary>
@@ -478,10 +478,10 @@ namespace netDxf.IO
         /// </summary>
         private void EndTable()
         {
-            Debug.Assert(this.activeSection != DxfObjectCode.Unknown);
+            Debug.Assert(activeSection != DxfObjectCode.Unknown);
 
-            this.chunk.Write(0, DxfObjectCode.EndTable);
-            this.activeTable = DxfObjectCode.Unknown;
+            chunk.Write(0, DxfObjectCode.EndTable);
+            activeTable = DxfObjectCode.Unknown;
         }
 
         #endregion
@@ -491,12 +491,12 @@ namespace netDxf.IO
         private void WriteComment(string comment)
         {
             if (!string.IsNullOrEmpty(comment))
-                this.chunk.Write(999, comment);
+                chunk.Write(999, comment);
         }
 
         private void WriteSystemVariable(HeaderVariable variable)
         {
-            Debug.Assert(this.activeSection == DxfObjectCode.HeaderSection);
+            Debug.Assert(activeSection == DxfObjectCode.HeaderSection);
 
             string name = variable.Name;
             object value = variable.Value;
@@ -504,243 +504,243 @@ namespace netDxf.IO
             switch (name)
             {
                 case HeaderVariableCode.AcadVer:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(1, StringEnum.GetStringValue((DxfVersion) value));
+                    chunk.Write(9, name);
+                    chunk.Write(1, StringEnum.GetStringValue((DxfVersion) value));
                     break;
                 case HeaderVariableCode.HandleSeed:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(5, value);
+                    chunk.Write(9, name);
+                    chunk.Write(5, value);
                     break;
                 case HeaderVariableCode.Angbase:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(50, value);
+                    chunk.Write(9, name);
+                    chunk.Write(50, value);
                     break;
                 case HeaderVariableCode.Angdir:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, (short) (AngleDirection) value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, (short) (AngleDirection) value);
                     break;
                 case HeaderVariableCode.AttMode:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, (short) (AttMode) value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, (short) (AttMode) value);
                     break;
                 case HeaderVariableCode.AUnits:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, (short) (AngleUnitType) value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, (short) (AngleUnitType) value);
                     break;
                 case HeaderVariableCode.AUprec:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, value);
                     break;
                 case HeaderVariableCode.CeColor:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(62, ((AciColor) value).Index);
+                    chunk.Write(9, name);
+                    chunk.Write(62, ((AciColor) value).Index);
                     break;
                 case HeaderVariableCode.CeLtScale:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, value);
+                    chunk.Write(9, name);
+                    chunk.Write(40, value);
                     break;
                 case HeaderVariableCode.CeLtype:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(6, this.EncodeNonAsciiCharacters((string) value));
+                    chunk.Write(9, name);
+                    chunk.Write(6, EncodeNonAsciiCharacters((string) value));
                     break;
                 case HeaderVariableCode.CeLweight:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(370, (short) (Lineweight) value);
+                    chunk.Write(9, name);
+                    chunk.Write(370, (short) (Lineweight) value);
                     break;
                 case HeaderVariableCode.CLayer:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(8, this.EncodeNonAsciiCharacters((string) value));
+                    chunk.Write(9, name);
+                    chunk.Write(8, EncodeNonAsciiCharacters((string) value));
                     break;
                 case HeaderVariableCode.CMLJust:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, (short) (MLineJustification) value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, (short) (MLineJustification) value);
                     break;
                 case HeaderVariableCode.CMLScale:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, value);
+                    chunk.Write(9, name);
+                    chunk.Write(40, value);
                     break;
                 case HeaderVariableCode.CMLStyle:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(2, this.EncodeNonAsciiCharacters((string) value));
+                    chunk.Write(9, name);
+                    chunk.Write(2, EncodeNonAsciiCharacters((string) value));
                     break;
                 case HeaderVariableCode.DimStyle:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(2, this.EncodeNonAsciiCharacters((string) value));
+                    chunk.Write(9, name);
+                    chunk.Write(2, EncodeNonAsciiCharacters((string) value));
                     break;
                 case HeaderVariableCode.TextSize:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, value);
+                    chunk.Write(9, name);
+                    chunk.Write(40, value);
                     break;
                 case HeaderVariableCode.TextStyle:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(7, this.EncodeNonAsciiCharacters((string) value));
+                    chunk.Write(9, name);
+                    chunk.Write(7, EncodeNonAsciiCharacters((string) value));
                     break;
                 case HeaderVariableCode.LastSavedBy:
-                    if (this.doc.DrawingVariables.AcadVer <= DxfVersion.AutoCad2000)
+                    if (doc.DrawingVariables.AcadVer <= DxfVersion.AutoCad2000)
                         break;
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(1, this.EncodeNonAsciiCharacters((string) value));
+                    chunk.Write(9, name);
+                    chunk.Write(1, EncodeNonAsciiCharacters((string) value));
                     break;
                 case HeaderVariableCode.LUnits:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, (short) (LinearUnitType) value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, (short) (LinearUnitType) value);
                     break;
                 case HeaderVariableCode.LUprec:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, value);
                     break;
                 case HeaderVariableCode.DwgCodePage:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(3, value);
+                    chunk.Write(9, name);
+                    chunk.Write(3, value);
                     break;
                 case HeaderVariableCode.Extnames:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(290, value);
+                    chunk.Write(9, name);
+                    chunk.Write(290, value);
                     break;
                 case HeaderVariableCode.InsBase:
-                    this.chunk.Write(9, name);
+                    chunk.Write(9, name);
                     Vector3 pos = (Vector3) value;
-                    this.chunk.Write(10, pos.X);
-                    this.chunk.Write(20, pos.Y);
-                    this.chunk.Write(30, pos.Z);
+                    chunk.Write(10, pos.X);
+                    chunk.Write(20, pos.Y);
+                    chunk.Write(30, pos.Z);
                     break;
                 case HeaderVariableCode.InsUnits:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, (short) (DrawingUnits) value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, (short) (DrawingUnits) value);
                     break;
                 case HeaderVariableCode.LtScale:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, value);
+                    chunk.Write(9, name);
+                    chunk.Write(40, value);
                     break;
                 case HeaderVariableCode.LwDisplay:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(290, value);
+                    chunk.Write(9, name);
+                    chunk.Write(290, value);
                     break;
                 case HeaderVariableCode.PdMode:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, (short) (PointShape) value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, (short) (PointShape) value);
                     break;
                 case HeaderVariableCode.PdSize:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, value);
+                    chunk.Write(9, name);
+                    chunk.Write(40, value);
                     break;
                 case HeaderVariableCode.PLineGen:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, value);
                     break;
                 case HeaderVariableCode.PsLtScale:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(70, value);
+                    chunk.Write(9, name);
+                    chunk.Write(70, value);
                     break;
                 case HeaderVariableCode.TdCreate:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, DrawingTime.ToJulianCalendar((DateTime) value));
+                    chunk.Write(9, name);
+                    chunk.Write(40, DrawingTime.ToJulianCalendar((DateTime) value));
                     break;
                 case HeaderVariableCode.TduCreate:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, DrawingTime.ToJulianCalendar((DateTime) value));
+                    chunk.Write(9, name);
+                    chunk.Write(40, DrawingTime.ToJulianCalendar((DateTime) value));
                     break;
                 case HeaderVariableCode.TdUpdate:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, DrawingTime.ToJulianCalendar((DateTime) value));
+                    chunk.Write(9, name);
+                    chunk.Write(40, DrawingTime.ToJulianCalendar((DateTime) value));
                     break;
                 case HeaderVariableCode.TduUpdate:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, DrawingTime.ToJulianCalendar((DateTime) value));
+                    chunk.Write(9, name);
+                    chunk.Write(40, DrawingTime.ToJulianCalendar((DateTime) value));
                     break;
                 case HeaderVariableCode.TdinDwg:
-                    this.chunk.Write(9, name);
-                    this.chunk.Write(40, ((TimeSpan) value).TotalDays);
+                    chunk.Write(9, name);
+                    chunk.Write(40, ((TimeSpan) value).TotalDays);
                     break;
                 case HeaderVariableCode.UcsOrg:
-                    this.chunk.Write(9, name);
+                    chunk.Write(9, name);
                     Vector3 org = (Vector3)value;
-                    this.chunk.Write(10, org.X);
-                    this.chunk.Write(20, org.Y);
-                    this.chunk.Write(30, org.Z);
+                    chunk.Write(10, org.X);
+                    chunk.Write(20, org.Y);
+                    chunk.Write(30, org.Z);
                     break;
                 case HeaderVariableCode.UcsXDir:
-                    this.chunk.Write(9, name);
+                    chunk.Write(9, name);
                     Vector3 xdir = (Vector3)value;
-                    this.chunk.Write(10, xdir.X);
-                    this.chunk.Write(20, xdir.Y);
-                    this.chunk.Write(30, xdir.Z);
+                    chunk.Write(10, xdir.X);
+                    chunk.Write(20, xdir.Y);
+                    chunk.Write(30, xdir.Z);
                     break;
                 case HeaderVariableCode.UcsYDir:
-                    this.chunk.Write(9, name);
+                    chunk.Write(9, name);
                     Vector3 ydir = (Vector3)value;
-                    this.chunk.Write(10, ydir.X);
-                    this.chunk.Write(20, ydir.Y);
-                    this.chunk.Write(30, ydir.Z);
+                    chunk.Write(10, ydir.X);
+                    chunk.Write(20, ydir.Y);
+                    chunk.Write(30, ydir.Z);
                     break;
             }
         }
 
         private void WriteActiveDimensionStyleSystemVaribles(DimensionStyle style)
         {
-            this.chunk.Write(9, "$DIMADEC");
-            this.chunk.Write(70, style.AngularPrecision);
+            chunk.Write(9, "$DIMADEC");
+            chunk.Write(70, style.AngularPrecision);
 
-            this.chunk.Write(9, "$DIMALT");
-            this.chunk.Write(70, style.AlternateUnits.Enabled ? (short) 1 : (short) 0);
+            chunk.Write(9, "$DIMALT");
+            chunk.Write(70, style.AlternateUnits.Enabled ? (short) 1 : (short) 0);
 
-            this.chunk.Write(9, "$DIMALTD");
-            this.chunk.Write(70, style.AlternateUnits.LengthPrecision);
+            chunk.Write(9, "$DIMALTD");
+            chunk.Write(70, style.AlternateUnits.LengthPrecision);
 
-            this.chunk.Write(9, "$DIMALTF");
-            this.chunk.Write(40, style.AlternateUnits.Multiplier);
+            chunk.Write(9, "$DIMALTF");
+            chunk.Write(40, style.AlternateUnits.Multiplier);
 
-            this.chunk.Write(9, "$DIMALTRND");
-            this.chunk.Write(40, style.AlternateUnits.Roundoff);
+            chunk.Write(9, "$DIMALTRND");
+            chunk.Write(40, style.AlternateUnits.Roundoff);
 
-            this.chunk.Write(9, "$DIMALTTD");
-            this.chunk.Write(70, style.Tolerances.AlternatePrecision);
+            chunk.Write(9, "$DIMALTTD");
+            chunk.Write(70, style.Tolerances.AlternatePrecision);
 
-            this.chunk.Write(9, "$DIMALTTZ");
-            this.chunk.Write(70, GetSupressZeroesValue(
+            chunk.Write(9, "$DIMALTTZ");
+            chunk.Write(70, GetSupressZeroesValue(
                     style.Tolerances.AlternateSuppressLinearLeadingZeros,
                     style.Tolerances.AlternateSuppressLinearTrailingZeros,
                     style.Tolerances.AlternateSuppressZeroFeet,
                     style.Tolerances.AlternateSuppressZeroInches));
 
-            this.chunk.Write(9, "$DIMALTU");
+            chunk.Write(9, "$DIMALTU");
             switch (style.AlternateUnits.LengthUnits)
             {
                 case LinearUnitType.Scientific:
-                    this.chunk.Write(70, (short) 1);
+                    chunk.Write(70, (short) 1);
                     break;
                 case LinearUnitType.Decimal:
-                    this.chunk.Write(70, (short) 2);
+                    chunk.Write(70, (short) 2);
                     break;
                 case LinearUnitType.Engineering:
-                    this.chunk.Write(70, (short) 3);
+                    chunk.Write(70, (short) 3);
                     break;
                 case LinearUnitType.Architectural:
-                    this.chunk.Write(70, style.AlternateUnits.StackUnits ? (short) 4 : (short) 6);
+                    chunk.Write(70, style.AlternateUnits.StackUnits ? (short) 4 : (short) 6);
                     break;
                 case LinearUnitType.Fractional:
-                    this.chunk.Write(70, style.AlternateUnits.StackUnits ? (short) 5 : (short) 7);
+                    chunk.Write(70, style.AlternateUnits.StackUnits ? (short) 5 : (short) 7);
                     break;
             }
 
-            this.chunk.Write(9, "$DIMALTZ");
-            this.chunk.Write(70, GetSupressZeroesValue(
+            chunk.Write(9, "$DIMALTZ");
+            chunk.Write(70, GetSupressZeroesValue(
                     style.AlternateUnits.SuppressLinearLeadingZeros,
                     style.AlternateUnits.SuppressLinearTrailingZeros,
                     style.AlternateUnits.SuppressZeroFeet,
                     style.AlternateUnits.SuppressZeroInches));
 
-            this.chunk.Write(9, "$DIMAPOST");
-            this.chunk.Write(1, this.EncodeNonAsciiCharacters(string.Format("{0}[]{1}", style.AlternateUnits.Prefix, style.AlternateUnits.Suffix)));
+            chunk.Write(9, "$DIMAPOST");
+            chunk.Write(1, EncodeNonAsciiCharacters(string.Format("{0}[]{1}", style.AlternateUnits.Prefix, style.AlternateUnits.Suffix)));
 
-            this.chunk.Write(9, "$DIMATFIT");
-            this.chunk.Write(70, (short) style.FitOptions);
+            chunk.Write(9, "$DIMATFIT");
+            chunk.Write(70, (short) style.FitOptions);
 
-            this.chunk.Write(9, "$DIMAUNIT");
-            this.chunk.Write(70, (short) style.DimAngularUnits);
+            chunk.Write(9, "$DIMAUNIT");
+            chunk.Write(70, (short) style.DimAngularUnits);
 
-            this.chunk.Write(9, "$DIMASZ");
-            this.chunk.Write(40, style.ArrowSize);
+            chunk.Write(9, "$DIMASZ");
+            chunk.Write(40, style.ArrowSize);
 
             short angSupress;
             if (style.SuppressAngularLeadingZeros && style.SuppressAngularTrailingZeros)
@@ -754,250 +754,250 @@ namespace netDxf.IO
             else
                 angSupress = 3;
 
-            this.chunk.Write(9, "$DIMAZIN");
-            this.chunk.Write(70, angSupress);
+            chunk.Write(9, "$DIMAZIN");
+            chunk.Write(70, angSupress);
 
             if (style.DimArrow1 == null && style.DimArrow2 == null)
             {
-                this.chunk.Write(9, "$DIMSAH");
-                this.chunk.Write(70, (short) 0);
+                chunk.Write(9, "$DIMSAH");
+                chunk.Write(70, (short) 0);
 
-                this.chunk.Write(9, "$DIMBLK");
-                this.chunk.Write(1, "");
+                chunk.Write(9, "$DIMBLK");
+                chunk.Write(1, "");
             }
             else if (style.DimArrow1 == null)
             {
-                this.chunk.Write(9, "$DIMSAH");
-                this.chunk.Write(70, (short) 1);
+                chunk.Write(9, "$DIMSAH");
+                chunk.Write(70, (short) 1);
 
-                this.chunk.Write(9, "$DIMBLK1");
-                this.chunk.Write(1, "");
+                chunk.Write(9, "$DIMBLK1");
+                chunk.Write(1, "");
 
-                this.chunk.Write(9, "$DIMBLK2");
-                this.chunk.Write(1, this.EncodeNonAsciiCharacters(style.DimArrow2.Name));
+                chunk.Write(9, "$DIMBLK2");
+                chunk.Write(1, EncodeNonAsciiCharacters(style.DimArrow2.Name));
             }
             else if (style.DimArrow2 == null)
             {
-                this.chunk.Write(9, "$DIMSAH");
-                this.chunk.Write(70, (short) 1);
+                chunk.Write(9, "$DIMSAH");
+                chunk.Write(70, (short) 1);
 
-                this.chunk.Write(9, "$DIMBLK1");
-                this.chunk.Write(1, this.EncodeNonAsciiCharacters(style.DimArrow1.Name));
+                chunk.Write(9, "$DIMBLK1");
+                chunk.Write(1, EncodeNonAsciiCharacters(style.DimArrow1.Name));
 
-                this.chunk.Write(9, "$DIMBLK2");
-                this.chunk.Write(1, "");
+                chunk.Write(9, "$DIMBLK2");
+                chunk.Write(1, "");
             }
             else if (string.Equals(style.DimArrow1.Name, style.DimArrow2.Name, StringComparison.OrdinalIgnoreCase))
             {
-                this.chunk.Write(9, "$DIMSAH");
-                this.chunk.Write(70, (short) 0);
+                chunk.Write(9, "$DIMSAH");
+                chunk.Write(70, (short) 0);
 
-                this.chunk.Write(9, "$DIMBLK");
-                this.chunk.Write(1, this.EncodeNonAsciiCharacters(style.DimArrow1.Name));
+                chunk.Write(9, "$DIMBLK");
+                chunk.Write(1, EncodeNonAsciiCharacters(style.DimArrow1.Name));
             }
             else
             {
-                this.chunk.Write(9, "$DIMSAH");
-                this.chunk.Write(70, (short) 1);
+                chunk.Write(9, "$DIMSAH");
+                chunk.Write(70, (short) 1);
 
-                this.chunk.Write(9, "$DIMBLK1");
-                this.chunk.Write(1, this.EncodeNonAsciiCharacters(style.DimArrow1.Name));
+                chunk.Write(9, "$DIMBLK1");
+                chunk.Write(1, EncodeNonAsciiCharacters(style.DimArrow1.Name));
 
-                this.chunk.Write(9, "$DIMBLK2");
-                this.chunk.Write(1, this.EncodeNonAsciiCharacters(style.DimArrow2.Name));
+                chunk.Write(9, "$DIMBLK2");
+                chunk.Write(1, EncodeNonAsciiCharacters(style.DimArrow2.Name));
             }
 
-            this.chunk.Write(9, "$DIMLDRBLK");
-            this.chunk.Write(1, style.LeaderArrow == null ? "" : this.EncodeNonAsciiCharacters(style.LeaderArrow.Name));
+            chunk.Write(9, "$DIMLDRBLK");
+            chunk.Write(1, style.LeaderArrow == null ? "" : EncodeNonAsciiCharacters(style.LeaderArrow.Name));
 
-            this.chunk.Write(9, "$DIMCEN");
-            this.chunk.Write(40, style.CenterMarkSize);
+            chunk.Write(9, "$DIMCEN");
+            chunk.Write(40, style.CenterMarkSize);
 
-            this.chunk.Write(9, "$DIMCLRD");
-            this.chunk.Write(70, style.DimLineColor.Index);
+            chunk.Write(9, "$DIMCLRD");
+            chunk.Write(70, style.DimLineColor.Index);
 
-            this.chunk.Write(9, "$DIMCLRE");
-            this.chunk.Write(70, style.ExtLineColor.Index);
+            chunk.Write(9, "$DIMCLRE");
+            chunk.Write(70, style.ExtLineColor.Index);
 
-            this.chunk.Write(9, "$DIMCLRT");
-            this.chunk.Write(70, style.TextColor.Index);
+            chunk.Write(9, "$DIMCLRT");
+            chunk.Write(70, style.TextColor.Index);
 
-            this.chunk.Write(9, "$DIMDEC");
-            this.chunk.Write(70, style.LengthPrecision);
+            chunk.Write(9, "$DIMDEC");
+            chunk.Write(70, style.LengthPrecision);
 
-            this.chunk.Write(9, "$DIMDLE");
-            this.chunk.Write(40, style.DimLineExtend);
+            chunk.Write(9, "$DIMDLE");
+            chunk.Write(40, style.DimLineExtend);
 
-            this.chunk.Write(9, "$DIMDLI");
-            this.chunk.Write(40, style.DimBaselineSpacing);
+            chunk.Write(9, "$DIMDLI");
+            chunk.Write(40, style.DimBaselineSpacing);
 
-            this.chunk.Write(9, "$DIMDSEP");
-            this.chunk.Write(70, (short) style.DecimalSeparator);
+            chunk.Write(9, "$DIMDSEP");
+            chunk.Write(70, (short) style.DecimalSeparator);
 
-            this.chunk.Write(9, "$DIMEXE");
-            this.chunk.Write(40, style.ExtLineExtend);
+            chunk.Write(9, "$DIMEXE");
+            chunk.Write(40, style.ExtLineExtend);
 
-            this.chunk.Write(9, "$DIMEXO");
-            this.chunk.Write(40, style.ExtLineOffset);
+            chunk.Write(9, "$DIMEXO");
+            chunk.Write(40, style.ExtLineOffset);
 
-            this.chunk.Write(9, "$DIMFXLON");
-            this.chunk.Write(70, style.ExtLineFixed ? (short) 1 : (short) 0);
+            chunk.Write(9, "$DIMFXLON");
+            chunk.Write(70, style.ExtLineFixed ? (short) 1 : (short) 0);
 
-            this.chunk.Write(9, "$DIMFXL");
-            this.chunk.Write(40, style.ExtLineFixedLength);
+            chunk.Write(9, "$DIMFXL");
+            chunk.Write(40, style.ExtLineFixedLength);
 
-            this.chunk.Write(9, "$DIMGAP");
-            this.chunk.Write(40, style.TextOffset);
+            chunk.Write(9, "$DIMGAP");
+            chunk.Write(40, style.TextOffset);
 
-            this.chunk.Write(9, "$DIMJUST");
-            this.chunk.Write(70, (short) style.TextHorizontalPlacement);
+            chunk.Write(9, "$DIMJUST");
+            chunk.Write(70, (short) style.TextHorizontalPlacement);
 
-            this.chunk.Write(9, "$DIMLFAC");
-            this.chunk.Write(40, style.DimScaleLinear);
+            chunk.Write(9, "$DIMLFAC");
+            chunk.Write(40, style.DimScaleLinear);
 
-            this.chunk.Write(9, "$DIMLUNIT");
-            this.chunk.Write(70, (short) style.DimLengthUnits);
+            chunk.Write(9, "$DIMLUNIT");
+            chunk.Write(70, (short) style.DimLengthUnits);
 
-            this.chunk.Write(9, "$DIMLWD");
-            this.chunk.Write(70, (short) style.DimLineLineweight);
+            chunk.Write(9, "$DIMLWD");
+            chunk.Write(70, (short) style.DimLineLineweight);
 
-            this.chunk.Write(9, "$DIMLWE");
-            this.chunk.Write(70, (short) style.ExtLineLineweight);
+            chunk.Write(9, "$DIMLWE");
+            chunk.Write(70, (short) style.ExtLineLineweight);
 
-            this.chunk.Write(9, "$DIMPOST");
-            this.chunk.Write(1, this.EncodeNonAsciiCharacters(string.Format("{0}<>{1}", style.DimPrefix, style.DimSuffix)));
+            chunk.Write(9, "$DIMPOST");
+            chunk.Write(1, EncodeNonAsciiCharacters(string.Format("{0}<>{1}", style.DimPrefix, style.DimSuffix)));
 
-            this.chunk.Write(9, "$DIMRND");
-            this.chunk.Write(40, style.DimRoundoff);
+            chunk.Write(9, "$DIMRND");
+            chunk.Write(40, style.DimRoundoff);
 
-            this.chunk.Write(9, "$DIMSCALE");
-            this.chunk.Write(40, style.DimScaleOverall);
+            chunk.Write(9, "$DIMSCALE");
+            chunk.Write(40, style.DimScaleOverall);
 
-            this.chunk.Write(9, "$DIMSD1");
-            this.chunk.Write(70, style.DimLine1Off ? (short) 1 : (short) 0);
+            chunk.Write(9, "$DIMSD1");
+            chunk.Write(70, style.DimLine1Off ? (short) 1 : (short) 0);
 
-            this.chunk.Write(9, "$DIMSD2");
-            this.chunk.Write(70, style.DimLine2Off ? (short) 1 : (short) 0);
+            chunk.Write(9, "$DIMSD2");
+            chunk.Write(70, style.DimLine2Off ? (short) 1 : (short) 0);
 
-            this.chunk.Write(9, "$DIMSE1");
-            this.chunk.Write(70, style.ExtLine1Off ? (short) 1 : (short) 0);
+            chunk.Write(9, "$DIMSE1");
+            chunk.Write(70, style.ExtLine1Off ? (short) 1 : (short) 0);
 
-            this.chunk.Write(9, "$DIMSE2");
-            this.chunk.Write(70, style.ExtLine2Off ? (short) 1 : (short) 0);
+            chunk.Write(9, "$DIMSE2");
+            chunk.Write(70, style.ExtLine2Off ? (short) 1 : (short) 0);
 
-            this.chunk.Write(9, "$DIMSOXD");
-            this.chunk.Write(70, style.FitDimLineInside ? (short) 1 : (short) 0);
+            chunk.Write(9, "$DIMSOXD");
+            chunk.Write(70, style.FitDimLineInside ? (short) 1 : (short) 0);
 
-            this.chunk.Write(9, "$DIMTAD");
-            this.chunk.Write(70, (short) style.TextVerticalPlacement);
+            chunk.Write(9, "$DIMTAD");
+            chunk.Write(70, (short) style.TextVerticalPlacement);
 
-            this.chunk.Write(9, "$DIMTDEC");
-            this.chunk.Write(70, style.Tolerances.Precision);
+            chunk.Write(9, "$DIMTDEC");
+            chunk.Write(70, style.Tolerances.Precision);
 
-            this.chunk.Write(9, "$DIMTFAC");
-            this.chunk.Write(40, style.TextFractionHeightScale);
+            chunk.Write(9, "$DIMTFAC");
+            chunk.Write(40, style.TextFractionHeightScale);
 
             if (style.TextFillColor != null)
             {
-                this.chunk.Write(9, "$DIMTFILL");
-                this.chunk.Write(70, (short) 2);
+                chunk.Write(9, "$DIMTFILL");
+                chunk.Write(70, (short) 2);
 
-                this.chunk.Write(9, "$DIMTFILLCLR");
-                this.chunk.Write(70, style.TextFillColor.Index);
+                chunk.Write(9, "$DIMTFILLCLR");
+                chunk.Write(70, style.TextFillColor.Index);
             }
 
-            this.chunk.Write(9, "$DIMTIH");
-            this.chunk.Write(70, style.TextInsideAlign ? (short) 1 : (short) 0);
+            chunk.Write(9, "$DIMTIH");
+            chunk.Write(70, style.TextInsideAlign ? (short) 1 : (short) 0);
 
-            this.chunk.Write(9, "$DIMTIX");
-            this.chunk.Write(70, style.FitTextInside ? (short)1 : (short)0);
+            chunk.Write(9, "$DIMTIX");
+            chunk.Write(70, style.FitTextInside ? (short)1 : (short)0);
 
             if (style.Tolerances.DisplayMethod == DimensionStyleTolerancesDisplayMethod.Deviation)
             {
-                this.chunk.Write(9, "$DIMTM");
-                this.chunk.Write(40, MathHelper.IsZero(style.Tolerances.LowerLimit) ? MathHelper.Epsilon : style.Tolerances.LowerLimit);
+                chunk.Write(9, "$DIMTM");
+                chunk.Write(40, MathHelper.IsZero(style.Tolerances.LowerLimit) ? MathHelper.Epsilon : style.Tolerances.LowerLimit);
             }
             else
             {
-                this.chunk.Write(9, "$DIMTM");
-                this.chunk.Write(40, style.Tolerances.LowerLimit);
+                chunk.Write(9, "$DIMTM");
+                chunk.Write(40, style.Tolerances.LowerLimit);
             }
 
-            this.chunk.Write(9, "$DIMTMOVE");
-            this.chunk.Write(70, (short) style.FitTextMove);
+            chunk.Write(9, "$DIMTMOVE");
+            chunk.Write(70, (short) style.FitTextMove);
 
-            this.chunk.Write(9, "$DIMTOFL");
-            this.chunk.Write(70, style.FitDimLineForce ? (short)1 : (short)0);
+            chunk.Write(9, "$DIMTOFL");
+            chunk.Write(70, style.FitDimLineForce ? (short)1 : (short)0);
 
-            this.chunk.Write(9, "$DIMTOH");
-            this.chunk.Write(70, style.TextOutsideAlign ? (short) 1 : (short) 0);
+            chunk.Write(9, "$DIMTOH");
+            chunk.Write(70, style.TextOutsideAlign ? (short) 1 : (short) 0);
 
             switch (style.Tolerances.DisplayMethod)
             {
                 case DimensionStyleTolerancesDisplayMethod.None:
-                    this.chunk.Write(9, "$DIMTOL");
-                    this.chunk.Write(70, (short) 0);
-                    this.chunk.Write(9, "$DIMLIM");
-                    this.chunk.Write(70, (short) 0);
+                    chunk.Write(9, "$DIMTOL");
+                    chunk.Write(70, (short) 0);
+                    chunk.Write(9, "$DIMLIM");
+                    chunk.Write(70, (short) 0);
                     break;
                 case DimensionStyleTolerancesDisplayMethod.Symmetrical:
-                    this.chunk.Write(9, "$DIMTOL");
-                    this.chunk.Write(70, (short) 1);
-                    this.chunk.Write(9, "$DIMLIM");
-                    this.chunk.Write(70, (short) 0);
+                    chunk.Write(9, "$DIMTOL");
+                    chunk.Write(70, (short) 1);
+                    chunk.Write(9, "$DIMLIM");
+                    chunk.Write(70, (short) 0);
                     break;
                 case DimensionStyleTolerancesDisplayMethod.Deviation:
-                    this.chunk.Write(9, "$DIMTOL");
-                    this.chunk.Write(70, (short) 1);
-                    this.chunk.Write(9, "$DIMLIM");
-                    this.chunk.Write(70, (short) 0);
+                    chunk.Write(9, "$DIMTOL");
+                    chunk.Write(70, (short) 1);
+                    chunk.Write(9, "$DIMLIM");
+                    chunk.Write(70, (short) 0);
                     break;
                 case DimensionStyleTolerancesDisplayMethod.Limits:
-                    this.chunk.Write(9, "$DIMTOL");
-                    this.chunk.Write(70, (short) 0);
-                    this.chunk.Write(9, "$DIMLIM");
-                    this.chunk.Write(70, (short) 1);
+                    chunk.Write(9, "$DIMTOL");
+                    chunk.Write(70, (short) 0);
+                    chunk.Write(9, "$DIMLIM");
+                    chunk.Write(70, (short) 1);
                     break;
             }
 
-            this.chunk.Write(9, "$DIMTOLJ");
-            this.chunk.Write(70, (short) style.Tolerances.VerticalPlacement);
+            chunk.Write(9, "$DIMTOLJ");
+            chunk.Write(70, (short) style.Tolerances.VerticalPlacement);
 
-            this.chunk.Write(9, "$DIMTP");
-            this.chunk.Write(40, style.Tolerances.UpperLimit);
+            chunk.Write(9, "$DIMTP");
+            chunk.Write(40, style.Tolerances.UpperLimit);
 
-            this.chunk.Write(9, "$DIMTXT");
-            this.chunk.Write(40, style.TextHeight);
+            chunk.Write(9, "$DIMTXT");
+            chunk.Write(40, style.TextHeight);
 
-            this.chunk.Write(9, "$DIMTXTDIRECTION");
-            this.chunk.Write(70, (short) style.TextDirection);
+            chunk.Write(9, "$DIMTXTDIRECTION");
+            chunk.Write(70, (short) style.TextDirection);
 
-            this.chunk.Write(9, "$DIMTZIN");
-            this.chunk.Write(70, GetSupressZeroesValue(
+            chunk.Write(9, "$DIMTZIN");
+            chunk.Write(70, GetSupressZeroesValue(
                     style.Tolerances.SuppressLinearLeadingZeros,
                     style.Tolerances.SuppressLinearTrailingZeros,
                     style.Tolerances.SuppressZeroFeet,
                     style.Tolerances.SuppressZeroInches));
 
-            this.chunk.Write(9, "$DIMZIN");
-            this.chunk.Write(70, GetSupressZeroesValue(
+            chunk.Write(9, "$DIMZIN");
+            chunk.Write(70, GetSupressZeroesValue(
                     style.SuppressLinearLeadingZeros,
                     style.SuppressLinearTrailingZeros,
                     style.SuppressZeroFeet,
                     style.SuppressZeroInches));
 
             // CAUTION: The next four codes are not documented in the official dxf docs
-            this.chunk.Write(9, "$DIMFRAC");
-            this.chunk.Write(70, (short) style.FractionType);
+            chunk.Write(9, "$DIMFRAC");
+            chunk.Write(70, (short) style.FractionType);
 
-            this.chunk.Write(9, "$DIMLTYPE");
-            this.chunk.Write(6, this.EncodeNonAsciiCharacters(style.DimLineLinetype.Name));
+            chunk.Write(9, "$DIMLTYPE");
+            chunk.Write(6, EncodeNonAsciiCharacters(style.DimLineLinetype.Name));
 
-            this.chunk.Write(9, "$DIMLTEX1");
-            this.chunk.Write(6, this.EncodeNonAsciiCharacters(style.ExtLine1Linetype.Name));
+            chunk.Write(9, "$DIMLTEX1");
+            chunk.Write(6, EncodeNonAsciiCharacters(style.ExtLine1Linetype.Name));
 
-            this.chunk.Write(9, "$DIMLTEX2");
-            this.chunk.Write(6, this.EncodeNonAsciiCharacters(style.ExtLine2Linetype.Name));
+            chunk.Write(9, "$DIMLTEX2");
+            chunk.Write(6, EncodeNonAsciiCharacters(style.ExtLine2Linetype.Name));
     }
 
         #endregion
@@ -1006,62 +1006,62 @@ namespace netDxf.IO
 
         private void WriteImageClass(int count)
         {
-            this.chunk.Write(0, DxfObjectCode.Class);
-            this.chunk.Write(1, DxfObjectCode.Image);
-            this.chunk.Write(2, SubclassMarker.RasterImage);
-            this.chunk.Write(3, "ISM");
+            chunk.Write(0, DxfObjectCode.Class);
+            chunk.Write(1, DxfObjectCode.Image);
+            chunk.Write(2, SubclassMarker.RasterImage);
+            chunk.Write(3, "ISM");
 
             // default codes as shown in the dxf documentation
-            this.chunk.Write(90, 127);
-            if (this.doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
-                this.chunk.Write(91, count);
-            this.chunk.Write(280, (short) 0);
-            this.chunk.Write(281, (short) 1);
+            chunk.Write(90, 127);
+            if (doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
+                chunk.Write(91, count);
+            chunk.Write(280, (short) 0);
+            chunk.Write(281, (short) 1);
         }
 
         private void WriteImageDefClass(int count)
         {
-            this.chunk.Write(0, DxfObjectCode.Class);
-            this.chunk.Write(1, DxfObjectCode.ImageDef);
-            this.chunk.Write(2, SubclassMarker.RasterImageDef);
-            this.chunk.Write(3, "ISM");
+            chunk.Write(0, DxfObjectCode.Class);
+            chunk.Write(1, DxfObjectCode.ImageDef);
+            chunk.Write(2, SubclassMarker.RasterImageDef);
+            chunk.Write(3, "ISM");
 
             // default codes as shown in the dxf documentation
-            this.chunk.Write(90, 0);
-            if (this.doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
-                this.chunk.Write(91, count);
-            this.chunk.Write(280, (short) 0);
-            this.chunk.Write(281, (short) 0);
+            chunk.Write(90, 0);
+            if (doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
+                chunk.Write(91, count);
+            chunk.Write(280, (short) 0);
+            chunk.Write(281, (short) 0);
         }
 
         private void WriteImageDefRectorClass(int count)
         {
-            this.chunk.Write(0, DxfObjectCode.Class);
-            this.chunk.Write(1, DxfObjectCode.ImageDefReactor);
-            this.chunk.Write(2, SubclassMarker.RasterImageDefReactor);
-            this.chunk.Write(3, "ISM");
+            chunk.Write(0, DxfObjectCode.Class);
+            chunk.Write(1, DxfObjectCode.ImageDefReactor);
+            chunk.Write(2, SubclassMarker.RasterImageDefReactor);
+            chunk.Write(3, "ISM");
 
             // default codes as shown in the dxf documentation
-            this.chunk.Write(90, 1);
-            if (this.doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
-                this.chunk.Write(91, count);
-            this.chunk.Write(280, (short) 0);
-            this.chunk.Write(281, (short) 0);
+            chunk.Write(90, 1);
+            if (doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
+                chunk.Write(91, count);
+            chunk.Write(280, (short) 0);
+            chunk.Write(281, (short) 0);
         }
 
         private void WriteRasterVariablesClass(int count)
         {
-            this.chunk.Write(0, DxfObjectCode.Class);
-            this.chunk.Write(1, DxfObjectCode.RasterVariables);
-            this.chunk.Write(2, SubclassMarker.RasterVariables);
-            this.chunk.Write(3, "ISM");
+            chunk.Write(0, DxfObjectCode.Class);
+            chunk.Write(1, DxfObjectCode.RasterVariables);
+            chunk.Write(2, SubclassMarker.RasterVariables);
+            chunk.Write(3, "ISM");
 
             // default codes as shown in the dxf documentation
-            this.chunk.Write(90, 0);
-            if (this.doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
-                this.chunk.Write(91, count);
-            this.chunk.Write(280, (short) 0);
-            this.chunk.Write(281, (short) 0);
+            chunk.Write(90, 0);
+            if (doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
+                chunk.Write(91, count);
+            chunk.Write(280, (short) 0);
+            chunk.Write(281, (short) 0);
         }
 
         #endregion
@@ -1074,20 +1074,20 @@ namespace netDxf.IO
         /// <param name="appReg">Name of the application registry.</param>
         private void WriteApplicationRegistry(ApplicationRegistry appReg)
         {
-            Debug.Assert(this.activeTable == DxfObjectCode.ApplicationIdTable);
+            Debug.Assert(activeTable == DxfObjectCode.ApplicationIdTable);
 
-            this.chunk.Write(0, DxfObjectCode.ApplicationIdTable);
-            this.chunk.Write(5, appReg.Handle);
-            this.chunk.Write(330, appReg.Owner.Handle);
+            chunk.Write(0, DxfObjectCode.ApplicationIdTable);
+            chunk.Write(5, appReg.Handle);
+            chunk.Write(330, appReg.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.TableRecord);
-            this.chunk.Write(100, SubclassMarker.ApplicationId);
+            chunk.Write(100, SubclassMarker.TableRecord);
+            chunk.Write(100, SubclassMarker.ApplicationId);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(appReg.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(appReg.Name));
 
-            this.chunk.Write(70, (short) 0);
+            chunk.Write(70, (short) 0);
 
-            this.WriteXData(appReg.XData);
+            WriteXData(appReg.XData);
         }
 
         /// <summary>
@@ -1096,53 +1096,53 @@ namespace netDxf.IO
         /// <param name="vp">viewport.</param>
         private void WriteVPort(VPort vp)
         {
-            Debug.Assert(this.activeTable == DxfObjectCode.VportTable);
+            Debug.Assert(activeTable == DxfObjectCode.VportTable);
 
-            this.chunk.Write(0, vp.CodeName);
-            this.chunk.Write(5, vp.Handle);
-            this.chunk.Write(330, vp.Owner.Handle);
+            chunk.Write(0, vp.CodeName);
+            chunk.Write(5, vp.Handle);
+            chunk.Write(330, vp.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.TableRecord);
+            chunk.Write(100, SubclassMarker.TableRecord);
 
-            this.chunk.Write(100, SubclassMarker.VPort);
+            chunk.Write(100, SubclassMarker.VPort);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(vp.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(vp.Name));
 
-            this.chunk.Write(70, (short) 0);
+            chunk.Write(70, (short) 0);
 
-            this.chunk.Write(10, 0.0);
-            this.chunk.Write(20, 0.0);
+            chunk.Write(10, 0.0);
+            chunk.Write(20, 0.0);
 
-            this.chunk.Write(11, 1.0);
-            this.chunk.Write(21, 1.0);
+            chunk.Write(11, 1.0);
+            chunk.Write(21, 1.0);
 
-            this.chunk.Write(12, vp.ViewCenter.X);
-            this.chunk.Write(22, vp.ViewCenter.Y);
+            chunk.Write(12, vp.ViewCenter.X);
+            chunk.Write(22, vp.ViewCenter.Y);
 
-            this.chunk.Write(13, vp.SnapBasePoint.X);
-            this.chunk.Write(23, vp.SnapBasePoint.Y);
+            chunk.Write(13, vp.SnapBasePoint.X);
+            chunk.Write(23, vp.SnapBasePoint.Y);
 
-            this.chunk.Write(14, vp.SnapSpacing.X);
-            this.chunk.Write(24, vp.SnapSpacing.Y);
+            chunk.Write(14, vp.SnapSpacing.X);
+            chunk.Write(24, vp.SnapSpacing.Y);
 
-            this.chunk.Write(15, vp.GridSpacing.X);
-            this.chunk.Write(25, vp.GridSpacing.Y);
+            chunk.Write(15, vp.GridSpacing.X);
+            chunk.Write(25, vp.GridSpacing.Y);
 
-            this.chunk.Write(16, vp.ViewDirection.X);
-            this.chunk.Write(26, vp.ViewDirection.Y);
-            this.chunk.Write(36, vp.ViewDirection.Z);
+            chunk.Write(16, vp.ViewDirection.X);
+            chunk.Write(26, vp.ViewDirection.Y);
+            chunk.Write(36, vp.ViewDirection.Z);
 
-            this.chunk.Write(17, vp.ViewTarget.X);
-            this.chunk.Write(27, vp.ViewTarget.Y);
-            this.chunk.Write(37, vp.ViewTarget.Z);
+            chunk.Write(17, vp.ViewTarget.X);
+            chunk.Write(27, vp.ViewTarget.Y);
+            chunk.Write(37, vp.ViewTarget.Z);
 
-            this.chunk.Write(40, vp.ViewHeight);
-            this.chunk.Write(41, vp.ViewAspectRatio);
+            chunk.Write(40, vp.ViewHeight);
+            chunk.Write(41, vp.ViewAspectRatio);
 
-            this.chunk.Write(75, vp.SnapMode ? (short) 1 : (short) 0);
-            this.chunk.Write(76, vp.ShowGrid ? (short) 1 : (short) 0);
+            chunk.Write(75, vp.SnapMode ? (short) 1 : (short) 0);
+            chunk.Write(76, vp.ShowGrid ? (short) 1 : (short) 0);
 
-            this.WriteXData(vp.XData);
+            WriteXData(vp.XData);
         }
 
         /// <summary>
@@ -1151,70 +1151,70 @@ namespace netDxf.IO
         /// <param name="style">DimensionStyle.</param>
         private void WriteDimensionStyle(DimensionStyle style)
         {
-            Debug.Assert(this.activeTable == DxfObjectCode.DimensionStyleTable);
+            Debug.Assert(activeTable == DxfObjectCode.DimensionStyleTable);
 
-            this.chunk.Write(0, style.CodeName);
-            this.chunk.Write(105, style.Handle);
-            this.chunk.Write(330, style.Owner.Handle);
+            chunk.Write(0, style.CodeName);
+            chunk.Write(105, style.Handle);
+            chunk.Write(330, style.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.TableRecord);
+            chunk.Write(100, SubclassMarker.TableRecord);
 
-            this.chunk.Write(100, SubclassMarker.DimensionStyle);
+            chunk.Write(100, SubclassMarker.DimensionStyle);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(style.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(style.Name));
            
-            this.chunk.Write(3, this.EncodeNonAsciiCharacters(string.Format("{0}<>{1}", style.DimPrefix, style.DimSuffix)));
-            this.chunk.Write(4, this.EncodeNonAsciiCharacters(string.Format("{0}[]{1}", style.AlternateUnits.Prefix, style.AlternateUnits.Suffix)));
-            this.chunk.Write(40, style.DimScaleOverall);
-            this.chunk.Write(41, style.ArrowSize);
-            this.chunk.Write(42, style.ExtLineOffset);
-            this.chunk.Write(43, style.DimBaselineSpacing);
-            this.chunk.Write(44, style.ExtLineExtend);
-            this.chunk.Write(45, style.DimRoundoff);
-            this.chunk.Write(46, style.DimLineExtend);
-            this.chunk.Write(47, style.Tolerances.UpperLimit);
+            chunk.Write(3, EncodeNonAsciiCharacters(string.Format("{0}<>{1}", style.DimPrefix, style.DimSuffix)));
+            chunk.Write(4, EncodeNonAsciiCharacters(string.Format("{0}[]{1}", style.AlternateUnits.Prefix, style.AlternateUnits.Suffix)));
+            chunk.Write(40, style.DimScaleOverall);
+            chunk.Write(41, style.ArrowSize);
+            chunk.Write(42, style.ExtLineOffset);
+            chunk.Write(43, style.DimBaselineSpacing);
+            chunk.Write(44, style.ExtLineExtend);
+            chunk.Write(45, style.DimRoundoff);
+            chunk.Write(46, style.DimLineExtend);
+            chunk.Write(47, style.Tolerances.UpperLimit);
             // code 48 is written later
-            this.chunk.Write(49, style.ExtLineFixedLength);
+            chunk.Write(49, style.ExtLineFixedLength);
 
             if (style.TextFillColor != null)
             {
-                this.chunk.Write(69, (short) 2);
-                this.chunk.Write(70, style.TextFillColor.Index);
+                chunk.Write(69, (short) 2);
+                chunk.Write(70, style.TextFillColor.Index);
             }
             else
             {
-                this.chunk.Write(70, (short) 0);
+                chunk.Write(70, (short) 0);
             }
 
             switch (style.Tolerances.DisplayMethod)
             {
                 case DimensionStyleTolerancesDisplayMethod.None:
-                    this.chunk.Write(71, (short) 0);
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(71, (short) 0);
+                    chunk.Write(72, (short) 0);
                     break;
                 case DimensionStyleTolerancesDisplayMethod.Symmetrical:
-                    this.chunk.Write(71, (short) 1);
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(71, (short) 1);
+                    chunk.Write(72, (short) 0);
                     break;
                 case DimensionStyleTolerancesDisplayMethod.Deviation:
-                    this.chunk.Write(48, MathHelper.IsZero(style.Tolerances.LowerLimit) ? MathHelper.Epsilon : style.Tolerances.LowerLimit);
-                    this.chunk.Write(71, (short) 1);
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(48, MathHelper.IsZero(style.Tolerances.LowerLimit) ? MathHelper.Epsilon : style.Tolerances.LowerLimit);
+                    chunk.Write(71, (short) 1);
+                    chunk.Write(72, (short) 0);
                     break;
                 case DimensionStyleTolerancesDisplayMethod.Limits:
-                    this.chunk.Write(48, style.Tolerances.LowerLimit);
-                    this.chunk.Write(71, (short) 0);
-                    this.chunk.Write(72, (short) 1);
+                    chunk.Write(48, style.Tolerances.LowerLimit);
+                    chunk.Write(71, (short) 0);
+                    chunk.Write(72, (short) 1);
                     break;
             }
 
-            this.chunk.Write(73, style.TextInsideAlign ? (short) 1 : (short) 0);
-            this.chunk.Write(74, style.TextOutsideAlign ? (short) 1 : (short) 0);
-            this.chunk.Write(75, style.ExtLine1Off ? (short) 1 : (short) 0);
-            this.chunk.Write(76, style.ExtLine2Off ? (short) 1 : (short) 0);
+            chunk.Write(73, style.TextInsideAlign ? (short) 1 : (short) 0);
+            chunk.Write(74, style.TextOutsideAlign ? (short) 1 : (short) 0);
+            chunk.Write(75, style.ExtLine1Off ? (short) 1 : (short) 0);
+            chunk.Write(76, style.ExtLine2Off ? (short) 1 : (short) 0);
 
-            this.chunk.Write(77, (short) style.TextVerticalPlacement);
-            this.chunk.Write(78, GetSupressZeroesValue(
+            chunk.Write(77, (short) style.TextVerticalPlacement);
+            chunk.Write(78, GetSupressZeroesValue(
                     style.SuppressLinearLeadingZeros,
                     style.SuppressLinearTrailingZeros,
                     style.SuppressZeroFeet,
@@ -1230,117 +1230,117 @@ namespace netDxf.IO
             else if (style.SuppressAngularLeadingZeros && !style.SuppressAngularTrailingZeros)
                 angSupress = 1;
 
-            this.chunk.Write(79, angSupress);
+            chunk.Write(79, angSupress);
 
-            this.chunk.Write(140, style.TextHeight);
-            this.chunk.Write(141, style.CenterMarkSize);
-            this.chunk.Write(143, style.AlternateUnits.Multiplier);
-            this.chunk.Write(144, style.DimScaleLinear);
-            this.chunk.Write(146, style.TextFractionHeightScale);
-            this.chunk.Write(147, style.TextOffset);
-            this.chunk.Write(148, style.AlternateUnits.Roundoff);
-            this.chunk.Write(170, style.AlternateUnits.Enabled ? (short) 1 : (short) 0);
-            this.chunk.Write(171, style.AlternateUnits.LengthPrecision);
-            this.chunk.Write(172, style.FitDimLineForce ? (short) 1 : (short) 0);
+            chunk.Write(140, style.TextHeight);
+            chunk.Write(141, style.CenterMarkSize);
+            chunk.Write(143, style.AlternateUnits.Multiplier);
+            chunk.Write(144, style.DimScaleLinear);
+            chunk.Write(146, style.TextFractionHeightScale);
+            chunk.Write(147, style.TextOffset);
+            chunk.Write(148, style.AlternateUnits.Roundoff);
+            chunk.Write(170, style.AlternateUnits.Enabled ? (short) 1 : (short) 0);
+            chunk.Write(171, style.AlternateUnits.LengthPrecision);
+            chunk.Write(172, style.FitDimLineForce ? (short) 1 : (short) 0);
             // code 173 is written later
-            this.chunk.Write(174, style.FitTextInside ? (short) 1 : (short) 0);
-            this.chunk.Write(175, style.FitDimLineInside ? (short) 1 : (short) 0);
-            this.chunk.Write(176, style.DimLineColor.Index);
-            this.chunk.Write(177, style.ExtLineColor.Index);
-            this.chunk.Write(178, style.TextColor.Index);
-            this.chunk.Write(179, style.AngularPrecision);
-            this.chunk.Write(271, style.LengthPrecision);
-            this.chunk.Write(272, style.Tolerances.Precision);
+            chunk.Write(174, style.FitTextInside ? (short) 1 : (short) 0);
+            chunk.Write(175, style.FitDimLineInside ? (short) 1 : (short) 0);
+            chunk.Write(176, style.DimLineColor.Index);
+            chunk.Write(177, style.ExtLineColor.Index);
+            chunk.Write(178, style.TextColor.Index);
+            chunk.Write(179, style.AngularPrecision);
+            chunk.Write(271, style.LengthPrecision);
+            chunk.Write(272, style.Tolerances.Precision);
             switch (style.AlternateUnits.LengthUnits)
             {
                 case LinearUnitType.Scientific:
-                    this.chunk.Write(273, (short) 1);
+                    chunk.Write(273, (short) 1);
                     break;
                 case LinearUnitType.Decimal:
-                    this.chunk.Write(273, (short) 2);
+                    chunk.Write(273, (short) 2);
                     break;
                 case LinearUnitType.Engineering:
-                    this.chunk.Write(273, (short) 3);
+                    chunk.Write(273, (short) 3);
                     break;
                 case LinearUnitType.Architectural:
-                    this.chunk.Write(273, style.AlternateUnits.StackUnits ? (short) 4 : (short) 6);
+                    chunk.Write(273, style.AlternateUnits.StackUnits ? (short) 4 : (short) 6);
                     break;
                 case LinearUnitType.Fractional:
-                    this.chunk.Write(273, style.AlternateUnits.StackUnits ? (short) 5 : (short) 7);
+                    chunk.Write(273, style.AlternateUnits.StackUnits ? (short) 5 : (short) 7);
                     break;
             }       
-            this.chunk.Write(274, style.Tolerances.AlternatePrecision);              
-            this.chunk.Write(275, (short) style.DimAngularUnits);
-            this.chunk.Write(276, (short) style.FractionType);
-            this.chunk.Write(277, (short) style.DimLengthUnits);
-            this.chunk.Write(278, (short) style.DecimalSeparator);
-            this.chunk.Write(279, (short) style.FitTextMove);
-            this.chunk.Write(280, (short) style.TextHorizontalPlacement);
-            this.chunk.Write(281, style.DimLine1Off ? (short) 1 : (short) 0);
-            this.chunk.Write(282, style.DimLine2Off ? (short) 1 : (short) 0);
-            this.chunk.Write(283, (short) style.Tolerances.VerticalPlacement);
-            this.chunk.Write(284, GetSupressZeroesValue(
+            chunk.Write(274, style.Tolerances.AlternatePrecision);              
+            chunk.Write(275, (short) style.DimAngularUnits);
+            chunk.Write(276, (short) style.FractionType);
+            chunk.Write(277, (short) style.DimLengthUnits);
+            chunk.Write(278, (short) style.DecimalSeparator);
+            chunk.Write(279, (short) style.FitTextMove);
+            chunk.Write(280, (short) style.TextHorizontalPlacement);
+            chunk.Write(281, style.DimLine1Off ? (short) 1 : (short) 0);
+            chunk.Write(282, style.DimLine2Off ? (short) 1 : (short) 0);
+            chunk.Write(283, (short) style.Tolerances.VerticalPlacement);
+            chunk.Write(284, GetSupressZeroesValue(
                     style.Tolerances.SuppressLinearLeadingZeros,
                     style.Tolerances.SuppressLinearTrailingZeros,
                     style.Tolerances.SuppressZeroFeet,
                     style.Tolerances.SuppressZeroInches));
-            this.chunk.Write(285, GetSupressZeroesValue(
+            chunk.Write(285, GetSupressZeroesValue(
                     style.AlternateUnits.SuppressLinearLeadingZeros,
                     style.AlternateUnits.SuppressLinearTrailingZeros,
                     style.AlternateUnits.SuppressZeroFeet,
                     style.AlternateUnits.SuppressZeroInches));
-            this.chunk.Write(286, GetSupressZeroesValue(
+            chunk.Write(286, GetSupressZeroesValue(
                     style.Tolerances.AlternateSuppressLinearLeadingZeros,
                     style.Tolerances.AlternateSuppressLinearTrailingZeros,
                     style.Tolerances.AlternateSuppressZeroFeet,
                     style.Tolerances.AlternateSuppressZeroInches));
-            this.chunk.Write(289, (short) style.FitOptions);
-            this.chunk.Write(290, style.ExtLineFixed);
-            this.chunk.Write(294, style.TextDirection == DimensionStyleTextDirection.RightToLeft);
-            this.chunk.Write(340, style.TextStyle.Handle);
+            chunk.Write(289, (short) style.FitOptions);
+            chunk.Write(290, style.ExtLineFixed);
+            chunk.Write(294, style.TextDirection == DimensionStyleTextDirection.RightToLeft);
+            chunk.Write(340, style.TextStyle.Handle);
 
             // CAUTION: The documentation says that the next values are the handles of referenced BLOCK,
             // but they are the handles of referenced BLOCK_RECORD
             if (style.LeaderArrow != null)
-                this.chunk.Write(341, style.LeaderArrow.Record.Handle);
+                chunk.Write(341, style.LeaderArrow.Record.Handle);
 
             if (style.DimArrow1 == null && style.DimArrow2 == null)
             {
-                this.chunk.Write(173, (short) 0);
+                chunk.Write(173, (short) 0);
             }
             else if (style.DimArrow1 == null)
             {
-                this.chunk.Write(173, (short) 1);
+                chunk.Write(173, (short) 1);
                 if (style.DimArrow2 != null)
-                    this.chunk.Write(344, style.DimArrow2.Record.Handle);
+                    chunk.Write(344, style.DimArrow2.Record.Handle);
             }
             else if (style.DimArrow2 == null)
             {
-                this.chunk.Write(173, (short) 1);
+                chunk.Write(173, (short) 1);
                 if (style.DimArrow1 != null)
-                    this.chunk.Write(344, style.DimArrow1.Record.Handle);
+                    chunk.Write(344, style.DimArrow1.Record.Handle);
             }
             else if (string.Equals(style.DimArrow1.Name, style.DimArrow2.Name, StringComparison.OrdinalIgnoreCase))
             {
-                this.chunk.Write(173, (short) 0);
-                this.chunk.Write(342, style.DimArrow1.Record.Handle);
+                chunk.Write(173, (short) 0);
+                chunk.Write(342, style.DimArrow1.Record.Handle);
             }
             else
             {
-                this.chunk.Write(173, (short) 1);
-                this.chunk.Write(343, style.DimArrow1.Record.Handle);
-                this.chunk.Write(344, style.DimArrow2.Record.Handle);
+                chunk.Write(173, (short) 1);
+                chunk.Write(343, style.DimArrow1.Record.Handle);
+                chunk.Write(344, style.DimArrow2.Record.Handle);
             }
 
             // CAUTION: The next three codes are undocumented in the official dxf docs
-            this.chunk.Write(345, style.DimLineLinetype.Handle);
-            this.chunk.Write(346, style.ExtLine1Linetype.Handle);
-            this.chunk.Write(347, style.ExtLine2Linetype.Handle);
+            chunk.Write(345, style.DimLineLinetype.Handle);
+            chunk.Write(346, style.ExtLine1Linetype.Handle);
+            chunk.Write(347, style.ExtLine2Linetype.Handle);
 
-            this.chunk.Write(371, (short) style.DimLineLineweight);
-            this.chunk.Write(372, (short) style.ExtLineLineweight);
+            chunk.Write(371, (short) style.DimLineLineweight);
+            chunk.Write(372, (short) style.ExtLineLineweight);
 
-            this.WriteXData(style.XData);
+            WriteXData(style.XData);
         }      
 
         /// <summary>
@@ -1349,33 +1349,33 @@ namespace netDxf.IO
         /// <param name="blockRecord">Block.</param>
         private void WriteBlockRecord(BlockRecord blockRecord)
         {
-            Debug.Assert(this.activeTable == DxfObjectCode.BlockRecordTable);
+            Debug.Assert(activeTable == DxfObjectCode.BlockRecordTable);
 
-            this.chunk.Write(0, blockRecord.CodeName);
-            this.chunk.Write(5, blockRecord.Handle);
-            this.chunk.Write(330, blockRecord.Owner.Handle);
+            chunk.Write(0, blockRecord.CodeName);
+            chunk.Write(5, blockRecord.Handle);
+            chunk.Write(330, blockRecord.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.TableRecord);
+            chunk.Write(100, SubclassMarker.TableRecord);
 
-            this.chunk.Write(100, SubclassMarker.BlockRecord);
+            chunk.Write(100, SubclassMarker.BlockRecord);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(blockRecord.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(blockRecord.Name));
 
             // Hard-pointer ID/handle to associated LAYOUT object
-            this.chunk.Write(340, blockRecord.Layout == null ? "0" : blockRecord.Layout.Handle);
+            chunk.Write(340, blockRecord.Layout == null ? "0" : blockRecord.Layout.Handle);
 
             // internal blocks do not need more information
             if (blockRecord.IsForInternalUseOnly)
                 return;
 
             // The next three values will only work for dxf version AutoCad2007 and upwards
-            this.chunk.Write(70, (short) blockRecord.Units);
-            this.chunk.Write(280, blockRecord.AllowExploding ? (short) 1 : (short) 0);
-            this.chunk.Write(281, blockRecord.ScaleUniformly ? (short) 1 : (short) 0);
+            chunk.Write(70, (short) blockRecord.Units);
+            chunk.Write(280, blockRecord.AllowExploding ? (short) 1 : (short) 0);
+            chunk.Write(281, blockRecord.ScaleUniformly ? (short) 1 : (short) 0);
 
             AddBlockRecordUnitsXData(blockRecord);
 
-            this.WriteXData(blockRecord.XData);
+            WriteXData(blockRecord.XData);
         }
 
         private static void AddBlockRecordUnitsXData(BlockRecord record)
@@ -1406,70 +1406,70 @@ namespace netDxf.IO
         /// <param name="linetype">Line type.</param>
         private void WriteLinetype(Linetype linetype)
         {
-            Debug.Assert(this.activeTable == DxfObjectCode.LinetypeTable);
+            Debug.Assert(activeTable == DxfObjectCode.LinetypeTable);
 
-            this.chunk.Write(0, linetype.CodeName);
-            this.chunk.Write(5, linetype.Handle);
-            this.chunk.Write(330, linetype.Owner.Handle);
+            chunk.Write(0, linetype.CodeName);
+            chunk.Write(5, linetype.Handle);
+            chunk.Write(330, linetype.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.TableRecord);
+            chunk.Write(100, SubclassMarker.TableRecord);
 
-            this.chunk.Write(100, SubclassMarker.Linetype);
+            chunk.Write(100, SubclassMarker.Linetype);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(linetype.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(linetype.Name));
 
-            this.chunk.Write(70, (short) 0);
+            chunk.Write(70, (short) 0);
 
-            this.chunk.Write(3, this.EncodeNonAsciiCharacters(linetype.Description));
+            chunk.Write(3, EncodeNonAsciiCharacters(linetype.Description));
 
-            this.chunk.Write(72, (short) 65);
-            this.chunk.Write(73, (short) linetype.Segments.Count);
-            this.chunk.Write(40, linetype.Length());
+            chunk.Write(72, (short) 65);
+            chunk.Write(73, (short) linetype.Segments.Count);
+            chunk.Write(40, linetype.Length());
 
             foreach (LinetypeSegment s in linetype.Segments)
             {
-                this.chunk.Write(49, s.Length);
+                chunk.Write(49, s.Length);
                 switch (s.Type)
                 {
                     case LinetypeSegmentType.Simple:
-                        this.chunk.Write(74, (short)0);
+                        chunk.Write(74, (short)0);
                         break;
 
                     case LinetypeSegmentType.Text:
                         LinetypeTextSegment textSegment = (LinetypeTextSegment)s;
                         if (textSegment.RotationType == LinetypeSegmentRotationType.Absolute)
-                            this.chunk.Write(74, (short)3);
+                            chunk.Write(74, (short)3);
                         else
-                            this.chunk.Write(74, (short)2);
+                            chunk.Write(74, (short)2);
 
-                        this.chunk.Write(75, (short)0);
-                        this.chunk.Write(340, textSegment.Style.Handle);
-                        this.chunk.Write(46, textSegment.Scale);
-                        this.chunk.Write(50, textSegment.Rotation); // the dxf documentation is wrong the rotation value is stored in degrees not radians
-                        this.chunk.Write(44, textSegment.Offset.X);
-                        this.chunk.Write(45, textSegment.Offset.Y);
-                        this.chunk.Write(9, this.EncodeNonAsciiCharacters(textSegment.Text));
+                        chunk.Write(75, (short)0);
+                        chunk.Write(340, textSegment.Style.Handle);
+                        chunk.Write(46, textSegment.Scale);
+                        chunk.Write(50, textSegment.Rotation); // the dxf documentation is wrong the rotation value is stored in degrees not radians
+                        chunk.Write(44, textSegment.Offset.X);
+                        chunk.Write(45, textSegment.Offset.Y);
+                        chunk.Write(9, EncodeNonAsciiCharacters(textSegment.Text));
 
                         break;
                     case LinetypeSegmentType.Shape:
                         LinetypeShapeSegment shapeSegment = (LinetypeShapeSegment) s;
                         if(shapeSegment.RotationType == LinetypeSegmentRotationType.Absolute)
-                            this.chunk.Write(74, (short)5);
+                            chunk.Write(74, (short)5);
                         else
-                            this.chunk.Write(74, (short)4);
+                            chunk.Write(74, (short)4);
 
-                        this.chunk.Write(75, shapeSegment.Style.ShapeNumber(shapeSegment.Name)); // this.ShapeNumberFromSHPfile(shapeSegment.Name, shapeSegment.Style.File));
-                        this.chunk.Write(340, shapeSegment.Style.Handle);
-                        this.chunk.Write(46, shapeSegment.Scale);
-                        this.chunk.Write(50, shapeSegment.Rotation); // the dxf documentation is wrong the rotation value is stored in degrees not radians
-                        this.chunk.Write(44, shapeSegment.Offset.X);
-                        this.chunk.Write(45, shapeSegment.Offset.Y);
+                        chunk.Write(75, shapeSegment.Style.ShapeNumber(shapeSegment.Name)); // this.ShapeNumberFromSHPfile(shapeSegment.Name, shapeSegment.Style.File));
+                        chunk.Write(340, shapeSegment.Style.Handle);
+                        chunk.Write(46, shapeSegment.Scale);
+                        chunk.Write(50, shapeSegment.Rotation); // the dxf documentation is wrong the rotation value is stored in degrees not radians
+                        chunk.Write(44, shapeSegment.Offset.X);
+                        chunk.Write(45, shapeSegment.Offset.Y);
 
                         break;
                 }
             }
 
-            this.WriteXData(linetype.XData);
+            WriteXData(linetype.XData);
         }
 
         /// <summary>
@@ -1478,39 +1478,39 @@ namespace netDxf.IO
         /// <param name="layer">Layer.</param>
         private void WriteLayer(Layer layer)
         {
-            Debug.Assert(this.activeTable == DxfObjectCode.LayerTable);
+            Debug.Assert(activeTable == DxfObjectCode.LayerTable);
 
-            this.chunk.Write(0, layer.CodeName);
-            this.chunk.Write(5, layer.Handle);
-            this.chunk.Write(330, layer.Owner.Handle);
+            chunk.Write(0, layer.CodeName);
+            chunk.Write(5, layer.Handle);
+            chunk.Write(330, layer.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.TableRecord);
+            chunk.Write(100, SubclassMarker.TableRecord);
 
-            this.chunk.Write(100, SubclassMarker.Layer);
+            chunk.Write(100, SubclassMarker.Layer);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(layer.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(layer.Name));
 
             LayerFlags flags = LayerFlags.None;
             if (layer.IsFrozen)
                 flags = flags | LayerFlags.Frozen;
             if (layer.IsLocked)
                 flags = flags | LayerFlags.Locked;
-            this.chunk.Write(70, (short) flags);
+            chunk.Write(70, (short) flags);
 
             //a negative color represents a hidden layer.
             if (layer.IsVisible)
-                this.chunk.Write(62, layer.Color.Index);
+                chunk.Write(62, layer.Color.Index);
             else
-                this.chunk.Write(62, (short) -layer.Color.Index);
+                chunk.Write(62, (short) -layer.Color.Index);
             if (layer.Color.UseTrueColor)
-                this.chunk.Write(420, AciColor.ToTrueColor(layer.Color));
+                chunk.Write(420, AciColor.ToTrueColor(layer.Color));
 
-            this.chunk.Write(6, this.EncodeNonAsciiCharacters(layer.Linetype.Name));
+            chunk.Write(6, EncodeNonAsciiCharacters(layer.Linetype.Name));
 
-            this.chunk.Write(290, layer.Plot);
-            this.chunk.Write(370, (short) layer.Lineweight);
+            chunk.Write(290, layer.Plot);
+            chunk.Write(370, (short) layer.Lineweight);
             // Hard pointer ID/handle of PlotStyleName object
-            this.chunk.Write(390, "0");
+            chunk.Write(390, "0");
 
             // transparency is stored in XData
             if (layer.Transparency.Value > 0)
@@ -1518,7 +1518,7 @@ namespace netDxf.IO
                 AddLayerTransparencyXData(layer);
             }
 
-            this.WriteXData(layer.XData);
+            WriteXData(layer.XData);
         }
 
         private static void AddLayerTransparencyXData(Layer layer)
@@ -1547,45 +1547,45 @@ namespace netDxf.IO
         /// <param name="style">TextStyle.</param>
         private void WriteTextStyle(TextStyle style)
         {
-            Debug.Assert(this.activeTable == DxfObjectCode.TextStyleTable);
+            Debug.Assert(activeTable == DxfObjectCode.TextStyleTable);
 
-            this.chunk.Write(0, style.CodeName);
-            this.chunk.Write(5, style.Handle);
-            this.chunk.Write(330, style.Owner.Handle);
+            chunk.Write(0, style.CodeName);
+            chunk.Write(5, style.Handle);
+            chunk.Write(330, style.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.TableRecord);
+            chunk.Write(100, SubclassMarker.TableRecord);
 
-            this.chunk.Write(100, SubclassMarker.TextStyle);
+            chunk.Write(100, SubclassMarker.TextStyle);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(style.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(style.Name));
 
-            this.chunk.Write(3, this.EncodeNonAsciiCharacters(style.FontFile));
+            chunk.Write(3, EncodeNonAsciiCharacters(style.FontFile));
 
             if(!string.IsNullOrEmpty(style.BigFont))
-                this.chunk.Write(4, this.EncodeNonAsciiCharacters(style.BigFont));
+                chunk.Write(4, EncodeNonAsciiCharacters(style.BigFont));
 
-            this.chunk.Write(70, style.IsVertical ? (short) 4 : (short) 0);
+            chunk.Write(70, style.IsVertical ? (short) 4 : (short) 0);
 
             if (style.IsBackward && style.IsUpsideDown)
-                this.chunk.Write(71, (short) 6);
+                chunk.Write(71, (short) 6);
             else if (style.IsBackward)
-                this.chunk.Write(71, (short) 2);
+                chunk.Write(71, (short) 2);
             else if (style.IsUpsideDown)
-                this.chunk.Write(71, (short) 4);
+                chunk.Write(71, (short) 4);
             else
-                this.chunk.Write(71, (short) 0);
+                chunk.Write(71, (short) 0);
 
-            this.chunk.Write(40, style.Height);
-            this.chunk.Write(41, style.WidthFactor);
-            this.chunk.Write(42, style.Height);
-            this.chunk.Write(50, style.ObliqueAngle);
+            chunk.Write(40, style.Height);
+            chunk.Write(41, style.WidthFactor);
+            chunk.Write(42, style.Height);
+            chunk.Write(50, style.ObliqueAngle);
 
             // when a true type font file is present the font information is defined by the file and this information is not needed
             if (style.IsTrueType && string.IsNullOrEmpty(style.FontFile))
             {
-               this.AddTextStyleFontXData(style);
+               AddTextStyleFontXData(style);
             }
-            this.WriteXData(style.XData);
+            WriteXData(style.XData);
         }
 
         private void AddTextStyleFontXData(TextStyle style)
@@ -1604,7 +1604,7 @@ namespace netDxf.IO
             }
             byte[] st = new byte[4];
             st[3] = (byte)style.FontStyle;
-            xdataEntry.XDataRecord.Add(new XDataRecord(XDataCode.String, this.EncodeNonAsciiCharacters(style.FontFamilyName)));
+            xdataEntry.XDataRecord.Add(new XDataRecord(XDataCode.String, EncodeNonAsciiCharacters(style.FontFamilyName)));
             xdataEntry.XDataRecord.Add(new XDataRecord(XDataCode.Int32, BitConverter.ToInt32(st, 0)));
         }
 
@@ -1614,26 +1614,26 @@ namespace netDxf.IO
         /// <param name="style">ShapeStyle.</param>
         private void WriteShapeStyle(ShapeStyle style)
         {
-            Debug.Assert(this.activeTable == DxfObjectCode.TextStyleTable);
+            Debug.Assert(activeTable == DxfObjectCode.TextStyleTable);
 
-            this.chunk.Write(0, style.CodeName);
-            this.chunk.Write(5, style.Handle);
-            this.chunk.Write(330, style.Owner.Handle);
+            chunk.Write(0, style.CodeName);
+            chunk.Write(5, style.Handle);
+            chunk.Write(330, style.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.TableRecord);
+            chunk.Write(100, SubclassMarker.TableRecord);
 
-            this.chunk.Write(100, SubclassMarker.TextStyle);
+            chunk.Write(100, SubclassMarker.TextStyle);
 
-            this.chunk.Write(2, string.Empty);
+            chunk.Write(2, string.Empty);
 
-            this.chunk.Write(3, this.EncodeNonAsciiCharacters(style.File));
-            this.chunk.Write(70, (short)1);
-            this.chunk.Write(40, style.Size);
-            this.chunk.Write(41, style.WidthFactor);
-            this.chunk.Write(42, style.Size);
-            this.chunk.Write(50, style.ObliqueAngle);
+            chunk.Write(3, EncodeNonAsciiCharacters(style.File));
+            chunk.Write(70, (short)1);
+            chunk.Write(40, style.Size);
+            chunk.Write(41, style.WidthFactor);
+            chunk.Write(42, style.Size);
+            chunk.Write(50, style.ObliqueAngle);
 
-            this.WriteXData(style.XData);
+            WriteXData(style.XData);
         }
 
         /// <summary>
@@ -1642,37 +1642,37 @@ namespace netDxf.IO
         /// <param name="ucs">UCS.</param>
         private void WriteUCS(UCS ucs)
         {
-            Debug.Assert(this.activeTable == DxfObjectCode.UcsTable);
+            Debug.Assert(activeTable == DxfObjectCode.UcsTable);
 
-            this.chunk.Write(0, ucs.CodeName);
-            this.chunk.Write(5, ucs.Handle);
-            this.chunk.Write(330, ucs.Owner.Handle);
+            chunk.Write(0, ucs.CodeName);
+            chunk.Write(5, ucs.Handle);
+            chunk.Write(330, ucs.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.TableRecord);
+            chunk.Write(100, SubclassMarker.TableRecord);
 
-            this.chunk.Write(100, SubclassMarker.Ucs);
+            chunk.Write(100, SubclassMarker.Ucs);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(ucs.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(ucs.Name));
 
-            this.chunk.Write(70, (short) 0);
+            chunk.Write(70, (short) 0);
 
-            this.chunk.Write(10, ucs.Origin.X);
-            this.chunk.Write(20, ucs.Origin.Y);
-            this.chunk.Write(30, ucs.Origin.Z);
+            chunk.Write(10, ucs.Origin.X);
+            chunk.Write(20, ucs.Origin.Y);
+            chunk.Write(30, ucs.Origin.Z);
 
-            this.chunk.Write(11, ucs.XAxis.X);
-            this.chunk.Write(21, ucs.XAxis.Y);
-            this.chunk.Write(31, ucs.XAxis.Z);
+            chunk.Write(11, ucs.XAxis.X);
+            chunk.Write(21, ucs.XAxis.Y);
+            chunk.Write(31, ucs.XAxis.Z);
 
-            this.chunk.Write(12, ucs.YAxis.X);
-            this.chunk.Write(22, ucs.YAxis.Y);
-            this.chunk.Write(32, ucs.YAxis.Z);
+            chunk.Write(12, ucs.YAxis.X);
+            chunk.Write(22, ucs.YAxis.Y);
+            chunk.Write(32, ucs.YAxis.Z);
 
-            this.chunk.Write(79, (short) 0);
+            chunk.Write(79, (short) 0);
 
-            this.chunk.Write(146, ucs.Elevation);
+            chunk.Write(146, ucs.Elevation);
 
-            this.WriteXData(ucs.XData);
+            WriteXData(ucs.XData);
         }
 
         #endregion
@@ -1681,43 +1681,43 @@ namespace netDxf.IO
 
         private void WriteBlock(Block block)
         {
-            Debug.Assert(this.activeSection == DxfObjectCode.BlocksSection);
+            Debug.Assert(activeSection == DxfObjectCode.BlocksSection);
 
-            string name = this.EncodeNonAsciiCharacters(block.Name);
-            string blockLayer = this.EncodeNonAsciiCharacters(block.Layer.Name);
+            string name = EncodeNonAsciiCharacters(block.Name);
+            string blockLayer = EncodeNonAsciiCharacters(block.Layer.Name);
             Layout layout = block.Record.Layout;
 
-            this.chunk.Write(0, block.CodeName);
-            this.chunk.Write(5, block.Handle);
-            this.chunk.Write(330, block.Owner.Handle);
+            chunk.Write(0, block.CodeName);
+            chunk.Write(5, block.Handle);
+            chunk.Write(330, block.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.Entity);
+            chunk.Write(100, SubclassMarker.Entity);
 
             if (layout != null)
-                this.chunk.Write(67, layout.IsPaperSpace ? (short) 1 : (short) 0);
+                chunk.Write(67, layout.IsPaperSpace ? (short) 1 : (short) 0);
 
-            this.chunk.Write(8, blockLayer);
+            chunk.Write(8, blockLayer);
 
-            this.chunk.Write(100, SubclassMarker.BlockBegin);
+            chunk.Write(100, SubclassMarker.BlockBegin);
             if (block.IsXRef)
-                this.chunk.Write(1, this.EncodeNonAsciiCharacters(block.XrefFile));
-            this.chunk.Write(2, name);
-            this.chunk.Write(70, (short) block.Flags);
-            this.chunk.Write(10, block.Origin.X);
-            this.chunk.Write(20, block.Origin.Y);
-            this.chunk.Write(30, block.Origin.Z);
-            this.chunk.Write(3, name);
+                chunk.Write(1, EncodeNonAsciiCharacters(block.XrefFile));
+            chunk.Write(2, name);
+            chunk.Write(70, (short) block.Flags);
+            chunk.Write(10, block.Origin.X);
+            chunk.Write(20, block.Origin.Y);
+            chunk.Write(30, block.Origin.Z);
+            chunk.Write(3, name);
 
             if (layout == null)
             {
                 foreach (AttributeDefinition attdef in block.AttributeDefinitions.Values)
                 {
-                    this.WriteAttributeDefinition(attdef, null);
+                    WriteAttributeDefinition(attdef, null);
                 }
 
                 foreach (EntityObject entity in block.Entities)
                 {
-                    this.WriteEntity(entity, null);
+                    WriteEntity(entity, null);
                 }
             }
             else
@@ -1726,29 +1726,29 @@ namespace netDxf.IO
                 if (!(string.Equals(layout.AssociatedBlock.Name, Block.DefaultModelSpaceName, StringComparison.OrdinalIgnoreCase) ||
                       string.Equals(layout.AssociatedBlock.Name, Block.DefaultPaperSpaceName, StringComparison.OrdinalIgnoreCase)))
                 {
-                    this.WriteEntity(layout.Viewport, layout);
+                    WriteEntity(layout.Viewport, layout);
 
                     foreach (AttributeDefinition attdef in layout.AssociatedBlock.AttributeDefinitions.Values)
                     {
-                        this.WriteAttributeDefinition(attdef, layout);
+                        WriteAttributeDefinition(attdef, layout);
                     }
 
                     foreach (EntityObject entity in layout.AssociatedBlock.Entities)
                     {
-                        this.WriteEntity(entity, layout);
+                        WriteEntity(entity, layout);
                     }
                 }               
             }
 
             // EndBlock entity
-            this.chunk.Write(0, block.End.CodeName);
-            this.chunk.Write(5, block.End.Handle);
-            this.chunk.Write(330, block.Owner.Handle);
-            this.chunk.Write(100, SubclassMarker.Entity);
-            this.chunk.Write(8, blockLayer);
-            this.chunk.Write(100, SubclassMarker.BlockEnd);
+            chunk.Write(0, block.End.CodeName);
+            chunk.Write(5, block.End.Handle);
+            chunk.Write(330, block.Owner.Handle);
+            chunk.Write(100, SubclassMarker.Entity);
+            chunk.Write(8, blockLayer);
+            chunk.Write(100, SubclassMarker.BlockEnd);
 
-            this.WriteXData(block.XData);
+            WriteXData(block.XData);
         }
 
         #endregion
@@ -1757,7 +1757,7 @@ namespace netDxf.IO
 
         private void WriteEntity(EntityObject entity, Layout layout)
         {
-            Debug.Assert(this.activeSection == DxfObjectCode.EntitiesSection || this.activeSection == DxfObjectCode.BlocksSection);
+            Debug.Assert(activeSection == DxfObjectCode.EntitiesSection || activeSection == DxfObjectCode.BlocksSection);
             Debug.Assert(entity != null);
 
             // hatches with zero boundaries are not allowed
@@ -1773,93 +1773,93 @@ namespace netDxf.IO
             if (entity.Type == EntityType.LwPolyline && ((LwPolyline) entity).Vertexes.Count < 2)
                 return;
 
-            this.WriteEntityCommonCodes(entity, layout);
+            WriteEntityCommonCodes(entity, layout);
 
             switch (entity.Type)
             {
                 case EntityType.Arc:
-                    this.WriteArc((Arc) entity);
+                    WriteArc((Arc) entity);
                     break;
                 case EntityType.Circle:
-                    this.WriteCircle((Circle) entity);
+                    WriteCircle((Circle) entity);
                     break;
                 case EntityType.Dimension:
-                    this.WriteDimension((Dimension) entity);
+                    WriteDimension((Dimension) entity);
                     break;
                 case EntityType.Ellipse:
-                    this.WriteEllipse((Ellipse) entity);
+                    WriteEllipse((Ellipse) entity);
                     break;
                 case EntityType.Face3D:
-                    this.WriteFace3D((Face3d) entity);
+                    WriteFace3D((Face3d) entity);
                     break;
                 case EntityType.Hatch:
-                    this.WriteHatch((Hatch) entity);
+                    WriteHatch((Hatch) entity);
                     break;
                 case EntityType.Image:
-                    this.WriteImage((Image) entity);
+                    WriteImage((Image) entity);
                     break;
                 case EntityType.Insert:
-                    this.WriteInsert((Insert) entity);
+                    WriteInsert((Insert) entity);
                     break;
                 case EntityType.Leader:
-                    this.WriteLeader((Leader) entity);
+                    WriteLeader((Leader) entity);
                     break;
                 case EntityType.LwPolyline:
-                    this.WriteLightWeightPolyline((LwPolyline) entity);
+                    WriteLightWeightPolyline((LwPolyline) entity);
                     break;
                 case EntityType.Line:
-                    this.WriteLine((Line) entity);
+                    WriteLine((Line) entity);
                     break;
                 case EntityType.Mesh:
-                    this.WriteMesh((Mesh) entity);
+                    WriteMesh((Mesh) entity);
                     break;
                 case EntityType.MLine:
-                    this.WriteMLine((MLine) entity);
+                    WriteMLine((MLine) entity);
                     break;
                 case EntityType.MText:
-                    this.WriteMText((MText) entity);
+                    WriteMText((MText) entity);
                     break;
                 case EntityType.Point:
-                    this.WritePoint((Point) entity);
+                    WritePoint((Point) entity);
                     break;
                 case EntityType.PolyfaceMesh:
-                    this.WritePolyfaceMesh((PolyfaceMesh) entity);
+                    WritePolyfaceMesh((PolyfaceMesh) entity);
                     break;
                 case EntityType.Polyline:
-                    this.WritePolyline((Polyline) entity);
+                    WritePolyline((Polyline) entity);
                     break;
                 case EntityType.Ray:
-                    this.WriteRay((Ray) entity);
+                    WriteRay((Ray) entity);
                     break;
                 case EntityType.Shape:
-                    this.WriteShape((Shape) entity);
+                    WriteShape((Shape) entity);
                     break;
                 case EntityType.Solid:
-                    this.WriteSolid((Solid) entity);
+                    WriteSolid((Solid) entity);
                     break;
                 case EntityType.Spline:
-                    this.WriteSpline((Spline) entity);
+                    WriteSpline((Spline) entity);
                     break;
                 case EntityType.Text:
-                    this.WriteText((Text) entity);
+                    WriteText((Text) entity);
                     break;
                 case EntityType.Tolerance:
-                    this.WriteTolerance((Tolerance) entity);
+                    WriteTolerance((Tolerance) entity);
                     break;
                 case EntityType.Trace:
-                    this.WriteTrace((Trace) entity);
+                    WriteTrace((Trace) entity);
                     break;
                 case EntityType.Underlay:
-                    this.WriteUnderlay((Underlay) entity);
+                    WriteUnderlay((Underlay) entity);
                     break;
                 case EntityType.Viewport:
-                    this.WriteViewport((Viewport) entity);
+                    WriteViewport((Viewport) entity);
                     break;
                 case EntityType.Wipeout:
-                    this.WriteWipeout((Wipeout) entity);
+                    WriteWipeout((Wipeout) entity);
                     break;
                 case EntityType.XLine:
-                    this.WriteXLine((XLine) entity);
+                    WriteXLine((XLine) entity);
                     break;
                 default:
                     throw new ArgumentException("Entity unknown.", nameof(entity));
@@ -1868,45 +1868,45 @@ namespace netDxf.IO
 
         private void WriteEntityCommonCodes(EntityObject entity, Layout layout)
         {
-            this.chunk.Write(0, entity.CodeName);
-            this.chunk.Write(5, entity.Handle);
+            chunk.Write(0, entity.CodeName);
+            chunk.Write(5, entity.Handle);
 
             if (entity.Reactors.Count > 0)
             {
-                this.chunk.Write(102, "{ACAD_REACTORS");
+                chunk.Write(102, "{ACAD_REACTORS");
                 foreach (DxfObject o in entity.Reactors)
                 {
-                    if(!string.IsNullOrEmpty(o.Handle)) this.chunk.Write(330, o.Handle);
+                    if(!string.IsNullOrEmpty(o.Handle)) chunk.Write(330, o.Handle);
                 }
-                this.chunk.Write(102, "}");
+                chunk.Write(102, "}");
             }
 
-            this.chunk.Write(330, entity.Owner.Record.Handle);
+            chunk.Write(330, entity.Owner.Record.Handle);
 
-            this.chunk.Write(100, SubclassMarker.Entity);
+            chunk.Write(100, SubclassMarker.Entity);
 
             if (layout != null)
-                this.chunk.Write(67, layout.IsPaperSpace ? (short) 1 : (short) 0);
+                chunk.Write(67, layout.IsPaperSpace ? (short) 1 : (short) 0);
 
-            this.chunk.Write(8, this.EncodeNonAsciiCharacters(entity.Layer.Name));
+            chunk.Write(8, EncodeNonAsciiCharacters(entity.Layer.Name));
 
-            this.chunk.Write(62, entity.Color.Index);
+            chunk.Write(62, entity.Color.Index);
             if (entity.Color.UseTrueColor)
-                this.chunk.Write(420, AciColor.ToTrueColor(entity.Color));
+                chunk.Write(420, AciColor.ToTrueColor(entity.Color));
 
             if (entity.Transparency.Value >= 0)
-                this.chunk.Write(440, Transparency.ToAlphaValue(entity.Transparency));
+                chunk.Write(440, Transparency.ToAlphaValue(entity.Transparency));
 
-            this.chunk.Write(6, this.EncodeNonAsciiCharacters(entity.Linetype.Name));
+            chunk.Write(6, EncodeNonAsciiCharacters(entity.Linetype.Name));
 
-            this.chunk.Write(370, (short) entity.Lineweight);
-            this.chunk.Write(48, entity.LinetypeScale);
-            this.chunk.Write(60, entity.IsVisible ? (short) 0 : (short) 1);
+            chunk.Write(370, (short) entity.Lineweight);
+            chunk.Write(48, entity.LinetypeScale);
+            chunk.Write(60, entity.IsVisible ? (short) 0 : (short) 1);
         }
 
         private void WriteWipeout(Wipeout wipeout)
         {
-            this.chunk.Write(100, SubclassMarker.Wipeout);
+            chunk.Write(100, SubclassMarker.Wipeout);
 
             BoundingRectangle br = new BoundingRectangle(wipeout.ClippingBoundary.Vertexes);
 
@@ -1920,156 +1920,156 @@ namespace netDxf.IO
             IList<Vector3> wcsPoints = MathHelper.Transform(new List<Vector3> {ocsInsPoint, ocsUx, ocsUy}, wipeout.Normal, CoordinateSystem.Object, CoordinateSystem.World);
 
             // Insertion point in WCS
-            this.chunk.Write(10, wcsPoints[0].X);
-            this.chunk.Write(20, wcsPoints[0].Y);
-            this.chunk.Write(30, wcsPoints[0].Z);
+            chunk.Write(10, wcsPoints[0].X);
+            chunk.Write(20, wcsPoints[0].Y);
+            chunk.Write(30, wcsPoints[0].Z);
 
             // U vector in WCS
-            this.chunk.Write(11, wcsPoints[1].X);
-            this.chunk.Write(21, wcsPoints[1].Y);
-            this.chunk.Write(31, wcsPoints[1].Z);
+            chunk.Write(11, wcsPoints[1].X);
+            chunk.Write(21, wcsPoints[1].Y);
+            chunk.Write(31, wcsPoints[1].Z);
 
             // V vector in WCS
-            this.chunk.Write(12, wcsPoints[2].X);
-            this.chunk.Write(22, wcsPoints[2].Y);
-            this.chunk.Write(32, wcsPoints[2].Z);
+            chunk.Write(12, wcsPoints[2].X);
+            chunk.Write(22, wcsPoints[2].Y);
+            chunk.Write(32, wcsPoints[2].Z);
 
-            this.chunk.Write(13, 1.0);
-            this.chunk.Write(23, 1.0);
+            chunk.Write(13, 1.0);
+            chunk.Write(23, 1.0);
 
             //this.chunk.Write(280, wipeout.ShowClippingFrame ? (short) 1 : (short) 0);
-            this.chunk.Write(280, (short) 1);
-            this.chunk.Write(281, (short) 50);
-            this.chunk.Write(282, (short) 50);
-            this.chunk.Write(283, (short) 0);
+            chunk.Write(280, (short) 1);
+            chunk.Write(281, (short) 50);
+            chunk.Write(282, (short) 50);
+            chunk.Write(283, (short) 0);
 
-            this.chunk.Write(71, (short) wipeout.ClippingBoundary.Type);
+            chunk.Write(71, (short) wipeout.ClippingBoundary.Type);
 
             // for unknown reasons the wipeout with a polygonal clipping boundary requires to repeat the first vertex
             if (wipeout.ClippingBoundary.Type == ClippingBoundaryType.Polygonal)
             {
-                this.chunk.Write(91, wipeout.ClippingBoundary.Vertexes.Count + 1);
+                chunk.Write(91, wipeout.ClippingBoundary.Vertexes.Count + 1);
                 foreach (Vector2 vertex in wipeout.ClippingBoundary.Vertexes)
                 {
                     double x = (vertex.X - ocsInsPoint.X)/max - 0.5;
                     double y = -((vertex.Y - ocsInsPoint.Y)/max - 0.5);
-                    this.chunk.Write(14, x);
-                    this.chunk.Write(24, y);
+                    chunk.Write(14, x);
+                    chunk.Write(24, y);
                 }
-                this.chunk.Write(14, (wipeout.ClippingBoundary.Vertexes[0].X - ocsInsPoint.X)/max - 0.5);
-                this.chunk.Write(24, -((wipeout.ClippingBoundary.Vertexes[0].Y - ocsInsPoint.Y)/max - 0.5));
+                chunk.Write(14, (wipeout.ClippingBoundary.Vertexes[0].X - ocsInsPoint.X)/max - 0.5);
+                chunk.Write(24, -((wipeout.ClippingBoundary.Vertexes[0].Y - ocsInsPoint.Y)/max - 0.5));
             }
             else
             {
-                this.chunk.Write(91, wipeout.ClippingBoundary.Vertexes.Count);
+                chunk.Write(91, wipeout.ClippingBoundary.Vertexes.Count);
                 foreach (Vector2 vertex in wipeout.ClippingBoundary.Vertexes)
                 {
                     double x = (vertex.X - ocsInsPoint.X)/max - 0.5;
                     double y = -((vertex.Y - ocsInsPoint.Y)/max - 0.5);
-                    this.chunk.Write(14, x);
-                    this.chunk.Write(24, y);
+                    chunk.Write(14, x);
+                    chunk.Write(24, y);
                 }
             }
-            this.WriteXData(wipeout.XData);
+            WriteXData(wipeout.XData);
         }
 
         private void WriteUnderlay(Underlay underlay)
         {
-            this.chunk.Write(100, SubclassMarker.Underlay);
+            chunk.Write(100, SubclassMarker.Underlay);
 
-            this.chunk.Write(340, underlay.Definition.Handle);
+            chunk.Write(340, underlay.Definition.Handle);
 
             Vector3 ocsPosition = MathHelper.Transform(underlay.Position, underlay.Normal, CoordinateSystem.World, CoordinateSystem.Object);
-            this.chunk.Write(10, ocsPosition.X);
-            this.chunk.Write(20, ocsPosition.Y);
-            this.chunk.Write(30, ocsPosition.Z);
+            chunk.Write(10, ocsPosition.X);
+            chunk.Write(20, ocsPosition.Y);
+            chunk.Write(30, ocsPosition.Z);
 
-            this.chunk.Write(41, underlay.Scale.X);
-            this.chunk.Write(42, underlay.Scale.Y);
-            this.chunk.Write(43, 1.0);
+            chunk.Write(41, underlay.Scale.X);
+            chunk.Write(42, underlay.Scale.Y);
+            chunk.Write(43, 1.0);
 
-            this.chunk.Write(50, underlay.Rotation);
+            chunk.Write(50, underlay.Rotation);
 
-            this.chunk.Write(210, underlay.Normal.X);
-            this.chunk.Write(220, underlay.Normal.Y);
-            this.chunk.Write(230, underlay.Normal.Z);
+            chunk.Write(210, underlay.Normal.X);
+            chunk.Write(220, underlay.Normal.Y);
+            chunk.Write(230, underlay.Normal.Z);
 
-            this.chunk.Write(280, (short) underlay.DisplayOptions);
+            chunk.Write(280, (short) underlay.DisplayOptions);
 
-            this.chunk.Write(281, underlay.Contrast);
-            this.chunk.Write(282, underlay.Fade);
+            chunk.Write(281, underlay.Contrast);
+            chunk.Write(282, underlay.Fade);
 
             if (underlay.ClippingBoundary != null)
             {
                 foreach (Vector2 vertex in underlay.ClippingBoundary.Vertexes)
                 {
-                    this.chunk.Write(11, vertex.X);
-                    this.chunk.Write(21, vertex.Y);
+                    chunk.Write(11, vertex.X);
+                    chunk.Write(21, vertex.Y);
                 }
             }
         }
 
         private void WriteTolerance(Tolerance tolerance)
         {
-            this.chunk.Write(100, SubclassMarker.Tolerance);
+            chunk.Write(100, SubclassMarker.Tolerance);
 
-            this.chunk.Write(3, this.EncodeNonAsciiCharacters(tolerance.Style.Name));
+            chunk.Write(3, EncodeNonAsciiCharacters(tolerance.Style.Name));
 
-            this.chunk.Write(10, tolerance.Position.X);
-            this.chunk.Write(20, tolerance.Position.Y);
-            this.chunk.Write(30, tolerance.Position.Z);
+            chunk.Write(10, tolerance.Position.X);
+            chunk.Write(20, tolerance.Position.Y);
+            chunk.Write(30, tolerance.Position.Z);
 
             string rep = tolerance.ToStringRepresentation();
-            this.chunk.Write(1, this.EncodeNonAsciiCharacters(rep));
+            chunk.Write(1, EncodeNonAsciiCharacters(rep));
 
-            this.chunk.Write(210, tolerance.Normal.X);
-            this.chunk.Write(220, tolerance.Normal.Y);
-            this.chunk.Write(230, tolerance.Normal.Z);
+            chunk.Write(210, tolerance.Normal.X);
+            chunk.Write(220, tolerance.Normal.Y);
+            chunk.Write(230, tolerance.Normal.Z);
 
             double angle = tolerance.Rotation*MathHelper.DegToRad;
             Vector3 xAxis = new Vector3(Math.Cos(angle), Math.Sin(angle), 0.0);
             xAxis = MathHelper.Transform(xAxis, tolerance.Normal, CoordinateSystem.Object, CoordinateSystem.World);
 
-            this.chunk.Write(11, xAxis.X);
-            this.chunk.Write(21, xAxis.Y);
-            this.chunk.Write(31, xAxis.Z);
+            chunk.Write(11, xAxis.X);
+            chunk.Write(21, xAxis.Y);
+            chunk.Write(31, xAxis.Z);
         }
 
         private void WriteLeader(Leader leader)
         {
-            this.chunk.Write(100, SubclassMarker.Leader);
+            chunk.Write(100, SubclassMarker.Leader);
 
-            this.chunk.Write(3, leader.Style.Name);
+            chunk.Write(3, leader.Style.Name);
 
             if (leader.ShowArrowhead)
-                this.chunk.Write(71, (short) 1);
+                chunk.Write(71, (short) 1);
             else
-                this.chunk.Write(71, (short) 0);
+                chunk.Write(71, (short) 0);
 
-            this.chunk.Write(72, (short) leader.PathType);
+            chunk.Write(72, (short) leader.PathType);
 
             if (leader.Annotation != null)
             {
                 switch (leader.Annotation.Type)
                 {
                     case EntityType.MText:
-                        this.chunk.Write(73, (short) 0);
+                        chunk.Write(73, (short) 0);
                         break;
                     case EntityType.Insert:
-                        this.chunk.Write(73, (short) 2);
+                        chunk.Write(73, (short) 2);
                         break;
                     default:
-                        this.chunk.Write(73, (short) 3);
+                        chunk.Write(73, (short) 3);
                         break;
                 }
             }
             else
             {
-                this.chunk.Write(73, (short) 3);
+                chunk.Write(73, (short) 3);
             }
 
-            this.chunk.Write(74, (short) 0);
-            this.chunk.Write(75, leader.HasHookline ? (short) 1 : (short) 0);
+            chunk.Write(74, (short) 0);
+            chunk.Write(75, leader.HasHookline ? (short) 1 : (short) 0);
 
             //this.chunk.Write(40, 0.0);
             //this.chunk.Write(41, 0.0);
@@ -2079,63 +2079,63 @@ namespace netDxf.IO
                 ocsVertexes.Add(new Vector3(vector.X, vector.Y, leader.Elevation));
 
             IList<Vector3> wcsVertexes = MathHelper.Transform(ocsVertexes, leader.Normal, CoordinateSystem.Object, CoordinateSystem.World);
-            this.chunk.Write(76, (short) wcsVertexes.Count);
+            chunk.Write(76, (short) wcsVertexes.Count);
             foreach (Vector3 vertex in wcsVertexes)
             {
-                this.chunk.Write(10, vertex.X);
-                this.chunk.Write(20, vertex.Y);
-                this.chunk.Write(30, vertex.Z);
+                chunk.Write(10, vertex.X);
+                chunk.Write(20, vertex.Y);
+                chunk.Write(30, vertex.Z);
             }
 
-            this.chunk.Write(77, leader.LineColor.Index);
+            chunk.Write(77, leader.LineColor.Index);
 
             if (leader.Annotation != null)
-                this.chunk.Write(340, leader.Annotation.Handle);
+                chunk.Write(340, leader.Annotation.Handle);
 
-            this.chunk.Write(210, leader.Normal.X);
-            this.chunk.Write(220, leader.Normal.Y);
-            this.chunk.Write(230, leader.Normal.Z);
+            chunk.Write(210, leader.Normal.X);
+            chunk.Write(220, leader.Normal.Y);
+            chunk.Write(230, leader.Normal.Z);
 
             Vector3 dir = ocsVertexes[ocsVertexes.Count-1] - ocsVertexes[ocsVertexes.Count - 2];
 
             Vector3 xDir = MathHelper.Transform(new Vector3(dir.X, dir.Y, 0.0), leader.Normal, CoordinateSystem.Object, CoordinateSystem.World);
             xDir.Normalize();
-            this.chunk.Write(211, xDir.X);
-            this.chunk.Write(221, xDir.Y);
-            this.chunk.Write(231, xDir.Z);
+            chunk.Write(211, xDir.X);
+            chunk.Write(221, xDir.Y);
+            chunk.Write(231, xDir.Z);
 
             Vector3 wcsOffset = MathHelper.Transform(new Vector3(leader.Offset.X, leader.Offset.Y, leader.Elevation), leader.Normal, CoordinateSystem.Object, CoordinateSystem.World);
-            this.chunk.Write(212, wcsOffset.X);
-            this.chunk.Write(222, wcsOffset.Y);
-            this.chunk.Write(232, wcsOffset.Z);
+            chunk.Write(212, wcsOffset.X);
+            chunk.Write(222, wcsOffset.Y);
+            chunk.Write(232, wcsOffset.Z);
 
-            this.chunk.Write(213, wcsOffset.X);
-            this.chunk.Write(223, wcsOffset.Y);
-            this.chunk.Write(233, wcsOffset.Z);
+            chunk.Write(213, wcsOffset.X);
+            chunk.Write(223, wcsOffset.Y);
+            chunk.Write(233, wcsOffset.Z);
 
             // dimension style overrides info
             if (leader.StyleOverrides.Count > 0)
-                this.AddDimensionStyleOverridesXData(leader.XData, leader.StyleOverrides);
+                AddDimensionStyleOverridesXData(leader.XData, leader.StyleOverrides);
 
-            this.WriteXData(leader.XData);
+            WriteXData(leader.XData);
         }
 
         private void WriteMesh(Mesh mesh)
         {
-            this.chunk.Write(100, SubclassMarker.Mesh);
+            chunk.Write(100, SubclassMarker.Mesh);
 
-            this.chunk.Write(71, (short) 2);
-            this.chunk.Write(72, (short) 0);
+            chunk.Write(71, (short) 2);
+            chunk.Write(72, (short) 0);
 
-            this.chunk.Write(91, (int) mesh.SubdivisionLevel);
+            chunk.Write(91, (int) mesh.SubdivisionLevel);
 
             //vertexes
-            this.chunk.Write(92, mesh.Vertexes.Count);
+            chunk.Write(92, mesh.Vertexes.Count);
             foreach (Vector3 vertex in mesh.Vertexes)
             {
-                this.chunk.Write(10, vertex.X);
-                this.chunk.Write(20, vertex.Y);
-                this.chunk.Write(30, vertex.Z);
+                chunk.Write(10, vertex.X);
+                chunk.Write(20, vertex.Y);
+                chunk.Write(30, vertex.Z);
             }
 
             //faces
@@ -2144,13 +2144,13 @@ namespace netDxf.IO
             {
                 sizeFaceList += face.Length;
             }
-            this.chunk.Write(93, sizeFaceList);
+            chunk.Write(93, sizeFaceList);
             foreach (int[] face in mesh.Faces)
             {
-                this.chunk.Write(90, face.Length);
+                chunk.Write(90, face.Length);
                 foreach (int index in face)
                 {
-                    this.chunk.Write(90, index);
+                    chunk.Write(90, index);
                 }
             }
 
@@ -2158,125 +2158,125 @@ namespace netDxf.IO
             if (mesh.Edges != null)
             {
                 //edges
-                this.chunk.Write(94, mesh.Edges.Count);
+                chunk.Write(94, mesh.Edges.Count);
                 foreach (MeshEdge edge in mesh.Edges)
                 {
-                    this.chunk.Write(90, edge.StartVertexIndex);
-                    this.chunk.Write(90, edge.EndVertexIndex);
+                    chunk.Write(90, edge.StartVertexIndex);
+                    chunk.Write(90, edge.EndVertexIndex);
                 }
 
                 //creases
-                this.chunk.Write(95, mesh.Edges.Count);
+                chunk.Write(95, mesh.Edges.Count);
                 foreach (MeshEdge edge in mesh.Edges)
                 {
-                    this.chunk.Write(140, edge.Crease);
+                    chunk.Write(140, edge.Crease);
                 }
             }
 
-            this.chunk.Write(90, 0);
+            chunk.Write(90, 0);
 
-            this.WriteXData(mesh.XData);
+            WriteXData(mesh.XData);
         }
 
         private void WriteShape(Shape shape)
         {
-            this.chunk.Write(100, SubclassMarker.Shape);
+            chunk.Write(100, SubclassMarker.Shape);
 
-            this.chunk.Write(39, shape.Thickness);
-            this.chunk.Write(10, shape.Position.X);
-            this.chunk.Write(20, shape.Position.Y);
-            this.chunk.Write(30, shape.Position.Z);
-            this.chunk.Write(40, shape.Size);
-            this.chunk.Write(2, shape.Name);
-            this.chunk.Write(50, shape.Rotation);
-            this.chunk.Write(41, shape.WidthFactor);
-            this.chunk.Write(51, shape.ObliqueAngle);
+            chunk.Write(39, shape.Thickness);
+            chunk.Write(10, shape.Position.X);
+            chunk.Write(20, shape.Position.Y);
+            chunk.Write(30, shape.Position.Z);
+            chunk.Write(40, shape.Size);
+            chunk.Write(2, shape.Name);
+            chunk.Write(50, shape.Rotation);
+            chunk.Write(41, shape.WidthFactor);
+            chunk.Write(51, shape.ObliqueAngle);
 
-            this.chunk.Write(210, shape.Normal.X);
-            this.chunk.Write(220, shape.Normal.Y);
-            this.chunk.Write(230, shape.Normal.Z);
+            chunk.Write(210, shape.Normal.X);
+            chunk.Write(220, shape.Normal.Y);
+            chunk.Write(230, shape.Normal.Z);
 
-            this.WriteXData(shape.XData);
+            WriteXData(shape.XData);
         }
 
         private void WriteArc(Arc arc)
         {
-            this.chunk.Write(100, SubclassMarker.Circle);
+            chunk.Write(100, SubclassMarker.Circle);
 
-            this.chunk.Write(39, arc.Thickness);
+            chunk.Write(39, arc.Thickness);
 
             // this is just an example of the weird Autodesk dxf way of doing things, while an ellipse the center is given in world coordinates,
             // the center of an arc is given in object coordinates (different rules for the same concept).
             // It is a lot more intuitive to give the center in world coordinates and then define the orientation with the normal..
             Vector3 ocsCenter = MathHelper.Transform(arc.Center, arc.Normal, CoordinateSystem.World, CoordinateSystem.Object);
 
-            this.chunk.Write(10, ocsCenter.X);
-            this.chunk.Write(20, ocsCenter.Y);
-            this.chunk.Write(30, ocsCenter.Z);
+            chunk.Write(10, ocsCenter.X);
+            chunk.Write(20, ocsCenter.Y);
+            chunk.Write(30, ocsCenter.Z);
 
-            this.chunk.Write(40, arc.Radius);
+            chunk.Write(40, arc.Radius);
 
-            this.chunk.Write(210, arc.Normal.X);
-            this.chunk.Write(220, arc.Normal.Y);
-            this.chunk.Write(230, arc.Normal.Z);
+            chunk.Write(210, arc.Normal.X);
+            chunk.Write(220, arc.Normal.Y);
+            chunk.Write(230, arc.Normal.Z);
 
-            this.chunk.Write(100, SubclassMarker.Arc);
-            this.chunk.Write(50, arc.StartAngle);
-            this.chunk.Write(51, arc.EndAngle);
+            chunk.Write(100, SubclassMarker.Arc);
+            chunk.Write(50, arc.StartAngle);
+            chunk.Write(51, arc.EndAngle);
 
-            this.WriteXData(arc.XData);
+            WriteXData(arc.XData);
         }
 
         private void WriteCircle(Circle circle)
         {
-            this.chunk.Write(100, SubclassMarker.Circle);
+            chunk.Write(100, SubclassMarker.Circle);
 
             // this is just an example of the stupid autodesk dxf way of doing things, while an ellipse the center is given in world coordinates,
             // the center of a circle is given in object coordinates (different rules for the same concept).
             // It is a lot more intuitive to give the center in world coordinates and then define the orientation with the normal..
             Vector3 ocsCenter = MathHelper.Transform(circle.Center, circle.Normal, CoordinateSystem.World, CoordinateSystem.Object);
 
-            this.chunk.Write(10, ocsCenter.X);
-            this.chunk.Write(20, ocsCenter.Y);
-            this.chunk.Write(30, ocsCenter.Z);
+            chunk.Write(10, ocsCenter.X);
+            chunk.Write(20, ocsCenter.Y);
+            chunk.Write(30, ocsCenter.Z);
 
-            this.chunk.Write(40, circle.Radius);
+            chunk.Write(40, circle.Radius);
 
-            this.chunk.Write(39, circle.Thickness);
+            chunk.Write(39, circle.Thickness);
 
-            this.chunk.Write(210, circle.Normal.X);
-            this.chunk.Write(220, circle.Normal.Y);
-            this.chunk.Write(230, circle.Normal.Z);
+            chunk.Write(210, circle.Normal.X);
+            chunk.Write(220, circle.Normal.Y);
+            chunk.Write(230, circle.Normal.Z);
 
-            this.WriteXData(circle.XData);
+            WriteXData(circle.XData);
         }
 
         private void WriteEllipse(Ellipse ellipse)
         {
-            this.chunk.Write(100, SubclassMarker.Ellipse);
+            chunk.Write(100, SubclassMarker.Ellipse);
 
-            this.chunk.Write(10, ellipse.Center.X);
-            this.chunk.Write(20, ellipse.Center.Y);
-            this.chunk.Write(30, ellipse.Center.Z);
+            chunk.Write(10, ellipse.Center.X);
+            chunk.Write(20, ellipse.Center.Y);
+            chunk.Write(30, ellipse.Center.Z);
 
             Vector2 axis = Vector2.Rotate(new Vector2(0.5*ellipse.MajorAxis, 0.0), ellipse.Rotation * MathHelper.DegToRad);
             Vector3 axisPoint = MathHelper.Transform(new Vector3(axis.X, axis.Y, 0.0), ellipse.Normal, CoordinateSystem.Object, CoordinateSystem.World);
 
-            this.chunk.Write(11, axisPoint.X);
-            this.chunk.Write(21, axisPoint.Y);
-            this.chunk.Write(31, axisPoint.Z);
+            chunk.Write(11, axisPoint.X);
+            chunk.Write(21, axisPoint.Y);
+            chunk.Write(31, axisPoint.Z);
 
-            this.chunk.Write(210, ellipse.Normal.X);
-            this.chunk.Write(220, ellipse.Normal.Y);
-            this.chunk.Write(230, ellipse.Normal.Z);
+            chunk.Write(210, ellipse.Normal.X);
+            chunk.Write(220, ellipse.Normal.Y);
+            chunk.Write(230, ellipse.Normal.Z);
 
-            this.chunk.Write(40, ellipse.MinorAxis/ellipse.MajorAxis);
+            chunk.Write(40, ellipse.MinorAxis/ellipse.MajorAxis);
 
             double[] paramaters = GetEllipseParameters(ellipse);
-            this.chunk.Write(41, paramaters[0]);
-            this.chunk.Write(42, paramaters[1]);
+            chunk.Write(41, paramaters[0]);
+            chunk.Write(42, paramaters[1]);
 
-            this.WriteXData(ellipse.XData);
+            WriteXData(ellipse.XData);
         }
 
         private static double[] GetEllipseParameters(Ellipse ellipse)
@@ -2307,92 +2307,92 @@ namespace netDxf.IO
 
         private void WriteSolid(Solid solid)
         {
-            this.chunk.Write(100, SubclassMarker.Solid);
+            chunk.Write(100, SubclassMarker.Solid);
 
             // the vertexes are stored in OCS
-            this.chunk.Write(10, solid.FirstVertex.X);
-            this.chunk.Write(20, solid.FirstVertex.Y);
-            this.chunk.Write(30, solid.Elevation);
+            chunk.Write(10, solid.FirstVertex.X);
+            chunk.Write(20, solid.FirstVertex.Y);
+            chunk.Write(30, solid.Elevation);
 
-            this.chunk.Write(11, solid.SecondVertex.X);
-            this.chunk.Write(21, solid.SecondVertex.Y);
-            this.chunk.Write(31, solid.Elevation);
+            chunk.Write(11, solid.SecondVertex.X);
+            chunk.Write(21, solid.SecondVertex.Y);
+            chunk.Write(31, solid.Elevation);
 
-            this.chunk.Write(12, solid.ThirdVertex.X);
-            this.chunk.Write(22, solid.ThirdVertex.Y);
-            this.chunk.Write(32, solid.Elevation);
+            chunk.Write(12, solid.ThirdVertex.X);
+            chunk.Write(22, solid.ThirdVertex.Y);
+            chunk.Write(32, solid.Elevation);
 
-            this.chunk.Write(13, solid.FourthVertex.X);
-            this.chunk.Write(23, solid.FourthVertex.Y);
-            this.chunk.Write(33, solid.Elevation);
+            chunk.Write(13, solid.FourthVertex.X);
+            chunk.Write(23, solid.FourthVertex.Y);
+            chunk.Write(33, solid.Elevation);
 
-            this.chunk.Write(39, solid.Thickness);
+            chunk.Write(39, solid.Thickness);
 
-            this.chunk.Write(210, solid.Normal.X);
-            this.chunk.Write(220, solid.Normal.Y);
-            this.chunk.Write(230, solid.Normal.Z);
+            chunk.Write(210, solid.Normal.X);
+            chunk.Write(220, solid.Normal.Y);
+            chunk.Write(230, solid.Normal.Z);
 
-            this.WriteXData(solid.XData);
+            WriteXData(solid.XData);
         }
 
         private void WriteTrace(Trace trace)
         {
-            this.chunk.Write(100, SubclassMarker.Trace);
+            chunk.Write(100, SubclassMarker.Trace);
 
             // the vertexes are stored in OCS
-            this.chunk.Write(10, trace.FirstVertex.X);
-            this.chunk.Write(20, trace.FirstVertex.Y);
-            this.chunk.Write(30, trace.Elevation);
+            chunk.Write(10, trace.FirstVertex.X);
+            chunk.Write(20, trace.FirstVertex.Y);
+            chunk.Write(30, trace.Elevation);
 
-            this.chunk.Write(11, trace.SecondVertex.X);
-            this.chunk.Write(21, trace.SecondVertex.Y);
-            this.chunk.Write(31, trace.Elevation);
+            chunk.Write(11, trace.SecondVertex.X);
+            chunk.Write(21, trace.SecondVertex.Y);
+            chunk.Write(31, trace.Elevation);
 
-            this.chunk.Write(12, trace.ThirdVertex.X);
-            this.chunk.Write(22, trace.ThirdVertex.Y);
-            this.chunk.Write(32, trace.Elevation);
+            chunk.Write(12, trace.ThirdVertex.X);
+            chunk.Write(22, trace.ThirdVertex.Y);
+            chunk.Write(32, trace.Elevation);
 
-            this.chunk.Write(13, trace.FourthVertex.X);
-            this.chunk.Write(23, trace.FourthVertex.Y);
-            this.chunk.Write(33, trace.Elevation);
+            chunk.Write(13, trace.FourthVertex.X);
+            chunk.Write(23, trace.FourthVertex.Y);
+            chunk.Write(33, trace.Elevation);
 
-            this.chunk.Write(39, trace.Thickness);
+            chunk.Write(39, trace.Thickness);
 
-            this.chunk.Write(210, trace.Normal.X);
-            this.chunk.Write(220, trace.Normal.Y);
-            this.chunk.Write(230, trace.Normal.Z);
+            chunk.Write(210, trace.Normal.X);
+            chunk.Write(220, trace.Normal.Y);
+            chunk.Write(230, trace.Normal.Z);
 
-            this.WriteXData(trace.XData);
+            WriteXData(trace.XData);
         }
 
         private void WriteFace3D(Face3d face)
         {
-            this.chunk.Write(100, SubclassMarker.Face3d);
+            chunk.Write(100, SubclassMarker.Face3d);
 
-            this.chunk.Write(10, face.FirstVertex.X);
-            this.chunk.Write(20, face.FirstVertex.Y);
-            this.chunk.Write(30, face.FirstVertex.Z);
+            chunk.Write(10, face.FirstVertex.X);
+            chunk.Write(20, face.FirstVertex.Y);
+            chunk.Write(30, face.FirstVertex.Z);
 
-            this.chunk.Write(11, face.SecondVertex.X);
-            this.chunk.Write(21, face.SecondVertex.Y);
-            this.chunk.Write(31, face.SecondVertex.Z);
+            chunk.Write(11, face.SecondVertex.X);
+            chunk.Write(21, face.SecondVertex.Y);
+            chunk.Write(31, face.SecondVertex.Z);
 
-            this.chunk.Write(12, face.ThirdVertex.X);
-            this.chunk.Write(22, face.ThirdVertex.Y);
-            this.chunk.Write(32, face.ThirdVertex.Z);
+            chunk.Write(12, face.ThirdVertex.X);
+            chunk.Write(22, face.ThirdVertex.Y);
+            chunk.Write(32, face.ThirdVertex.Z);
 
-            this.chunk.Write(13, face.FourthVertex.X);
-            this.chunk.Write(23, face.FourthVertex.Y);
-            this.chunk.Write(33, face.FourthVertex.Z);
+            chunk.Write(13, face.FourthVertex.X);
+            chunk.Write(23, face.FourthVertex.Y);
+            chunk.Write(33, face.FourthVertex.Z);
 
-            this.chunk.Write(70, (short) face.EdgeFlags);
+            chunk.Write(70, (short) face.EdgeFlags);
 
-            this.WriteXData(face.XData);
+            WriteXData(face.XData);
         }
 
         private void WriteSpline(Spline spline)
         {
-            this.chunk.Write(100, SubclassMarker.Spline);
+            chunk.Write(100, SubclassMarker.Spline);
 
             short flags = (short) spline.Flags;
 
@@ -2405,8 +2405,8 @@ namespace netDxf.IO
             if (spline.IsPeriodic)
                 flags += (short) SplinetypeFlags.ClosedPeriodicSpline;
 
-            this.chunk.Write(70, flags);
-            this.chunk.Write(71, spline.Degree);
+            chunk.Write(70, flags);
+            chunk.Write(71, spline.Degree);
 
             // the next two codes are purely cosmetic and writing them causes more bad than good.
             // internally AutoCad allows for an INT number of knots and control points,
@@ -2416,461 +2416,461 @@ namespace netDxf.IO
             //this.chunk.Write(73, (short)spline.ControlPoints.Count);
             //this.chunk.Write(74, (short)spline.FitPoints.Count);
 
-            this.chunk.Write(42, spline.KnotTolerance);
-            this.chunk.Write(43, spline.CtrlPointTolerance);
-            this.chunk.Write(44, spline.FitTolerance);
+            chunk.Write(42, spline.KnotTolerance);
+            chunk.Write(43, spline.CtrlPointTolerance);
+            chunk.Write(44, spline.FitTolerance);
 
             if (spline.StartTangent != null)
             {
-                this.chunk.Write(12, spline.StartTangent.Value.X);
-                this.chunk.Write(22, spline.StartTangent.Value.Y);
-                this.chunk.Write(32, spline.StartTangent.Value.Z);
+                chunk.Write(12, spline.StartTangent.Value.X);
+                chunk.Write(22, spline.StartTangent.Value.Y);
+                chunk.Write(32, spline.StartTangent.Value.Z);
             }
 
             if (spline.EndTangent != null)
             {
-                this.chunk.Write(13, spline.EndTangent.Value.X);
-                this.chunk.Write(23, spline.EndTangent.Value.Y);
-                this.chunk.Write(33, spline.EndTangent.Value.Z);
+                chunk.Write(13, spline.EndTangent.Value.X);
+                chunk.Write(23, spline.EndTangent.Value.Y);
+                chunk.Write(33, spline.EndTangent.Value.Z);
             }
 
             foreach (double knot in spline.Knots)
-                this.chunk.Write(40, knot);
+                chunk.Write(40, knot);
 
             foreach (SplineVertex point in spline.ControlPoints)
             {
-                this.chunk.Write(41, point.Weight);
-                this.chunk.Write(10, point.Position.X);
-                this.chunk.Write(20, point.Position.Y);
-                this.chunk.Write(30, point.Position.Z);
+                chunk.Write(41, point.Weight);
+                chunk.Write(10, point.Position.X);
+                chunk.Write(20, point.Position.Y);
+                chunk.Write(30, point.Position.Z);
             }
 
             foreach (Vector3 point in spline.FitPoints)
             {
-                this.chunk.Write(11, point.X);
-                this.chunk.Write(21, point.Y);
-                this.chunk.Write(31, point.Z);
+                chunk.Write(11, point.X);
+                chunk.Write(21, point.Y);
+                chunk.Write(31, point.Z);
             }
 
 
-            this.WriteXData(spline.XData);
+            WriteXData(spline.XData);
         }
 
         private void WriteInsert(Insert insert)
         {
-            this.chunk.Write(100, SubclassMarker.Insert);
+            chunk.Write(100, SubclassMarker.Insert);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(insert.Block.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(insert.Block.Name));
 
             // It is a lot more intuitive to give the center in world coordinates and then define the orientation with the normal.
             Vector3 ocsInsertion = MathHelper.Transform(insert.Position, insert.Normal, CoordinateSystem.World, CoordinateSystem.Object);
 
-            this.chunk.Write(10, ocsInsertion.X);
-            this.chunk.Write(20, ocsInsertion.Y);
-            this.chunk.Write(30, ocsInsertion.Z);
+            chunk.Write(10, ocsInsertion.X);
+            chunk.Write(20, ocsInsertion.Y);
+            chunk.Write(30, ocsInsertion.Z);
 
             // we need to apply the scaling factor between the block and the document or the block that owns it in case of nested blocks
-            double scale = UnitHelper.ConversionFactor(insert.Block.Record.Units, insert.Owner.Record.IsForInternalUseOnly ? this.doc.DrawingVariables.InsUnits : insert.Owner.Record.Units);
+            double scale = UnitHelper.ConversionFactor(insert.Block.Record.Units, insert.Owner.Record.IsForInternalUseOnly ? doc.DrawingVariables.InsUnits : insert.Owner.Record.Units);
 
-            this.chunk.Write(41, insert.Scale.X*scale);
-            this.chunk.Write(42, insert.Scale.Y*scale);
-            this.chunk.Write(43, insert.Scale.Z*scale);
+            chunk.Write(41, insert.Scale.X*scale);
+            chunk.Write(42, insert.Scale.Y*scale);
+            chunk.Write(43, insert.Scale.Z*scale);
 
-            this.chunk.Write(50, insert.Rotation);
+            chunk.Write(50, insert.Rotation);
 
-            this.chunk.Write(210, insert.Normal.X);
-            this.chunk.Write(220, insert.Normal.Y);
-            this.chunk.Write(230, insert.Normal.Z);
+            chunk.Write(210, insert.Normal.X);
+            chunk.Write(220, insert.Normal.Y);
+            chunk.Write(230, insert.Normal.Z);
 
             if (insert.Attributes.Count > 0)
             {
                 //Obsolete; formerly an entities follow flag (optional; ignore if present)
                 //AutoCAD will fail loading the file if it is not there, more dxf voodoo
-                this.chunk.Write(66, (short) 1);
+                chunk.Write(66, (short) 1);
 
-                this.WriteXData(insert.XData);
+                WriteXData(insert.XData);
 
                 foreach (Attribute attrib in insert.Attributes)
-                    this.WriteAttribute(attrib);
+                    WriteAttribute(attrib);
 
-                this.chunk.Write(0, insert.EndSequence.CodeName);
-                this.chunk.Write(5, insert.EndSequence.Handle);
-                this.chunk.Write(100, SubclassMarker.Entity);
-                this.chunk.Write(8, this.EncodeNonAsciiCharacters(insert.Layer.Name));
+                chunk.Write(0, insert.EndSequence.CodeName);
+                chunk.Write(5, insert.EndSequence.Handle);
+                chunk.Write(100, SubclassMarker.Entity);
+                chunk.Write(8, EncodeNonAsciiCharacters(insert.Layer.Name));
             }
             else
             {
-                this.WriteXData(insert.XData);
+                WriteXData(insert.XData);
             }
         }
 
         private void WriteLine(Line line)
         {
-            this.chunk.Write(100, SubclassMarker.Line);
+            chunk.Write(100, SubclassMarker.Line);
 
-            this.chunk.Write(10, line.StartPoint.X);
-            this.chunk.Write(20, line.StartPoint.Y);
-            this.chunk.Write(30, line.StartPoint.Z);
+            chunk.Write(10, line.StartPoint.X);
+            chunk.Write(20, line.StartPoint.Y);
+            chunk.Write(30, line.StartPoint.Z);
 
-            this.chunk.Write(11, line.EndPoint.X);
-            this.chunk.Write(21, line.EndPoint.Y);
-            this.chunk.Write(31, line.EndPoint.Z);
+            chunk.Write(11, line.EndPoint.X);
+            chunk.Write(21, line.EndPoint.Y);
+            chunk.Write(31, line.EndPoint.Z);
 
-            this.chunk.Write(39, line.Thickness);
+            chunk.Write(39, line.Thickness);
 
-            this.chunk.Write(210, line.Normal.X);
-            this.chunk.Write(220, line.Normal.Y);
-            this.chunk.Write(230, line.Normal.Z);
+            chunk.Write(210, line.Normal.X);
+            chunk.Write(220, line.Normal.Y);
+            chunk.Write(230, line.Normal.Z);
 
-            this.WriteXData(line.XData);
+            WriteXData(line.XData);
         }
 
         private void WriteRay(Ray ray)
         {
-            this.chunk.Write(100, SubclassMarker.Ray);
+            chunk.Write(100, SubclassMarker.Ray);
 
-            this.chunk.Write(10, ray.Origin.X);
-            this.chunk.Write(20, ray.Origin.Y);
-            this.chunk.Write(30, ray.Origin.Z);
+            chunk.Write(10, ray.Origin.X);
+            chunk.Write(20, ray.Origin.Y);
+            chunk.Write(30, ray.Origin.Z);
 
-            this.chunk.Write(11, ray.Direction.X);
-            this.chunk.Write(21, ray.Direction.Y);
-            this.chunk.Write(31, ray.Direction.Z);
+            chunk.Write(11, ray.Direction.X);
+            chunk.Write(21, ray.Direction.Y);
+            chunk.Write(31, ray.Direction.Z);
 
-            this.WriteXData(ray.XData);
+            WriteXData(ray.XData);
         }
 
         private void WriteXLine(XLine xline)
         {
-            this.chunk.Write(100, SubclassMarker.XLine);
+            chunk.Write(100, SubclassMarker.XLine);
 
-            this.chunk.Write(10, xline.Origin.X);
-            this.chunk.Write(20, xline.Origin.Y);
-            this.chunk.Write(30, xline.Origin.Z);
+            chunk.Write(10, xline.Origin.X);
+            chunk.Write(20, xline.Origin.Y);
+            chunk.Write(30, xline.Origin.Z);
 
-            this.chunk.Write(11, xline.Direction.X);
-            this.chunk.Write(21, xline.Direction.Y);
-            this.chunk.Write(31, xline.Direction.Z);
+            chunk.Write(11, xline.Direction.X);
+            chunk.Write(21, xline.Direction.Y);
+            chunk.Write(31, xline.Direction.Z);
 
-            this.WriteXData(xline.XData);
+            WriteXData(xline.XData);
         }
 
         private void WriteLightWeightPolyline(LwPolyline polyline)
         {
-            this.chunk.Write(100, SubclassMarker.LightWeightPolyline);
-            this.chunk.Write(90, polyline.Vertexes.Count);
-            this.chunk.Write(70, (short) polyline.Flags);
+            chunk.Write(100, SubclassMarker.LightWeightPolyline);
+            chunk.Write(90, polyline.Vertexes.Count);
+            chunk.Write(70, (short) polyline.Flags);
 
-            this.chunk.Write(38, polyline.Elevation);
-            this.chunk.Write(39, polyline.Thickness);
+            chunk.Write(38, polyline.Elevation);
+            chunk.Write(39, polyline.Thickness);
 
 
             foreach (LwPolylineVertex v in polyline.Vertexes)
             {
-                this.chunk.Write(10, v.Position.X);
-                this.chunk.Write(20, v.Position.Y);
-                this.chunk.Write(40, v.StartWidth);
-                this.chunk.Write(41, v.EndWidth);
-                this.chunk.Write(42, v.Bulge);
+                chunk.Write(10, v.Position.X);
+                chunk.Write(20, v.Position.Y);
+                chunk.Write(40, v.StartWidth);
+                chunk.Write(41, v.EndWidth);
+                chunk.Write(42, v.Bulge);
             }
 
-            this.chunk.Write(210, polyline.Normal.X);
-            this.chunk.Write(220, polyline.Normal.Y);
-            this.chunk.Write(230, polyline.Normal.Z);
+            chunk.Write(210, polyline.Normal.X);
+            chunk.Write(220, polyline.Normal.Y);
+            chunk.Write(230, polyline.Normal.Z);
 
-            this.WriteXData(polyline.XData);
+            WriteXData(polyline.XData);
         }
 
         private void WritePolyline(Polyline polyline)
         {
-            this.chunk.Write(100, SubclassMarker.Polyline3d);
+            chunk.Write(100, SubclassMarker.Polyline3d);
 
             //dummy point
-            this.chunk.Write(10, 0.0);
-            this.chunk.Write(20, 0.0);
-            this.chunk.Write(30, 0.0);
+            chunk.Write(10, 0.0);
+            chunk.Write(20, 0.0);
+            chunk.Write(30, 0.0);
 
-            this.chunk.Write(70, (short) polyline.Flags);
-            this.chunk.Write(75, (short) polyline.SmoothType);
+            chunk.Write(70, (short) polyline.Flags);
+            chunk.Write(75, (short) polyline.SmoothType);
 
-            this.chunk.Write(210, polyline.Normal.X);
-            this.chunk.Write(220, polyline.Normal.Y);
-            this.chunk.Write(230, polyline.Normal.Z);
+            chunk.Write(210, polyline.Normal.X);
+            chunk.Write(220, polyline.Normal.Y);
+            chunk.Write(230, polyline.Normal.Z);
 
-            this.WriteXData(polyline.XData);
+            WriteXData(polyline.XData);
 
-            string layerName = this.EncodeNonAsciiCharacters(polyline.Layer.Name);
+            string layerName = EncodeNonAsciiCharacters(polyline.Layer.Name);
 
             foreach (PolylineVertex v in polyline.Vertexes)
             {
-                this.chunk.Write(0, v.CodeName);
-                this.chunk.Write(5, v.Handle);
-                this.chunk.Write(100, SubclassMarker.Entity);
+                chunk.Write(0, v.CodeName);
+                chunk.Write(5, v.Handle);
+                chunk.Write(100, SubclassMarker.Entity);
 
-                this.chunk.Write(8, layerName); // the vertex layer should be the same as the polyline layer
+                chunk.Write(8, layerName); // the vertex layer should be the same as the polyline layer
 
-                this.chunk.Write(62, polyline.Color.Index); // the vertex color should be the same as the polyline color
+                chunk.Write(62, polyline.Color.Index); // the vertex color should be the same as the polyline color
                 if (polyline.Color.UseTrueColor)
-                    this.chunk.Write(420, AciColor.ToTrueColor(polyline.Color));
-                this.chunk.Write(100, SubclassMarker.Vertex);
-                this.chunk.Write(100, SubclassMarker.Polyline3dVertex);
-                this.chunk.Write(10, v.Position.X);
-                this.chunk.Write(20, v.Position.Y);
-                this.chunk.Write(30, v.Position.Z);
-                this.chunk.Write(70, (short) v.Flags);
+                    chunk.Write(420, AciColor.ToTrueColor(polyline.Color));
+                chunk.Write(100, SubclassMarker.Vertex);
+                chunk.Write(100, SubclassMarker.Polyline3dVertex);
+                chunk.Write(10, v.Position.X);
+                chunk.Write(20, v.Position.Y);
+                chunk.Write(30, v.Position.Z);
+                chunk.Write(70, (short) v.Flags);
             }
 
-            this.chunk.Write(0, polyline.EndSequence.CodeName);
-            this.chunk.Write(5, polyline.EndSequence.Handle);
-            this.chunk.Write(100, SubclassMarker.Entity);
-            this.chunk.Write(8, layerName); // the polyline EndSequence layer should be the same as the polyline layer
+            chunk.Write(0, polyline.EndSequence.CodeName);
+            chunk.Write(5, polyline.EndSequence.Handle);
+            chunk.Write(100, SubclassMarker.Entity);
+            chunk.Write(8, layerName); // the polyline EndSequence layer should be the same as the polyline layer
         }
 
         private void WritePolyfaceMesh(PolyfaceMesh mesh)
         {
-            this.chunk.Write(100, SubclassMarker.PolyfaceMesh);
-            this.chunk.Write(70, (short) mesh.Flags);
+            chunk.Write(100, SubclassMarker.PolyfaceMesh);
+            chunk.Write(70, (short) mesh.Flags);
 
-            this.chunk.Write(71, (short) mesh.Vertexes.Count);
-            this.chunk.Write(72, (short) mesh.Faces.Count);
+            chunk.Write(71, (short) mesh.Vertexes.Count);
+            chunk.Write(72, (short) mesh.Faces.Count);
 
             //dummy point
-            this.chunk.Write(10, 0.0);
-            this.chunk.Write(20, 0.0);
-            this.chunk.Write(30, 0.0);
+            chunk.Write(10, 0.0);
+            chunk.Write(20, 0.0);
+            chunk.Write(30, 0.0);
 
-            this.chunk.Write(210, mesh.Normal.X);
-            this.chunk.Write(220, mesh.Normal.Y);
-            this.chunk.Write(230, mesh.Normal.Z);
+            chunk.Write(210, mesh.Normal.X);
+            chunk.Write(220, mesh.Normal.Y);
+            chunk.Write(230, mesh.Normal.Z);
 
             if (mesh.XData != null)
-                this.WriteXData(mesh.XData);
+                WriteXData(mesh.XData);
 
-            string layerName = this.EncodeNonAsciiCharacters(mesh.Layer.Name);
+            string layerName = EncodeNonAsciiCharacters(mesh.Layer.Name);
 
             foreach (PolyfaceMeshVertex v in mesh.Vertexes)
             {
-                this.chunk.Write(0, v.CodeName);
-                this.chunk.Write(5, v.Handle);
-                this.chunk.Write(100, SubclassMarker.Entity);
+                chunk.Write(0, v.CodeName);
+                chunk.Write(5, v.Handle);
+                chunk.Write(100, SubclassMarker.Entity);
 
-                this.chunk.Write(8, layerName); // the polyface mesh vertex layer should be the same as the polyface mesh layer
+                chunk.Write(8, layerName); // the polyface mesh vertex layer should be the same as the polyface mesh layer
 
-                this.chunk.Write(62, mesh.Color.Index); // the polyface mesh vertex color should be the same as the polyface mesh color
+                chunk.Write(62, mesh.Color.Index); // the polyface mesh vertex color should be the same as the polyface mesh color
                 if (mesh.Color.UseTrueColor)
-                    this.chunk.Write(420, AciColor.ToTrueColor(mesh.Color));
-                this.chunk.Write(100, SubclassMarker.Vertex);
-                this.chunk.Write(100, SubclassMarker.PolyfaceMeshVertex);
-                this.chunk.Write(70, (short) v.Flags);
-                this.chunk.Write(10, v.Position.X);
-                this.chunk.Write(20, v.Position.Y);
-                this.chunk.Write(30, v.Position.Z);
+                    chunk.Write(420, AciColor.ToTrueColor(mesh.Color));
+                chunk.Write(100, SubclassMarker.Vertex);
+                chunk.Write(100, SubclassMarker.PolyfaceMeshVertex);
+                chunk.Write(70, (short) v.Flags);
+                chunk.Write(10, v.Position.X);
+                chunk.Write(20, v.Position.Y);
+                chunk.Write(30, v.Position.Z);
             }
 
             foreach (PolyfaceMeshFace face in mesh.Faces)
             {
-                this.chunk.Write(0, face.CodeName);
-                this.chunk.Write(5, face.Handle);
-                this.chunk.Write(100, SubclassMarker.Entity);
+                chunk.Write(0, face.CodeName);
+                chunk.Write(5, face.Handle);
+                chunk.Write(100, SubclassMarker.Entity);
 
-                this.chunk.Write(8, layerName); // the polyface mesh face layer should be the same as the polyface mesh layer
-                this.chunk.Write(62, mesh.Color.Index); // the polyface mesh face color should be the same as the polyface mesh color
+                chunk.Write(8, layerName); // the polyface mesh face layer should be the same as the polyface mesh layer
+                chunk.Write(62, mesh.Color.Index); // the polyface mesh face color should be the same as the polyface mesh color
                 if (mesh.Color.UseTrueColor)
-                    this.chunk.Write(420, AciColor.ToTrueColor(mesh.Color));
-                this.chunk.Write(100, SubclassMarker.PolyfaceMeshFace);
-                this.chunk.Write(70, (short) VertexTypeFlags.PolyfaceMeshVertex);
-                this.chunk.Write(10, 0.0);
-                this.chunk.Write(20, 0.0);
-                this.chunk.Write(30, 0.0);
+                    chunk.Write(420, AciColor.ToTrueColor(mesh.Color));
+                chunk.Write(100, SubclassMarker.PolyfaceMeshFace);
+                chunk.Write(70, (short) VertexTypeFlags.PolyfaceMeshVertex);
+                chunk.Write(10, 0.0);
+                chunk.Write(20, 0.0);
+                chunk.Write(30, 0.0);
 
-                this.chunk.Write(71, face.VertexIndexes[0]);
+                chunk.Write(71, face.VertexIndexes[0]);
                 if (face.VertexIndexes.Count > 1)
-                    this.chunk.Write(72, face.VertexIndexes[1]);
+                    chunk.Write(72, face.VertexIndexes[1]);
                 if (face.VertexIndexes.Count > 2)
-                    this.chunk.Write(73, face.VertexIndexes[2]);
+                    chunk.Write(73, face.VertexIndexes[2]);
                 if (face.VertexIndexes.Count > 3)
-                    this.chunk.Write(74, face.VertexIndexes[3]);
+                    chunk.Write(74, face.VertexIndexes[3]);
             }
 
-            this.chunk.Write(0, mesh.EndSequence.CodeName);
-            this.chunk.Write(5, mesh.EndSequence.Handle);
-            this.chunk.Write(100, SubclassMarker.Entity);
-            this.chunk.Write(8, layerName); // the polyface mesh EndSequence layer should be the same as the polyface mesh layer
+            chunk.Write(0, mesh.EndSequence.CodeName);
+            chunk.Write(5, mesh.EndSequence.Handle);
+            chunk.Write(100, SubclassMarker.Entity);
+            chunk.Write(8, layerName); // the polyface mesh EndSequence layer should be the same as the polyface mesh layer
         }
 
         private void WritePoint(Point point)
         {
-            this.chunk.Write(100, SubclassMarker.Point);
+            chunk.Write(100, SubclassMarker.Point);
 
-            this.chunk.Write(10, point.Position.X);
-            this.chunk.Write(20, point.Position.Y);
-            this.chunk.Write(30, point.Position.Z);
+            chunk.Write(10, point.Position.X);
+            chunk.Write(20, point.Position.Y);
+            chunk.Write(30, point.Position.Z);
 
-            this.chunk.Write(39, point.Thickness);
+            chunk.Write(39, point.Thickness);
 
-            this.chunk.Write(210, point.Normal.X);
-            this.chunk.Write(220, point.Normal.Y);
-            this.chunk.Write(230, point.Normal.Z);
+            chunk.Write(210, point.Normal.X);
+            chunk.Write(220, point.Normal.Y);
+            chunk.Write(230, point.Normal.Z);
 
             // for unknown reasons the dxf likes the point rotation inverted
-            this.chunk.Write(50, 360.0 - point.Rotation);
+            chunk.Write(50, 360.0 - point.Rotation);
 
-            this.WriteXData(point.XData);
+            WriteXData(point.XData);
         }
 
         private void WriteText(Text text)
         {
-            this.chunk.Write(100, SubclassMarker.Text);
+            chunk.Write(100, SubclassMarker.Text);
 
-            this.chunk.Write(1, this.EncodeNonAsciiCharacters(text.Value));
+            chunk.Write(1, EncodeNonAsciiCharacters(text.Value));
 
             // another example of this OCS vs WCS non sense.
             // while the MText position is written in WCS the position of the Text is written in OCS (different rules for the same concept).
             Vector3 ocsBasePoint = MathHelper.Transform(text.Position, text.Normal, CoordinateSystem.World, CoordinateSystem.Object);
 
-            this.chunk.Write(10, ocsBasePoint.X);
-            this.chunk.Write(20, ocsBasePoint.Y);
-            this.chunk.Write(30, ocsBasePoint.Z);
+            chunk.Write(10, ocsBasePoint.X);
+            chunk.Write(20, ocsBasePoint.Y);
+            chunk.Write(30, ocsBasePoint.Z);
 
-            this.chunk.Write(40, text.Height);
+            chunk.Write(40, text.Height);
 
-            this.chunk.Write(41, text.WidthFactor);
+            chunk.Write(41, text.WidthFactor);
 
-            this.chunk.Write(50, text.Rotation);
+            chunk.Write(50, text.Rotation);
 
-            this.chunk.Write(51, text.ObliqueAngle);
+            chunk.Write(51, text.ObliqueAngle);
 
-            this.chunk.Write(7, this.EncodeNonAsciiCharacters(text.Style.Name));
+            chunk.Write(7, EncodeNonAsciiCharacters(text.Style.Name));
 
-            this.chunk.Write(11, ocsBasePoint.X);
-            this.chunk.Write(21, ocsBasePoint.Y);
-            this.chunk.Write(31, ocsBasePoint.Z);
+            chunk.Write(11, ocsBasePoint.X);
+            chunk.Write(21, ocsBasePoint.Y);
+            chunk.Write(31, ocsBasePoint.Z);
 
-            this.chunk.Write(210, text.Normal.X);
-            this.chunk.Write(220, text.Normal.Y);
-            this.chunk.Write(230, text.Normal.Z);
+            chunk.Write(210, text.Normal.X);
+            chunk.Write(220, text.Normal.Y);
+            chunk.Write(230, text.Normal.Z);
 
             switch (text.Alignment)
             {
                 case TextAlignment.TopLeft:
 
-                    this.chunk.Write(72, (short) 0);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 3);
+                    chunk.Write(72, (short) 0);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 3);
                     break;
 
                 case TextAlignment.TopCenter:
 
-                    this.chunk.Write(72, (short) 1);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 3);
+                    chunk.Write(72, (short) 1);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 3);
                     break;
 
                 case TextAlignment.TopRight:
 
-                    this.chunk.Write(72, (short) 2);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 3);
+                    chunk.Write(72, (short) 2);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 3);
                     break;
 
                 case TextAlignment.MiddleLeft:
 
-                    this.chunk.Write(72, (short) 0);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 2);
+                    chunk.Write(72, (short) 0);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 2);
                     break;
 
                 case TextAlignment.MiddleCenter:
 
-                    this.chunk.Write(72, (short) 1);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 2);
+                    chunk.Write(72, (short) 1);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 2);
                     break;
 
                 case TextAlignment.MiddleRight:
 
-                    this.chunk.Write(72, (short) 2);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 2);
+                    chunk.Write(72, (short) 2);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 2);
                     break;
 
                 case TextAlignment.BottomLeft:
 
-                    this.chunk.Write(72, (short) 0);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 1);
+                    chunk.Write(72, (short) 0);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 1);
                     break;
                 case TextAlignment.BottomCenter:
 
-                    this.chunk.Write(72, (short) 1);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 1);
+                    chunk.Write(72, (short) 1);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 1);
                     break;
 
                 case TextAlignment.BottomRight:
 
-                    this.chunk.Write(72, (short) 2);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 1);
+                    chunk.Write(72, (short) 2);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 1);
                     break;
 
                 case TextAlignment.BaselineLeft:
-                    this.chunk.Write(72, (short) 0);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 0);
+                    chunk.Write(72, (short) 0);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 0);
                     break;
 
                 case TextAlignment.BaselineCenter:
-                    this.chunk.Write(72, (short) 1);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 0);
+                    chunk.Write(72, (short) 1);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 0);
                     break;
 
                 case TextAlignment.BaselineRight:
-                    this.chunk.Write(72, (short) 2);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 0);
+                    chunk.Write(72, (short) 2);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 0);
                     break;
 
                 case TextAlignment.Aligned:
-                    this.chunk.Write(72, (short) 3);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 0);
+                    chunk.Write(72, (short) 3);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 0);
                     break;
 
                 case TextAlignment.Middle:
-                    this.chunk.Write(72, (short) 4);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 0);
+                    chunk.Write(72, (short) 4);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 0);
                     break;
 
                 case TextAlignment.Fit:
-                    this.chunk.Write(72, (short) 5);
-                    this.chunk.Write(100, SubclassMarker.Text);
-                    this.chunk.Write(73, (short) 0);
+                    chunk.Write(72, (short) 5);
+                    chunk.Write(100, SubclassMarker.Text);
+                    chunk.Write(73, (short) 0);
                     break;
             }
 
-            this.WriteXData(text.XData);
+            WriteXData(text.XData);
         }
 
         private void WriteMText(MText mText)
         {
-            this.chunk.Write(100, SubclassMarker.MText);
+            chunk.Write(100, SubclassMarker.MText);
 
-            this.chunk.Write(10, mText.Position.X);
-            this.chunk.Write(20, mText.Position.Y);
-            this.chunk.Write(30, mText.Position.Z);
+            chunk.Write(10, mText.Position.X);
+            chunk.Write(20, mText.Position.Y);
+            chunk.Write(30, mText.Position.Z);
 
-            this.chunk.Write(210, mText.Normal.X);
-            this.chunk.Write(220, mText.Normal.Y);
-            this.chunk.Write(230, mText.Normal.Z);
+            chunk.Write(210, mText.Normal.X);
+            chunk.Write(220, mText.Normal.Y);
+            chunk.Write(230, mText.Normal.Z);
 
-            this.WriteMTextChunks(this.EncodeNonAsciiCharacters(mText.Value));
+            WriteMTextChunks(EncodeNonAsciiCharacters(mText.Value));
 
-            this.chunk.Write(40, mText.Height);
-            this.chunk.Write(41, mText.RectangleWidth);
-            this.chunk.Write(44, mText.LineSpacingFactor);
+            chunk.Write(40, mText.Height);
+            chunk.Write(41, mText.RectangleWidth);
+            chunk.Write(44, mText.LineSpacingFactor);
 
             //even if the AutoCAD dxf documentation says that the rotation is in radians, this is wrong this value must be saved in degrees
             //this.chunk.Write(50, mText.Rotation);
@@ -2881,19 +2881,19 @@ namespace netDxf.IO
             direction.Normalize();
             Vector3 ocsDirection = MathHelper.Transform(new Vector3(direction.X, direction.Y, 0.0), mText.Normal, CoordinateSystem.Object, CoordinateSystem.World);
 
-            this.chunk.Write(11, ocsDirection.X);
-            this.chunk.Write(21, ocsDirection.Y);
-            this.chunk.Write(31, ocsDirection.Z);
+            chunk.Write(11, ocsDirection.X);
+            chunk.Write(21, ocsDirection.Y);
+            chunk.Write(31, ocsDirection.Z);
 
-            this.chunk.Write(71, (short) mText.AttachmentPoint);
+            chunk.Write(71, (short) mText.AttachmentPoint);
 
-            this.chunk.Write(72, (short) mText.DrawingDirection);
+            chunk.Write(72, (short) mText.DrawingDirection);
 
-            this.chunk.Write(73, (short) mText.LineSpacingStyle);
+            chunk.Write(73, (short) mText.LineSpacingStyle);
 
-            this.chunk.Write(7, this.EncodeNonAsciiCharacters(mText.Style.Name));
+            chunk.Write(7, EncodeNonAsciiCharacters(mText.Style.Name));
 
-            this.WriteXData(mText.XData);
+            WriteXData(mText.XData);
         }
 
         private void WriteMTextChunks(string text)
@@ -2906,43 +2906,43 @@ namespace netDxf.IO
             while (text.Length > 250)
             {
                 string part = text.Substring(0, 250);
-                this.chunk.Write(3, part);
+                chunk.Write(3, part);
                 text = text.Remove(0, 250);
             }
-            this.chunk.Write(1, text);
+            chunk.Write(1, text);
         }
 
         private void WriteHatch(Hatch hatch)
         {
-            this.chunk.Write(100, SubclassMarker.Hatch);
+            chunk.Write(100, SubclassMarker.Hatch);
 
-            this.chunk.Write(10, 0.0);
-            this.chunk.Write(20, 0.0);
-            this.chunk.Write(30, hatch.Elevation);
+            chunk.Write(10, 0.0);
+            chunk.Write(20, 0.0);
+            chunk.Write(30, hatch.Elevation);
 
-            this.chunk.Write(210, hatch.Normal.X);
-            this.chunk.Write(220, hatch.Normal.Y);
-            this.chunk.Write(230, hatch.Normal.Z);
+            chunk.Write(210, hatch.Normal.X);
+            chunk.Write(220, hatch.Normal.Y);
+            chunk.Write(230, hatch.Normal.Z);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(hatch.Pattern.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(hatch.Pattern.Name));
 
-            this.chunk.Write(70, (short) hatch.Pattern.Fill);
+            chunk.Write(70, (short) hatch.Pattern.Fill);
 
             if (hatch.Associative)
-                this.chunk.Write(71, (short) 1);
+                chunk.Write(71, (short) 1);
             else
-                this.chunk.Write(71, (short) 0);
+                chunk.Write(71, (short) 0);
 
             // boundary paths info
-            this.WriteHatchBoundaryPaths(hatch.BoundaryPaths);
+            WriteHatchBoundaryPaths(hatch.BoundaryPaths);
 
             // pattern info
-            this.WriteHatchPattern(hatch.Pattern);
+            WriteHatchPattern(hatch.Pattern);
 
             // add the required extended data entries to the hatch XData
             AddHatchPatternXData(hatch);
 
-            this.WriteXData(hatch.XData);
+            WriteXData(hatch.XData);
         }
 
         private static void AddHatchPatternXData(Hatch hatch)
@@ -2994,23 +2994,23 @@ namespace netDxf.IO
 
         private void WriteHatchBoundaryPaths(ObservableCollection<HatchBoundaryPath> boundaryPaths)
         {
-            this.chunk.Write(91, boundaryPaths.Count);
+            chunk.Write(91, boundaryPaths.Count);
 
             // each hatch boundary paths are made of multiple closed loops
             foreach (HatchBoundaryPath path in boundaryPaths)
             {
-                this.chunk.Write(92, (int) path.PathType);
+                chunk.Write(92, (int) path.PathType);
 
                 if (!path.PathType.HasFlag(HatchBoundaryPathTypeFlags.Polyline))
-                    this.chunk.Write(93, path.Edges.Count);
+                    chunk.Write(93, path.Edges.Count);
 
                 foreach (HatchBoundaryPath.Edge entity in path.Edges)
-                    this.WriteHatchBoundaryPathData(entity);
+                    WriteHatchBoundaryPathData(entity);
 
-                this.chunk.Write(97, path.Entities.Count);
+                chunk.Write(97, path.Entities.Count);
                 foreach (EntityObject entity in path.Entities)
                 {
-                    this.chunk.Write(330, entity.Handle);
+                    chunk.Write(330, entity.Handle);
                 }
             }
         }
@@ -3019,139 +3019,139 @@ namespace netDxf.IO
         {
             if (entity.Type == HatchBoundaryPath.EdgeType.Arc)
             {
-                this.chunk.Write(72, (short) 2); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
+                chunk.Write(72, (short) 2); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
 
                 HatchBoundaryPath.Arc arc = (HatchBoundaryPath.Arc) entity;
 
-                this.chunk.Write(10, arc.Center.X);
-                this.chunk.Write(20, arc.Center.Y);
-                this.chunk.Write(40, arc.Radius);
-                this.chunk.Write(50, arc.StartAngle);
-                this.chunk.Write(51, arc.EndAngle);
-                this.chunk.Write(73, arc.IsCounterclockwise ? (short) 1 : (short) 0);
+                chunk.Write(10, arc.Center.X);
+                chunk.Write(20, arc.Center.Y);
+                chunk.Write(40, arc.Radius);
+                chunk.Write(50, arc.StartAngle);
+                chunk.Write(51, arc.EndAngle);
+                chunk.Write(73, arc.IsCounterclockwise ? (short) 1 : (short) 0);
             }
             else if (entity.Type == HatchBoundaryPath.EdgeType.Ellipse)
             {
-                this.chunk.Write(72, (short) 3); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
+                chunk.Write(72, (short) 3); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
 
                 HatchBoundaryPath.Ellipse ellipse = (HatchBoundaryPath.Ellipse) entity;
 
-                this.chunk.Write(10, ellipse.Center.X);
-                this.chunk.Write(20, ellipse.Center.Y);
-                this.chunk.Write(11, ellipse.EndMajorAxis.X);
-                this.chunk.Write(21, ellipse.EndMajorAxis.Y);
-                this.chunk.Write(40, ellipse.MinorRatio);
-                this.chunk.Write(50, ellipse.StartAngle);
-                this.chunk.Write(51, ellipse.EndAngle);
-                this.chunk.Write(73, ellipse.IsCounterclockwise ? (short) 1 : (short) 0);
+                chunk.Write(10, ellipse.Center.X);
+                chunk.Write(20, ellipse.Center.Y);
+                chunk.Write(11, ellipse.EndMajorAxis.X);
+                chunk.Write(21, ellipse.EndMajorAxis.Y);
+                chunk.Write(40, ellipse.MinorRatio);
+                chunk.Write(50, ellipse.StartAngle);
+                chunk.Write(51, ellipse.EndAngle);
+                chunk.Write(73, ellipse.IsCounterclockwise ? (short) 1 : (short) 0);
             }
             else if (entity.Type == HatchBoundaryPath.EdgeType.Line)
             {
-                this.chunk.Write(72, (short) 1); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
+                chunk.Write(72, (short) 1); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
 
                 HatchBoundaryPath.Line line = (HatchBoundaryPath.Line) entity;
 
-                this.chunk.Write(10, line.Start.X);
-                this.chunk.Write(20, line.Start.Y);
-                this.chunk.Write(11, line.End.X);
-                this.chunk.Write(21, line.End.Y);
+                chunk.Write(10, line.Start.X);
+                chunk.Write(20, line.Start.Y);
+                chunk.Write(11, line.End.X);
+                chunk.Write(21, line.End.Y);
             }
             else if (entity.Type == HatchBoundaryPath.EdgeType.Polyline)
             {
                 HatchBoundaryPath.Polyline poly = (HatchBoundaryPath.Polyline) entity;
-                this.chunk.Write(72, (short) 1); // Has bulge flag
-                this.chunk.Write(73, poly.IsClosed ? (short) 1 : (short) 0);
-                this.chunk.Write(93, poly.Vertexes.Length);
+                chunk.Write(72, (short) 1); // Has bulge flag
+                chunk.Write(73, poly.IsClosed ? (short) 1 : (short) 0);
+                chunk.Write(93, poly.Vertexes.Length);
 
                 foreach (Vector3 vertex in poly.Vertexes)
                 {
-                    this.chunk.Write(10, vertex.X);
-                    this.chunk.Write(20, vertex.Y);
-                    this.chunk.Write(42, vertex.Z);
+                    chunk.Write(10, vertex.X);
+                    chunk.Write(20, vertex.Y);
+                    chunk.Write(42, vertex.Z);
                 }
             }
             else if (entity.Type == HatchBoundaryPath.EdgeType.Spline)
             {
-                this.chunk.Write(72, (short) 4); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
+                chunk.Write(72, (short) 4); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
 
                 HatchBoundaryPath.Spline spline = (HatchBoundaryPath.Spline) entity;
 
                 // another dxf inconsistency!; while the Spline entity degree is written as a short (code 71)
                 // the degree of a hatch boundary path spline is written as an int (code 94)
-                this.chunk.Write(94, (int) spline.Degree);
-                this.chunk.Write(73, spline.IsRational ? (short) 1 : (short) 0);
-                this.chunk.Write(74, spline.IsPeriodic ? (short) 1 : (short) 0);
+                chunk.Write(94, (int) spline.Degree);
+                chunk.Write(73, spline.IsRational ? (short) 1 : (short) 0);
+                chunk.Write(74, spline.IsPeriodic ? (short) 1 : (short) 0);
 
                 // now the number of knots and control points of a spline are written as an int, as it should be.
                 // but in the Spline entities they are defined as shorts. Guess what, while you can avoid writing these two codes for the Spline entity, now they are required.
-                this.chunk.Write(95, spline.Knots.Length);
-                this.chunk.Write(96, spline.ControlPoints.Length);
+                chunk.Write(95, spline.Knots.Length);
+                chunk.Write(96, spline.ControlPoints.Length);
 
                 foreach (double knot in spline.Knots)
-                    this.chunk.Write(40, knot);
+                    chunk.Write(40, knot);
                 foreach (Vector3 point in spline.ControlPoints)
                 {
-                    this.chunk.Write(10, point.X);
-                    this.chunk.Write(20, point.Y);
+                    chunk.Write(10, point.X);
+                    chunk.Write(20, point.Y);
                     if (spline.IsRational)
-                        this.chunk.Write(42, point.Z);
+                        chunk.Write(42, point.Z);
                 }
 
                 // this information is only required for AutoCAD version 2010
                 // stores information about spline fit points (the spline entity has no fit points and no tangent info)
                 // another dxf inconsistency!; while the number of fit points of Spline entity is written as a short (code 74)
                 // the number of fit points of a hatch boundary path spline is written as an int (code 97)
-                if (this.doc.DrawingVariables.AcadVer >= DxfVersion.AutoCad2010)
-                    this.chunk.Write(97, 0);
+                if (doc.DrawingVariables.AcadVer >= DxfVersion.AutoCad2010)
+                    chunk.Write(97, 0);
             }
         }
 
         private void WriteHatchPattern(HatchPattern pattern)
         {
-            this.chunk.Write(75, (short) pattern.Style);
-            this.chunk.Write(76, (short) pattern.Type);
+            chunk.Write(75, (short) pattern.Style);
+            chunk.Write(76, (short) pattern.Type);
 
             if (pattern.Fill == HatchFillType.PatternFill)
             {
-                this.chunk.Write(52, pattern.Angle);
-                this.chunk.Write(41, pattern.Scale);
-                this.chunk.Write(77, (short) 0); // Hatch pattern double flag
-                this.chunk.Write(78, (short) pattern.LineDefinitions.Count); // Number of pattern definition lines  
-                this.WriteHatchPatternDefinitonLines(pattern);
+                chunk.Write(52, pattern.Angle);
+                chunk.Write(41, pattern.Scale);
+                chunk.Write(77, (short) 0); // Hatch pattern double flag
+                chunk.Write(78, (short) pattern.LineDefinitions.Count); // Number of pattern definition lines  
+                WriteHatchPatternDefinitonLines(pattern);
             }
 
             // I don't know what is the purpose of these codes, it seems that it doesn't change anything but they are needed
-            this.chunk.Write(47, 0.0);
-            this.chunk.Write(98, 1);
-            this.chunk.Write(10, 0.0);
-            this.chunk.Write(20, 0.0);
+            chunk.Write(47, 0.0);
+            chunk.Write(98, 1);
+            chunk.Write(10, 0.0);
+            chunk.Write(20, 0.0);
 
             // dxf AutoCad2000 does not support hatch gradient patterns
-            if (this.doc.DrawingVariables.AcadVer <= DxfVersion.AutoCad2000)
+            if (doc.DrawingVariables.AcadVer <= DxfVersion.AutoCad2000)
                 return;
 
             HatchGradientPattern gradientPattern = pattern as HatchGradientPattern;
             if (gradientPattern != null)
-                this.WriteGradientHatchPattern(gradientPattern);
+                WriteGradientHatchPattern(gradientPattern);
         }
 
         private void WriteGradientHatchPattern(HatchGradientPattern pattern)
         {
             // again the order of codes shown in the documentation will not work
-            this.chunk.Write(450, 1);
-            this.chunk.Write(451, 0);
-            this.chunk.Write(460, pattern.Angle*MathHelper.DegToRad);
-            this.chunk.Write(461, pattern.Centered ? 0.0 : 1.0);
-            this.chunk.Write(452, pattern.SingleColor ? 1 : 0);
-            this.chunk.Write(462, pattern.Tint);
-            this.chunk.Write(453, 2);
-            this.chunk.Write(463, 0.0);
-            this.chunk.Write(63, pattern.Color1.Index);
-            this.chunk.Write(421, AciColor.ToTrueColor(pattern.Color1));
-            this.chunk.Write(463, 1.0);
-            this.chunk.Write(63, pattern.Color2.Index);
-            this.chunk.Write(421, AciColor.ToTrueColor(pattern.Color2));
-            this.chunk.Write(470, StringEnum.GetStringValue(pattern.GradientType));
+            chunk.Write(450, 1);
+            chunk.Write(451, 0);
+            chunk.Write(460, pattern.Angle*MathHelper.DegToRad);
+            chunk.Write(461, pattern.Centered ? 0.0 : 1.0);
+            chunk.Write(452, pattern.SingleColor ? 1 : 0);
+            chunk.Write(462, pattern.Tint);
+            chunk.Write(453, 2);
+            chunk.Write(463, 0.0);
+            chunk.Write(63, pattern.Color1.Index);
+            chunk.Write(421, AciColor.ToTrueColor(pattern.Color1));
+            chunk.Write(463, 1.0);
+            chunk.Write(63, pattern.Color2.Index);
+            chunk.Write(421, AciColor.ToTrueColor(pattern.Color2));
+            chunk.Write(470, StringEnum.GetStringValue(pattern.GradientType));
         }
 
         private void WriteHatchPatternDefinitonLines(HatchPattern pattern)
@@ -3164,43 +3164,43 @@ namespace netDxf.IO
                 // In theory this should hold the same information as the pat file but for unknown reason the dxf requires global data instead of local,
                 // it's a guess the documentation is kinda obscure.
                 // This means we have to apply the pattern rotation and scale to the line definitions
-                this.chunk.Write(53, angle);
+                chunk.Write(53, angle);
 
                 double sinOrigin = Math.Sin(pattern.Angle*MathHelper.DegToRad);
                 double cosOrigin = Math.Cos(pattern.Angle*MathHelper.DegToRad);
                 Vector2 origin = new Vector2(cosOrigin*line.Origin.X*scale - sinOrigin*line.Origin.Y*scale, sinOrigin*line.Origin.X*scale + cosOrigin*line.Origin.Y*scale);
-                this.chunk.Write(43, origin.X);
-                this.chunk.Write(44, origin.Y);
+                chunk.Write(43, origin.X);
+                chunk.Write(44, origin.Y);
 
                 double sinDelta = Math.Sin(angle*MathHelper.DegToRad);
                 double cosDelta = Math.Cos(angle*MathHelper.DegToRad);
                 Vector2 delta = new Vector2(cosDelta*line.Delta.X*scale - sinDelta*line.Delta.Y*scale, sinDelta*line.Delta.X*scale + cosDelta*line.Delta.Y*scale);
-                this.chunk.Write(45, delta.X);
-                this.chunk.Write(46, delta.Y);
+                chunk.Write(45, delta.X);
+                chunk.Write(46, delta.Y);
 
-                this.chunk.Write(79, (short) line.DashPattern.Count);
+                chunk.Write(79, (short) line.DashPattern.Count);
                 foreach (double dash in line.DashPattern)
                 {
-                    this.chunk.Write(49, dash*scale);
+                    chunk.Write(49, dash*scale);
                 }
             }
         }
 
         private void WriteDimension(Dimension dim)
         {
-            this.chunk.Write(100, SubclassMarker.Dimension);
+            chunk.Write(100, SubclassMarker.Dimension);
 
             if(dim.Block != null)
-                this.chunk.Write(2, this.EncodeNonAsciiCharacters(dim.Block.Name));
+                chunk.Write(2, EncodeNonAsciiCharacters(dim.Block.Name));
 
             Vector3 ocsDef = new Vector3(dim.DefinitionPoint.X, dim.DefinitionPoint.Y, dim.Elevation);
             Vector3 wcsDef = MathHelper.Transform(ocsDef, dim.Normal, CoordinateSystem.Object, CoordinateSystem.World);
-            this.chunk.Write(10, wcsDef.X);
-            this.chunk.Write(20, wcsDef.Y);
-            this.chunk.Write(30, wcsDef.Z);
-            this.chunk.Write(11, dim.TextReferencePoint.X);
-            this.chunk.Write(21, dim.TextReferencePoint.Y);
-            this.chunk.Write(31, dim.Elevation);
+            chunk.Write(10, wcsDef.X);
+            chunk.Write(20, wcsDef.Y);
+            chunk.Write(30, wcsDef.Z);
+            chunk.Write(11, dim.TextReferencePoint.X);
+            chunk.Write(21, dim.TextReferencePoint.Y);
+            chunk.Write(31, dim.Elevation);
 
             DimensionTypeFlags flags = (DimensionTypeFlags) dim.DimensionType;
             flags |= DimensionTypeFlags.BlockReference;
@@ -3210,48 +3210,48 @@ namespace netDxf.IO
             if (ordinateDim != null)
             {
                 // even if the documentation says that code 51 is optional, rotated ordinate dimensions will not work correctly if this value is not provided
-                this.chunk.Write(51, 360.0 - ordinateDim.Rotation);
+                chunk.Write(51, 360.0 - ordinateDim.Rotation);
                 if (ordinateDim.Axis == OrdinateDimensionAxis.X) flags |= DimensionTypeFlags.OrdinateType;
             }
-            this.chunk.Write(53, dim.TextRotation);
-            this.chunk.Write(70, (short) flags);
-            this.chunk.Write(71, (short) dim.AttachmentPoint);
-            this.chunk.Write(72, (short) dim.LineSpacingStyle);
-            this.chunk.Write(41, dim.LineSpacingFactor);
+            chunk.Write(53, dim.TextRotation);
+            chunk.Write(70, (short) flags);
+            chunk.Write(71, (short) dim.AttachmentPoint);
+            chunk.Write(72, (short) dim.LineSpacingStyle);
+            chunk.Write(41, dim.LineSpacingFactor);
             if (dim.UserText != null)
-                this.chunk.Write(1, this.EncodeNonAsciiCharacters(dim.UserText));
-            this.chunk.Write(210, dim.Normal.X);
-            this.chunk.Write(220, dim.Normal.Y);
-            this.chunk.Write(230, dim.Normal.Z);
+                chunk.Write(1, EncodeNonAsciiCharacters(dim.UserText));
+            chunk.Write(210, dim.Normal.X);
+            chunk.Write(220, dim.Normal.Y);
+            chunk.Write(230, dim.Normal.Z);
 
-            this.chunk.Write(3, this.EncodeNonAsciiCharacters(dim.Style.Name));
+            chunk.Write(3, EncodeNonAsciiCharacters(dim.Style.Name));
 
             // add dimension style overrides info
             if (dim.StyleOverrides.Count > 0)
-                this.AddDimensionStyleOverridesXData(dim.XData, dim.StyleOverrides);
+                AddDimensionStyleOverridesXData(dim.XData, dim.StyleOverrides);
 
             switch (dim.DimensionType)
             {
                 case DimensionType.Aligned:
-                    this.WriteAlignedDimension((AlignedDimension) dim);
+                    WriteAlignedDimension((AlignedDimension) dim);
                     break;
                 case DimensionType.Linear:
-                    this.WriteLinearDimension((LinearDimension) dim);
+                    WriteLinearDimension((LinearDimension) dim);
                     break;
                 case DimensionType.Radius:
-                    this.WriteRadialDimension((RadialDimension) dim);
+                    WriteRadialDimension((RadialDimension) dim);
                     break;
                 case DimensionType.Diameter:
-                    this.WriteDiametricDimension((DiametricDimension) dim);
+                    WriteDiametricDimension((DiametricDimension) dim);
                     break;
                 case DimensionType.Angular3Point:
-                    this.WriteAngular3PointDimension((Angular3PointDimension) dim);
+                    WriteAngular3PointDimension((Angular3PointDimension) dim);
                     break;
                 case DimensionType.Angular:
-                    this.WriteAngular2LineDimension((Angular2LineDimension) dim);
+                    WriteAngular2LineDimension((Angular2LineDimension) dim);
                     break;
                 case DimensionType.Ordinate:
-                    this.WriteOrdinateDimension((OrdinateDimension) dim);
+                    WriteOrdinateDimension((OrdinateDimension) dim);
                     break;
             }
         }
@@ -3668,7 +3668,7 @@ namespace netDxf.IO
             {
                 xdataEntry.XDataRecord.Add(new XDataRecord(XDataCode.Int16, (short) 3));
                 xdataEntry.XDataRecord.Add(new XDataRecord(XDataCode.String,
-                    this.EncodeNonAsciiCharacters(string.Format("{0}<>{1}", prefix, suffix))));
+                    EncodeNonAsciiCharacters(string.Format("{0}<>{1}", prefix, suffix))));
             }
 
             if (writeDIMZIN)
@@ -3700,7 +3700,7 @@ namespace netDxf.IO
             {
                 xdataEntry.XDataRecord.Add(new XDataRecord(XDataCode.Int16, (short) 4));
                 xdataEntry.XDataRecord.Add(new XDataRecord(XDataCode.String,
-                    this.EncodeNonAsciiCharacters(string.Format("{0}[]{1}", altPrefix, altSuffix))));
+                    EncodeNonAsciiCharacters(string.Format("{0}[]{1}", altPrefix, altSuffix))));
             }
 
             if (writeDIMALTU)
@@ -3791,7 +3791,7 @@ namespace netDxf.IO
 
         private void WriteAlignedDimension(AlignedDimension dim)
         {
-            this.chunk.Write(100, SubclassMarker.AlignedDimension);
+            chunk.Write(100, SubclassMarker.AlignedDimension);
 
             IList<Vector3> wcsPoints = MathHelper.Transform(
                 new[]
@@ -3801,20 +3801,20 @@ namespace netDxf.IO
                 },
                 dim.Normal, CoordinateSystem.Object, CoordinateSystem.World);
 
-            this.chunk.Write(13, wcsPoints[0].X);
-            this.chunk.Write(23, wcsPoints[0].Y);
-            this.chunk.Write(33, wcsPoints[0].Z);
+            chunk.Write(13, wcsPoints[0].X);
+            chunk.Write(23, wcsPoints[0].Y);
+            chunk.Write(33, wcsPoints[0].Z);
 
-            this.chunk.Write(14, wcsPoints[1].X);
-            this.chunk.Write(24, wcsPoints[1].Y);
-            this.chunk.Write(34, wcsPoints[1].Z);
+            chunk.Write(14, wcsPoints[1].X);
+            chunk.Write(24, wcsPoints[1].Y);
+            chunk.Write(34, wcsPoints[1].Z);
 
-            this.WriteXData(dim.XData);
+            WriteXData(dim.XData);
         }
 
         private void WriteLinearDimension(LinearDimension dim)
         {
-            this.chunk.Write(100, SubclassMarker.AlignedDimension);
+            chunk.Write(100, SubclassMarker.AlignedDimension);
 
             IList<Vector3> wcsPoints = MathHelper.Transform(
                 new[]
@@ -3824,55 +3824,55 @@ namespace netDxf.IO
                 },
                 dim.Normal, CoordinateSystem.Object, CoordinateSystem.World);
 
-            this.chunk.Write(13, wcsPoints[0].X);
-            this.chunk.Write(23, wcsPoints[0].Y);
-            this.chunk.Write(33, wcsPoints[0].Z);
+            chunk.Write(13, wcsPoints[0].X);
+            chunk.Write(23, wcsPoints[0].Y);
+            chunk.Write(33, wcsPoints[0].Z);
 
-            this.chunk.Write(14, wcsPoints[1].X);
-            this.chunk.Write(24, wcsPoints[1].Y);
-            this.chunk.Write(34, wcsPoints[1].Z);
+            chunk.Write(14, wcsPoints[1].X);
+            chunk.Write(24, wcsPoints[1].Y);
+            chunk.Write(34, wcsPoints[1].Z);
 
-            this.chunk.Write(50, dim.Rotation);
+            chunk.Write(50, dim.Rotation);
 
             // AutoCAD is unable to recognized code 52 for oblique dimension line even though it appears as valid in the dxf documentation
             // this.chunk.Write(52, dim.ObliqueAngle);
 
-            this.chunk.Write(100, SubclassMarker.LinearDimension);
+            chunk.Write(100, SubclassMarker.LinearDimension);
 
-            this.WriteXData(dim.XData);
+            WriteXData(dim.XData);
         }
 
         private void WriteRadialDimension(RadialDimension dim)
         {
-            this.chunk.Write(100, SubclassMarker.RadialDimension);
+            chunk.Write(100, SubclassMarker.RadialDimension);
 
             Vector3 wcsPoint = MathHelper.Transform(new Vector3(dim.ReferencePoint.X, dim.ReferencePoint.Y, dim.Elevation), dim.Normal, CoordinateSystem.Object, CoordinateSystem.World);
-            this.chunk.Write(15, wcsPoint.X);
-            this.chunk.Write(25, wcsPoint.Y);
-            this.chunk.Write(35, wcsPoint.Z);
+            chunk.Write(15, wcsPoint.X);
+            chunk.Write(25, wcsPoint.Y);
+            chunk.Write(35, wcsPoint.Z);
 
-            this.chunk.Write(40, 0.0);
+            chunk.Write(40, 0.0);
 
-            this.WriteXData(dim.XData);
+            WriteXData(dim.XData);
         }
 
         private void WriteDiametricDimension(DiametricDimension dim)
         {
-            this.chunk.Write(100, SubclassMarker.DiametricDimension);
+            chunk.Write(100, SubclassMarker.DiametricDimension);
 
             Vector3 wcsPoint = MathHelper.Transform(new Vector3(dim.ReferencePoint.X, dim.ReferencePoint.Y, dim.Elevation), dim.Normal, CoordinateSystem.Object, CoordinateSystem.World);
-            this.chunk.Write(15, wcsPoint.X);
-            this.chunk.Write(25, wcsPoint.Y);
-            this.chunk.Write(35, wcsPoint.Z);
+            chunk.Write(15, wcsPoint.X);
+            chunk.Write(25, wcsPoint.Y);
+            chunk.Write(35, wcsPoint.Z);
 
-            this.chunk.Write(40, 0.0);
+            chunk.Write(40, 0.0);
 
-            this.WriteXData(dim.XData);
+            WriteXData(dim.XData);
         }
 
         private void WriteAngular3PointDimension(Angular3PointDimension dim)
         {
-            this.chunk.Write(100, SubclassMarker.Angular3PointDimension);
+            chunk.Write(100, SubclassMarker.Angular3PointDimension);
 
             IList<Vector3> wcsPoints = MathHelper.Transform(
                 new[]
@@ -3883,26 +3883,26 @@ namespace netDxf.IO
                 },
                 dim.Normal, CoordinateSystem.Object, CoordinateSystem.World);
 
-            this.chunk.Write(13, wcsPoints[0].X);
-            this.chunk.Write(23, wcsPoints[0].Y);
-            this.chunk.Write(33, wcsPoints[0].Z);
+            chunk.Write(13, wcsPoints[0].X);
+            chunk.Write(23, wcsPoints[0].Y);
+            chunk.Write(33, wcsPoints[0].Z);
 
-            this.chunk.Write(14, wcsPoints[1].X);
-            this.chunk.Write(24, wcsPoints[1].Y);
-            this.chunk.Write(34, wcsPoints[1].Z);
+            chunk.Write(14, wcsPoints[1].X);
+            chunk.Write(24, wcsPoints[1].Y);
+            chunk.Write(34, wcsPoints[1].Z);
 
-            this.chunk.Write(15, wcsPoints[2].X);
-            this.chunk.Write(25, wcsPoints[2].Y);
-            this.chunk.Write(35, wcsPoints[2].Z);
+            chunk.Write(15, wcsPoints[2].X);
+            chunk.Write(25, wcsPoints[2].Y);
+            chunk.Write(35, wcsPoints[2].Z);
 
-            this.chunk.Write(40, 0.0);
+            chunk.Write(40, 0.0);
 
-            this.WriteXData(dim.XData);
+            WriteXData(dim.XData);
         }
 
         private void WriteAngular2LineDimension(Angular2LineDimension dim)
         {
-            this.chunk.Write(100, SubclassMarker.Angular2LineDimension);
+            chunk.Write(100, SubclassMarker.Angular2LineDimension);
 
             IList<Vector3> wcsPoints = MathHelper.Transform(
                 new[]
@@ -3913,30 +3913,30 @@ namespace netDxf.IO
                 },
                 dim.Normal, CoordinateSystem.Object, CoordinateSystem.World);
 
-            this.chunk.Write(13, wcsPoints[0].X);
-            this.chunk.Write(23, wcsPoints[0].Y);
-            this.chunk.Write(33, wcsPoints[0].Z);
+            chunk.Write(13, wcsPoints[0].X);
+            chunk.Write(23, wcsPoints[0].Y);
+            chunk.Write(33, wcsPoints[0].Z);
 
-            this.chunk.Write(14, wcsPoints[1].X);
-            this.chunk.Write(24, wcsPoints[1].Y);
-            this.chunk.Write(34, wcsPoints[1].Z);
+            chunk.Write(14, wcsPoints[1].X);
+            chunk.Write(24, wcsPoints[1].Y);
+            chunk.Write(34, wcsPoints[1].Z);
 
-            this.chunk.Write(15, wcsPoints[2].X);
-            this.chunk.Write(25, wcsPoints[2].Y);
-            this.chunk.Write(35, wcsPoints[2].Z);
+            chunk.Write(15, wcsPoints[2].X);
+            chunk.Write(25, wcsPoints[2].Y);
+            chunk.Write(35, wcsPoints[2].Z);
 
-            this.chunk.Write(16, dim.ArcDefinitionPoint.X);
-            this.chunk.Write(26, dim.ArcDefinitionPoint.Y);
-            this.chunk.Write(36, dim.Elevation);
+            chunk.Write(16, dim.ArcDefinitionPoint.X);
+            chunk.Write(26, dim.ArcDefinitionPoint.Y);
+            chunk.Write(36, dim.Elevation);
 
-            this.chunk.Write(40, 0.0);
+            chunk.Write(40, 0.0);
 
-            this.WriteXData(dim.XData);
+            WriteXData(dim.XData);
         }
 
         private void WriteOrdinateDimension(OrdinateDimension dim)
         {
-            this.chunk.Write(100, SubclassMarker.OrdinateDimension);
+            chunk.Write(100, SubclassMarker.OrdinateDimension);
 
             IList<Vector3> wcsPoints = MathHelper.Transform(
                 new[]
@@ -3946,24 +3946,24 @@ namespace netDxf.IO
                 },
                 dim.Normal, CoordinateSystem.Object, CoordinateSystem.World);
 
-            this.chunk.Write(13, wcsPoints[0].X);
-            this.chunk.Write(23, wcsPoints[0].Y);
-            this.chunk.Write(33, wcsPoints[0].Z);
+            chunk.Write(13, wcsPoints[0].X);
+            chunk.Write(23, wcsPoints[0].Y);
+            chunk.Write(33, wcsPoints[0].Z);
 
-            this.chunk.Write(14, wcsPoints[1].X);
-            this.chunk.Write(24, wcsPoints[1].Y);
-            this.chunk.Write(34, wcsPoints[1].Z);
+            chunk.Write(14, wcsPoints[1].X);
+            chunk.Write(24, wcsPoints[1].Y);
+            chunk.Write(34, wcsPoints[1].Z);
 
-            this.WriteXData(dim.XData);
+            WriteXData(dim.XData);
         }
 
         private void WriteImage(Image image)
         {
-            this.chunk.Write(100, SubclassMarker.RasterImage);
+            chunk.Write(100, SubclassMarker.RasterImage);
 
-            this.chunk.Write(10, image.Position.X);
-            this.chunk.Write(20, image.Position.Y);
-            this.chunk.Write(30, image.Position.Z);
+            chunk.Write(10, image.Position.X);
+            chunk.Write(20, image.Position.Y);
+            chunk.Write(30, image.Position.Z);
 
             //Vector2 u = new Vector2(image.Width/image.Definition.Width, 0.0);
             //Vector2 v = new Vector2(0.0, image.Height/image.Definition.Height);
@@ -3987,69 +3987,69 @@ namespace netDxf.IO
                 CoordinateSystem.Object,
                 CoordinateSystem.World);
 
-            double factor = UnitHelper.ConversionFactor(this.doc.RasterVariables.Units, this.doc.DrawingVariables.InsUnits);
+            double factor = UnitHelper.ConversionFactor(doc.RasterVariables.Units, doc.DrawingVariables.InsUnits);
 
             Vector3 wcsU = wcsUV[0]*factor;
-            this.chunk.Write(11, wcsU.X);
-            this.chunk.Write(21, wcsU.Y);
-            this.chunk.Write(31, wcsU.Z);
+            chunk.Write(11, wcsU.X);
+            chunk.Write(21, wcsU.Y);
+            chunk.Write(31, wcsU.Z);
 
             Vector3 wcsV = wcsUV[1]*factor;
-            this.chunk.Write(12, wcsV.X);
-            this.chunk.Write(22, wcsV.Y);
-            this.chunk.Write(32, wcsV.Z);
+            chunk.Write(12, wcsV.X);
+            chunk.Write(22, wcsV.Y);
+            chunk.Write(32, wcsV.Z);
 
-            this.chunk.Write(13, (double) image.Definition.Width);
-            this.chunk.Write(23, (double) image.Definition.Height);
+            chunk.Write(13, (double) image.Definition.Width);
+            chunk.Write(23, (double) image.Definition.Height);
 
-            this.chunk.Write(340, image.Definition.Handle);
+            chunk.Write(340, image.Definition.Handle);
 
-            this.chunk.Write(70, (short) image.DisplayOptions);
-            this.chunk.Write(280, image.Clipping ? (short) 1 : (short) 0);
-            this.chunk.Write(281, image.Brightness);
-            this.chunk.Write(282, image.Contrast);
-            this.chunk.Write(283, image.Fade);
-            this.chunk.Write(360, image.Definition.Reactors[image.Handle].Handle);
+            chunk.Write(70, (short) image.DisplayOptions);
+            chunk.Write(280, image.Clipping ? (short) 1 : (short) 0);
+            chunk.Write(281, image.Brightness);
+            chunk.Write(282, image.Contrast);
+            chunk.Write(283, image.Fade);
+            chunk.Write(360, image.Definition.Reactors[image.Handle].Handle);
 
-            this.chunk.Write(71, (short) image.ClippingBoundary.Type);
+            chunk.Write(71, (short) image.ClippingBoundary.Type);
             if (image.ClippingBoundary.Type == ClippingBoundaryType.Rectangular)
             {
-                this.chunk.Write(91, image.ClippingBoundary.Vertexes.Count);
+                chunk.Write(91, image.ClippingBoundary.Vertexes.Count);
                 foreach (Vector2 vertex in image.ClippingBoundary.Vertexes)
                 {
-                    this.chunk.Write(14, vertex.X-0.5);
-                    this.chunk.Write(24, vertex.Y-0.5);
+                    chunk.Write(14, vertex.X-0.5);
+                    chunk.Write(24, vertex.Y-0.5);
                 }
             }
             else
             {
                 // for polygonal clipping boundaries the last vertex must be duplicated
-                this.chunk.Write(91, image.ClippingBoundary.Vertexes.Count+1);
+                chunk.Write(91, image.ClippingBoundary.Vertexes.Count+1);
                 foreach (Vector2 vertex in image.ClippingBoundary.Vertexes)
                 {
-                    this.chunk.Write(14, vertex.X - 0.5);
-                    this.chunk.Write(24, vertex.Y - 0.5);
+                    chunk.Write(14, vertex.X - 0.5);
+                    chunk.Write(24, vertex.Y - 0.5);
                 }
-                this.chunk.Write(14, image.ClippingBoundary.Vertexes[0].X - 0.5);
-                this.chunk.Write(24, image.ClippingBoundary.Vertexes[0].Y - 0.5);
+                chunk.Write(14, image.ClippingBoundary.Vertexes[0].X - 0.5);
+                chunk.Write(24, image.ClippingBoundary.Vertexes[0].Y - 0.5);
             }
 
-            this.WriteXData(image.XData);
+            WriteXData(image.XData);
         }
 
         private void WriteMLine(MLine mLine)
         {
-            this.chunk.Write(100, SubclassMarker.MLine);
+            chunk.Write(100, SubclassMarker.MLine);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(mLine.Style.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(mLine.Style.Name));
 
-            this.chunk.Write(340, mLine.Style.Handle);
+            chunk.Write(340, mLine.Style.Handle);
 
-            this.chunk.Write(40, mLine.Scale);
-            this.chunk.Write(70, (short) mLine.Justification);
-            this.chunk.Write(71, (short) mLine.Flags);
-            this.chunk.Write(72, (short) mLine.Vertexes.Count);
-            this.chunk.Write(73, (short) mLine.Style.Elements.Count);
+            chunk.Write(40, mLine.Scale);
+            chunk.Write(70, (short) mLine.Justification);
+            chunk.Write(71, (short) mLine.Flags);
+            chunk.Write(72, (short) mLine.Vertexes.Count);
+            chunk.Write(73, (short) mLine.Style.Elements.Count);
 
             // the MLine information is in OCS we need to save it in WCS
             // this behavior is similar to the LWPolyline, the info is in OCS because these entities are strictly 2d. Normally they are used in the XY plane whose
@@ -4067,57 +4067,57 @@ namespace netDxf.IO
             // Although it is not recommended the vertex list might have 0 entries
             if (wcsVertexes.Length == 0)
             {
-                this.chunk.Write(10, 0.0);
-                this.chunk.Write(20, 0.0);
-                this.chunk.Write(30, 0.0);
+                chunk.Write(10, 0.0);
+                chunk.Write(20, 0.0);
+                chunk.Write(30, 0.0);
             }
             else
             {
-                this.chunk.Write(10, wcsVertexes[0].X);
-                this.chunk.Write(20, wcsVertexes[0].Y);
-                this.chunk.Write(30, wcsVertexes[0].Z);
+                chunk.Write(10, wcsVertexes[0].X);
+                chunk.Write(20, wcsVertexes[0].Y);
+                chunk.Write(30, wcsVertexes[0].Z);
             }
 
-            this.chunk.Write(210, mLine.Normal.X);
-            this.chunk.Write(220, mLine.Normal.Y);
-            this.chunk.Write(230, mLine.Normal.Z);
+            chunk.Write(210, mLine.Normal.X);
+            chunk.Write(220, mLine.Normal.Y);
+            chunk.Write(230, mLine.Normal.Z);
 
             for (int i = 0; i < wcsVertexes.Length; i++)
             {
-                this.chunk.Write(11, wcsVertexes[i].X);
-                this.chunk.Write(21, wcsVertexes[i].Y);
-                this.chunk.Write(31, wcsVertexes[i].Z);
+                chunk.Write(11, wcsVertexes[i].X);
+                chunk.Write(21, wcsVertexes[i].Y);
+                chunk.Write(31, wcsVertexes[i].Z);
 
                 // the directions are written in world coordinates
                 Vector2 dir = mLine.Vertexes[i].Direction;
                 Vector3 wcsDir = MathHelper.Transform(new Vector3(dir.X, dir.Y, mLine.Elevation), mLine.Normal, CoordinateSystem.Object, CoordinateSystem.World);
-                this.chunk.Write(12, wcsDir.X);
-                this.chunk.Write(22, wcsDir.Y);
-                this.chunk.Write(32, wcsDir.Z);
+                chunk.Write(12, wcsDir.X);
+                chunk.Write(22, wcsDir.Y);
+                chunk.Write(32, wcsDir.Z);
                 Vector2 mitter = mLine.Vertexes[i].Miter;
                 Vector3 wcsMitter = MathHelper.Transform(new Vector3(mitter.X, mitter.Y, mLine.Elevation), mLine.Normal, CoordinateSystem.Object, CoordinateSystem.World);
-                this.chunk.Write(13, wcsMitter.X);
-                this.chunk.Write(23, wcsMitter.Y);
-                this.chunk.Write(33, wcsMitter.Z);
+                chunk.Write(13, wcsMitter.X);
+                chunk.Write(23, wcsMitter.Y);
+                chunk.Write(33, wcsMitter.Z);
 
                 foreach (List<double> distances in mLine.Vertexes[i].Distances)
                 {
-                    this.chunk.Write(74, (short) distances.Count);
+                    chunk.Write(74, (short) distances.Count);
                     foreach (double distance in distances)
                     {
-                        this.chunk.Write(41, distance);
+                        chunk.Write(41, distance);
                     }
-                    this.chunk.Write(75, (short) 0);
+                    chunk.Write(75, (short) 0);
                 }
             }
 
-            this.WriteXData(mLine.XData);
+            WriteXData(mLine.XData);
         }
 
         private void WriteAttributeDefinition(AttributeDefinition def, Layout layout)
         {
-            this.chunk.Write(0, def.CodeName);
-            this.chunk.Write(5, def.Handle);
+            chunk.Write(0, def.CodeName);
+            chunk.Write(5, def.Handle);
 
             //if (def.Reactors.Count > 0)
             //{
@@ -4129,394 +4129,394 @@ namespace netDxf.IO
             //    this.chunk.Write(102, "}");
             //}
 
-            this.chunk.Write(330, def.Owner.Record.Handle);
+            chunk.Write(330, def.Owner.Record.Handle);
 
-            this.chunk.Write(100, SubclassMarker.Entity);
+            chunk.Write(100, SubclassMarker.Entity);
 
             if (layout != null)
-                this.chunk.Write(67, layout.IsPaperSpace ? (short)1 : (short)0);
+                chunk.Write(67, layout.IsPaperSpace ? (short)1 : (short)0);
 
-            this.chunk.Write(8, this.EncodeNonAsciiCharacters(def.Layer.Name));
+            chunk.Write(8, EncodeNonAsciiCharacters(def.Layer.Name));
 
-            this.chunk.Write(62, def.Color.Index);
+            chunk.Write(62, def.Color.Index);
             if (def.Color.UseTrueColor)
-                this.chunk.Write(420, AciColor.ToTrueColor(def.Color));
+                chunk.Write(420, AciColor.ToTrueColor(def.Color));
 
             if (def.Transparency.Value >= 0)
-                this.chunk.Write(440, Transparency.ToAlphaValue(def.Transparency));
+                chunk.Write(440, Transparency.ToAlphaValue(def.Transparency));
 
-            this.chunk.Write(6, this.EncodeNonAsciiCharacters(def.Linetype.Name));
+            chunk.Write(6, EncodeNonAsciiCharacters(def.Linetype.Name));
 
-            this.chunk.Write(370, (short)def.Lineweight);
-            this.chunk.Write(48, def.LinetypeScale);
-            this.chunk.Write(60, def.IsVisible ? (short)0 : (short)1);
+            chunk.Write(370, (short)def.Lineweight);
+            chunk.Write(48, def.LinetypeScale);
+            chunk.Write(60, def.IsVisible ? (short)0 : (short)1);
 
-            this.chunk.Write(100, SubclassMarker.Text);
+            chunk.Write(100, SubclassMarker.Text);
 
             Vector3 ocsInsertion = MathHelper.Transform(def.Position, def.Normal, CoordinateSystem.World, CoordinateSystem.Object);
 
-            this.chunk.Write(10, ocsInsertion.X);
-            this.chunk.Write(20, ocsInsertion.Y);
-            this.chunk.Write(30, ocsInsertion.Z);
+            chunk.Write(10, ocsInsertion.X);
+            chunk.Write(20, ocsInsertion.Y);
+            chunk.Write(30, ocsInsertion.Z);
 
-            this.chunk.Write(40, def.Height);
+            chunk.Write(40, def.Height);
 
             object value = def.Value;
             if (value == null)
-                this.chunk.Write(1, string.Empty);
+                chunk.Write(1, string.Empty);
             else if (value is string)
-                this.chunk.Write(1, this.EncodeNonAsciiCharacters((string) value));
+                chunk.Write(1, EncodeNonAsciiCharacters((string) value));
             else
-                this.chunk.Write(1, value.ToString());
+                chunk.Write(1, value.ToString());
 
             switch (def.Alignment)
             {
                 case TextAlignment.TopLeft:
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(72, (short) 0);
                     break;
                 case TextAlignment.TopCenter:
-                    this.chunk.Write(72, (short) 1);
+                    chunk.Write(72, (short) 1);
                     break;
                 case TextAlignment.TopRight:
-                    this.chunk.Write(72, (short) 2);
+                    chunk.Write(72, (short) 2);
                     break;
                 case TextAlignment.MiddleLeft:
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(72, (short) 0);
                     break;
                 case TextAlignment.MiddleCenter:
-                    this.chunk.Write(72, (short) 1);
+                    chunk.Write(72, (short) 1);
                     break;
                 case TextAlignment.MiddleRight:
-                    this.chunk.Write(72, (short) 2);
+                    chunk.Write(72, (short) 2);
                     break;
                 case TextAlignment.BottomLeft:
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(72, (short) 0);
                     break;
                 case TextAlignment.BottomCenter:
-                    this.chunk.Write(72, (short) 1);
+                    chunk.Write(72, (short) 1);
                     break;
                 case TextAlignment.BottomRight:
-                    this.chunk.Write(72, (short) 2);
+                    chunk.Write(72, (short) 2);
                     break;
                 case TextAlignment.BaselineLeft:
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(72, (short) 0);
                     break;
                 case TextAlignment.BaselineCenter:
-                    this.chunk.Write(72, (short) 1);
+                    chunk.Write(72, (short) 1);
                     break;
                 case TextAlignment.BaselineRight:
-                    this.chunk.Write(72, (short) 2);
+                    chunk.Write(72, (short) 2);
                     break;
                 case TextAlignment.Aligned:
-                    this.chunk.Write(72, (short) 3);
+                    chunk.Write(72, (short) 3);
                     break;
                 case TextAlignment.Middle:
-                    this.chunk.Write(72, (short) 4);
+                    chunk.Write(72, (short) 4);
                     break;
                 case TextAlignment.Fit:
-                    this.chunk.Write(72, (short) 5);
+                    chunk.Write(72, (short) 5);
                     break;
             }
 
-            this.chunk.Write(50, def.Rotation);
-            this.chunk.Write(51, def.ObliqueAngle);
-            this.chunk.Write(41, def.WidthFactor);
+            chunk.Write(50, def.Rotation);
+            chunk.Write(51, def.ObliqueAngle);
+            chunk.Write(41, def.WidthFactor);
 
-            this.chunk.Write(7, this.EncodeNonAsciiCharacters(def.Style.Name));
+            chunk.Write(7, EncodeNonAsciiCharacters(def.Style.Name));
 
-            this.chunk.Write(11, def.Position.X);
-            this.chunk.Write(21, def.Position.Y);
-            this.chunk.Write(31, def.Position.Z);
+            chunk.Write(11, def.Position.X);
+            chunk.Write(21, def.Position.Y);
+            chunk.Write(31, def.Position.Z);
 
-            this.chunk.Write(210, def.Normal.X);
-            this.chunk.Write(220, def.Normal.Y);
-            this.chunk.Write(230, def.Normal.Z);
+            chunk.Write(210, def.Normal.X);
+            chunk.Write(220, def.Normal.Y);
+            chunk.Write(230, def.Normal.Z);
 
-            this.chunk.Write(100, SubclassMarker.AttributeDefinition);
+            chunk.Write(100, SubclassMarker.AttributeDefinition);
 
-            this.chunk.Write(3, this.EncodeNonAsciiCharacters(def.Prompt));
+            chunk.Write(3, EncodeNonAsciiCharacters(def.Prompt));
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(def.Tag));
+            chunk.Write(2, EncodeNonAsciiCharacters(def.Tag));
 
-            this.chunk.Write(70, (short) def.Flags);
+            chunk.Write(70, (short) def.Flags);
 
             switch (def.Alignment)
             {
                 case TextAlignment.TopLeft:
-                    this.chunk.Write(74, (short) 3);
+                    chunk.Write(74, (short) 3);
                     break;
                 case TextAlignment.TopCenter:
-                    this.chunk.Write(74, (short) 3);
+                    chunk.Write(74, (short) 3);
                     break;
                 case TextAlignment.TopRight:
-                    this.chunk.Write(74, (short) 3);
+                    chunk.Write(74, (short) 3);
                     break;
                 case TextAlignment.MiddleLeft:
-                    this.chunk.Write(74, (short) 2);
+                    chunk.Write(74, (short) 2);
                     break;
                 case TextAlignment.MiddleCenter:
-                    this.chunk.Write(74, (short) 2);
+                    chunk.Write(74, (short) 2);
                     break;
                 case TextAlignment.MiddleRight:
-                    this.chunk.Write(74, (short) 2);
+                    chunk.Write(74, (short) 2);
                     break;
                 case TextAlignment.BottomLeft:
-                    this.chunk.Write(74, (short) 1);
+                    chunk.Write(74, (short) 1);
                     break;
                 case TextAlignment.BottomCenter:
-                    this.chunk.Write(74, (short) 1);
+                    chunk.Write(74, (short) 1);
                     break;
                 case TextAlignment.BottomRight:
-                    this.chunk.Write(74, (short) 1);
+                    chunk.Write(74, (short) 1);
                     break;
                 case TextAlignment.BaselineLeft:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.BaselineCenter:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.BaselineRight:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.Aligned:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.Middle:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.Fit:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
             }
 
-            this.WriteXData(def.XData);
+            WriteXData(def.XData);
         }
 
         private void WriteAttribute(Attribute attrib)
         {
-            this.chunk.Write(0, attrib.CodeName);
-            this.chunk.Write(5, attrib.Handle);
+            chunk.Write(0, attrib.CodeName);
+            chunk.Write(5, attrib.Handle);
 
-            this.chunk.Write(330, attrib.Owner.Handle);
+            chunk.Write(330, attrib.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.Entity);
+            chunk.Write(100, SubclassMarker.Entity);
 
-            this.chunk.Write(8, this.EncodeNonAsciiCharacters(attrib.Layer.Name));
+            chunk.Write(8, EncodeNonAsciiCharacters(attrib.Layer.Name));
 
-            this.chunk.Write(62, attrib.Color.Index);
+            chunk.Write(62, attrib.Color.Index);
             if (attrib.Color.UseTrueColor)
-                this.chunk.Write(420, AciColor.ToTrueColor(attrib.Color));
+                chunk.Write(420, AciColor.ToTrueColor(attrib.Color));
 
             if (attrib.Transparency.Value >= 0)
-                this.chunk.Write(440, Transparency.ToAlphaValue(attrib.Transparency));
+                chunk.Write(440, Transparency.ToAlphaValue(attrib.Transparency));
 
-            this.chunk.Write(6, this.EncodeNonAsciiCharacters(attrib.Linetype.Name));
+            chunk.Write(6, EncodeNonAsciiCharacters(attrib.Linetype.Name));
 
-            this.chunk.Write(370, (short) attrib.Lineweight);
-            this.chunk.Write(48, attrib.LinetypeScale);
-            this.chunk.Write(60, attrib.IsVisible ? (short) 0 : (short) 1);
+            chunk.Write(370, (short) attrib.Lineweight);
+            chunk.Write(48, attrib.LinetypeScale);
+            chunk.Write(60, attrib.IsVisible ? (short) 0 : (short) 1);
 
-            this.chunk.Write(100, SubclassMarker.Text);
+            chunk.Write(100, SubclassMarker.Text);
 
             Vector3 ocsInsertion = MathHelper.Transform(attrib.Position, attrib.Normal, CoordinateSystem.World, CoordinateSystem.Object);
 
-            this.chunk.Write(10, ocsInsertion.X);
-            this.chunk.Write(20, ocsInsertion.Y);
-            this.chunk.Write(30, ocsInsertion.Z);
+            chunk.Write(10, ocsInsertion.X);
+            chunk.Write(20, ocsInsertion.Y);
+            chunk.Write(30, ocsInsertion.Z);
 
-            this.chunk.Write(40, attrib.Height);
-            this.chunk.Write(41, attrib.WidthFactor);
+            chunk.Write(40, attrib.Height);
+            chunk.Write(41, attrib.WidthFactor);
 
-            this.chunk.Write(7, this.EncodeNonAsciiCharacters(attrib.Style.Name));
+            chunk.Write(7, EncodeNonAsciiCharacters(attrib.Style.Name));
 
             object value = attrib.Value;
             if (value == null)
-                this.chunk.Write(1, string.Empty);
+                chunk.Write(1, string.Empty);
             else if (value is string)
-                this.chunk.Write(1, this.EncodeNonAsciiCharacters((string) value));
+                chunk.Write(1, EncodeNonAsciiCharacters((string) value));
             else
-                this.chunk.Write(1, value.ToString());
+                chunk.Write(1, value.ToString());
 
             switch (attrib.Alignment)
             {
                 case TextAlignment.TopLeft:
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(72, (short) 0);
                     break;
                 case TextAlignment.TopCenter:
-                    this.chunk.Write(72, (short) 1);
+                    chunk.Write(72, (short) 1);
                     break;
                 case TextAlignment.TopRight:
-                    this.chunk.Write(72, (short) 2);
+                    chunk.Write(72, (short) 2);
                     break;
                 case TextAlignment.MiddleLeft:
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(72, (short) 0);
                     break;
                 case TextAlignment.MiddleCenter:
-                    this.chunk.Write(72, (short) 1);
+                    chunk.Write(72, (short) 1);
                     break;
                 case TextAlignment.MiddleRight:
-                    this.chunk.Write(72, (short) 2);
+                    chunk.Write(72, (short) 2);
                     break;
                 case TextAlignment.BottomLeft:
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(72, (short) 0);
                     break;
                 case TextAlignment.BottomCenter:
-                    this.chunk.Write(72, (short) 1);
+                    chunk.Write(72, (short) 1);
                     break;
                 case TextAlignment.BottomRight:
-                    this.chunk.Write(72, (short) 2);
+                    chunk.Write(72, (short) 2);
                     break;
                 case TextAlignment.BaselineLeft:
-                    this.chunk.Write(72, (short) 0);
+                    chunk.Write(72, (short) 0);
                     break;
                 case TextAlignment.BaselineCenter:
-                    this.chunk.Write(72, (short) 1);
+                    chunk.Write(72, (short) 1);
                     break;
                 case TextAlignment.BaselineRight:
-                    this.chunk.Write(72, (short) 2);
+                    chunk.Write(72, (short) 2);
                     break;
                 case TextAlignment.Aligned:
-                    this.chunk.Write(72, (short) 3);
+                    chunk.Write(72, (short) 3);
                     break;
                 case TextAlignment.Middle:
-                    this.chunk.Write(72, (short) 4);
+                    chunk.Write(72, (short) 4);
                     break;
                 case TextAlignment.Fit:
-                    this.chunk.Write(72, (short) 5);
+                    chunk.Write(72, (short) 5);
                     break;
             }
 
-            this.chunk.Write(11, ocsInsertion.X);
-            this.chunk.Write(21, ocsInsertion.Y);
-            this.chunk.Write(31, ocsInsertion.Z);
+            chunk.Write(11, ocsInsertion.X);
+            chunk.Write(21, ocsInsertion.Y);
+            chunk.Write(31, ocsInsertion.Z);
 
-            this.chunk.Write(50, attrib.Rotation);
-            this.chunk.Write(51, attrib.ObliqueAngle);
+            chunk.Write(50, attrib.Rotation);
+            chunk.Write(51, attrib.ObliqueAngle);
 
-            this.chunk.Write(210, attrib.Normal.X);
-            this.chunk.Write(220, attrib.Normal.Y);
-            this.chunk.Write(230, attrib.Normal.Z);
+            chunk.Write(210, attrib.Normal.X);
+            chunk.Write(220, attrib.Normal.Y);
+            chunk.Write(230, attrib.Normal.Z);
 
-            this.chunk.Write(100, SubclassMarker.Attribute);
+            chunk.Write(100, SubclassMarker.Attribute);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(attrib.Tag));
+            chunk.Write(2, EncodeNonAsciiCharacters(attrib.Tag));
 
-            this.chunk.Write(70, (short) attrib.Flags);
+            chunk.Write(70, (short) attrib.Flags);
 
             switch (attrib.Alignment)
             {
                 case TextAlignment.TopLeft:
-                    this.chunk.Write(74, (short) 3);
+                    chunk.Write(74, (short) 3);
                     break;
                 case TextAlignment.TopCenter:
-                    this.chunk.Write(74, (short) 3);
+                    chunk.Write(74, (short) 3);
                     break;
                 case TextAlignment.TopRight:
-                    this.chunk.Write(74, (short) 3);
+                    chunk.Write(74, (short) 3);
                     break;
                 case TextAlignment.MiddleLeft:
-                    this.chunk.Write(74, (short) 2);
+                    chunk.Write(74, (short) 2);
                     break;
                 case TextAlignment.MiddleCenter:
-                    this.chunk.Write(74, (short) 2);
+                    chunk.Write(74, (short) 2);
                     break;
                 case TextAlignment.MiddleRight:
-                    this.chunk.Write(74, (short) 2);
+                    chunk.Write(74, (short) 2);
                     break;
                 case TextAlignment.BottomLeft:
-                    this.chunk.Write(74, (short) 1);
+                    chunk.Write(74, (short) 1);
                     break;
                 case TextAlignment.BottomCenter:
-                    this.chunk.Write(74, (short) 1);
+                    chunk.Write(74, (short) 1);
                     break;
                 case TextAlignment.BottomRight:
-                    this.chunk.Write(74, (short) 1);
+                    chunk.Write(74, (short) 1);
                     break;
                 case TextAlignment.BaselineLeft:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.BaselineCenter:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.BaselineRight:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.Aligned:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.Middle:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
                 case TextAlignment.Fit:
-                    this.chunk.Write(74, (short) 0);
+                    chunk.Write(74, (short) 0);
                     break;
             }
         }
 
         private void WriteViewport(Viewport vp)
         {
-            this.chunk.Write(100, SubclassMarker.Viewport);
+            chunk.Write(100, SubclassMarker.Viewport);
 
-            this.chunk.Write(10, vp.Center.X);
-            this.chunk.Write(20, vp.Center.Y);
-            this.chunk.Write(30, vp.Center.Z);
+            chunk.Write(10, vp.Center.X);
+            chunk.Write(20, vp.Center.Y);
+            chunk.Write(30, vp.Center.Z);
 
-            this.chunk.Write(40, vp.Width);
-            this.chunk.Write(41, vp.Height);
-            this.chunk.Write(68, vp.Stacking);
-            this.chunk.Write(69, vp.Id);
+            chunk.Write(40, vp.Width);
+            chunk.Write(41, vp.Height);
+            chunk.Write(68, vp.Stacking);
+            chunk.Write(69, vp.Id);
 
-            this.chunk.Write(12, vp.ViewCenter.X);
-            this.chunk.Write(22, vp.ViewCenter.Y);
+            chunk.Write(12, vp.ViewCenter.X);
+            chunk.Write(22, vp.ViewCenter.Y);
 
-            this.chunk.Write(13, vp.SnapBase.X);
-            this.chunk.Write(23, vp.SnapBase.Y);
+            chunk.Write(13, vp.SnapBase.X);
+            chunk.Write(23, vp.SnapBase.Y);
 
-            this.chunk.Write(14, vp.SnapSpacing.X);
-            this.chunk.Write(24, vp.SnapSpacing.Y);
+            chunk.Write(14, vp.SnapSpacing.X);
+            chunk.Write(24, vp.SnapSpacing.Y);
 
-            this.chunk.Write(15, vp.GridSpacing.X);
-            this.chunk.Write(25, vp.GridSpacing.Y);
+            chunk.Write(15, vp.GridSpacing.X);
+            chunk.Write(25, vp.GridSpacing.Y);
 
-            this.chunk.Write(16, vp.ViewDirection.X);
-            this.chunk.Write(26, vp.ViewDirection.Y);
-            this.chunk.Write(36, vp.ViewDirection.Z);
+            chunk.Write(16, vp.ViewDirection.X);
+            chunk.Write(26, vp.ViewDirection.Y);
+            chunk.Write(36, vp.ViewDirection.Z);
 
-            this.chunk.Write(17, vp.ViewTarget.X);
-            this.chunk.Write(27, vp.ViewTarget.Y);
-            this.chunk.Write(37, vp.ViewTarget.Z);
+            chunk.Write(17, vp.ViewTarget.X);
+            chunk.Write(27, vp.ViewTarget.Y);
+            chunk.Write(37, vp.ViewTarget.Z);
 
-            this.chunk.Write(42, vp.LensLength);
+            chunk.Write(42, vp.LensLength);
 
-            this.chunk.Write(43, vp.FrontClipPlane);
-            this.chunk.Write(44, vp.BackClipPlane);
-            this.chunk.Write(45, vp.ViewHeight);
+            chunk.Write(43, vp.FrontClipPlane);
+            chunk.Write(44, vp.BackClipPlane);
+            chunk.Write(45, vp.ViewHeight);
 
-            this.chunk.Write(50, vp.SnapAngle);
-            this.chunk.Write(51, vp.TwistAngle);
-            this.chunk.Write(72, vp.CircleZoomPercent);
+            chunk.Write(50, vp.SnapAngle);
+            chunk.Write(51, vp.TwistAngle);
+            chunk.Write(72, vp.CircleZoomPercent);
 
             foreach (Layer layer in vp.FrozenLayers)
-                this.chunk.Write(331, layer.Handle);
+                chunk.Write(331, layer.Handle);
 
-            this.chunk.Write(90, (int) vp.Status);
+            chunk.Write(90, (int) vp.Status);
 
             if (vp.ClippingBoundary != null)
-                this.chunk.Write(340, vp.ClippingBoundary.Handle);
+                chunk.Write(340, vp.ClippingBoundary.Handle);
 
-            this.chunk.Write(110, vp.UcsOrigin.X);
-            this.chunk.Write(120, vp.UcsOrigin.Y);
-            this.chunk.Write(130, vp.UcsOrigin.Z);
+            chunk.Write(110, vp.UcsOrigin.X);
+            chunk.Write(120, vp.UcsOrigin.Y);
+            chunk.Write(130, vp.UcsOrigin.Z);
 
-            this.chunk.Write(111, vp.UcsXAxis.X);
-            this.chunk.Write(121, vp.UcsXAxis.Y);
-            this.chunk.Write(131, vp.UcsXAxis.Z);
+            chunk.Write(111, vp.UcsXAxis.X);
+            chunk.Write(121, vp.UcsXAxis.Y);
+            chunk.Write(131, vp.UcsXAxis.Z);
 
-            this.chunk.Write(112, vp.UcsYAxis.X);
-            this.chunk.Write(122, vp.UcsYAxis.Y);
-            this.chunk.Write(132, vp.UcsYAxis.Z);
+            chunk.Write(112, vp.UcsYAxis.X);
+            chunk.Write(122, vp.UcsYAxis.Y);
+            chunk.Write(132, vp.UcsYAxis.Z);
 
-            this.WriteXData(vp.XData);
+            WriteXData(vp.XData);
         }
 
         #endregion
@@ -4525,40 +4525,40 @@ namespace netDxf.IO
 
         private void WriteDictionary(DictionaryObject dictionary)
         {
-            this.chunk.Write(0, DxfObjectCode.Dictionary);
-            this.chunk.Write(5, dictionary.Handle);
-            this.chunk.Write(330, dictionary.Owner.Handle);
+            chunk.Write(0, DxfObjectCode.Dictionary);
+            chunk.Write(5, dictionary.Handle);
+            chunk.Write(330, dictionary.Owner.Handle);
 
-            this.chunk.Write(100, SubclassMarker.Dictionary);
-            this.chunk.Write(280, dictionary.IsHardOwner ? (short) 1 : (short) 0);
-            this.chunk.Write(281, (short) dictionary.Cloning);
+            chunk.Write(100, SubclassMarker.Dictionary);
+            chunk.Write(280, dictionary.IsHardOwner ? (short) 1 : (short) 0);
+            chunk.Write(281, (short) dictionary.Cloning);
 
             if (dictionary.Entries == null)
                 return;
 
             foreach (KeyValuePair<string, string> entry in dictionary.Entries)
             {
-                this.chunk.Write(3, this.EncodeNonAsciiCharacters(entry.Value));
-                this.chunk.Write(350, entry.Key);
+                chunk.Write(3, EncodeNonAsciiCharacters(entry.Value));
+                chunk.Write(350, entry.Key);
             }
         }
 
         private void WriteUnderlayDefinition(UnderlayDefinition underlayDef, string ownerHandle)
         {
-            this.chunk.Write(0, underlayDef.CodeName);
-            this.chunk.Write(5, underlayDef.Handle);
-            this.chunk.Write(102, "{ACAD_REACTORS");
+            chunk.Write(0, underlayDef.CodeName);
+            chunk.Write(5, underlayDef.Handle);
+            chunk.Write(102, "{ACAD_REACTORS");
             List<DxfObject> objects = null;
             switch (underlayDef.Type)
             {
                 case UnderlayType.DGN:
-                    objects = this.doc.UnderlayDgnDefinitions.References[underlayDef.Name];
+                    objects = doc.UnderlayDgnDefinitions.References[underlayDef.Name];
                     break;
                 case UnderlayType.DWF:
-                    objects = this.doc.UnderlayDwfDefinitions.References[underlayDef.Name];
+                    objects = doc.UnderlayDwfDefinitions.References[underlayDef.Name];
                     break;
                 case UnderlayType.PDF:
-                    objects = this.doc.UnderlayPdfDefinitions.References[underlayDef.Name];
+                    objects = doc.UnderlayPdfDefinitions.References[underlayDef.Name];
                     break;
             }
             if (objects == null)
@@ -4567,227 +4567,227 @@ namespace netDxf.IO
             {
                 Underlay underlay = o as Underlay;
                 if (underlay != null)
-                    this.chunk.Write(330, underlay.Handle);
+                    chunk.Write(330, underlay.Handle);
             }
-            this.chunk.Write(102, "}");
-            this.chunk.Write(330, ownerHandle);
+            chunk.Write(102, "}");
+            chunk.Write(330, ownerHandle);
 
-            this.chunk.Write(100, SubclassMarker.UnderlayDefinition);
-            this.chunk.Write(1, this.EncodeNonAsciiCharacters(underlayDef.File));
+            chunk.Write(100, SubclassMarker.UnderlayDefinition);
+            chunk.Write(1, EncodeNonAsciiCharacters(underlayDef.File));
             switch (underlayDef.Type)
             {
                 case UnderlayType.DGN:
-                    this.chunk.Write(2, this.EncodeNonAsciiCharacters(((UnderlayDgnDefinition) underlayDef).Layout));
+                    chunk.Write(2, EncodeNonAsciiCharacters(((UnderlayDgnDefinition) underlayDef).Layout));
                     break;
                 case UnderlayType.DWF:
-                    this.chunk.Write(2, string.Empty);
+                    chunk.Write(2, string.Empty);
                     break;
                 case UnderlayType.PDF:
-                    this.chunk.Write(2, this.EncodeNonAsciiCharacters(((UnderlayPdfDefinition) underlayDef).Page));
+                    chunk.Write(2, EncodeNonAsciiCharacters(((UnderlayPdfDefinition) underlayDef).Page));
                     break;
             }
         }
 
         private void WriteImageDefReactor(ImageDefinitionReactor reactor)
         {
-            this.chunk.Write(0, reactor.CodeName);
-            this.chunk.Write(5, reactor.Handle);
-            this.chunk.Write(330, reactor.ImageHandle);
+            chunk.Write(0, reactor.CodeName);
+            chunk.Write(5, reactor.Handle);
+            chunk.Write(330, reactor.ImageHandle);
 
-            this.chunk.Write(100, SubclassMarker.RasterImageDefReactor);
-            this.chunk.Write(90, 2);
-            this.chunk.Write(330, reactor.ImageHandle);
+            chunk.Write(100, SubclassMarker.RasterImageDefReactor);
+            chunk.Write(90, 2);
+            chunk.Write(330, reactor.ImageHandle);
         }
 
         private void WriteImageDef(ImageDefinition imageDefinition, string ownerHandle)
         {
-            this.chunk.Write(0, imageDefinition.CodeName);
-            this.chunk.Write(5, imageDefinition.Handle);
+            chunk.Write(0, imageDefinition.CodeName);
+            chunk.Write(5, imageDefinition.Handle);
 
-            this.chunk.Write(102, "{ACAD_REACTORS");
-            this.chunk.Write(330, ownerHandle);
+            chunk.Write(102, "{ACAD_REACTORS");
+            chunk.Write(330, ownerHandle);
             foreach (ImageDefinitionReactor reactor in imageDefinition.Reactors.Values)
             {
-                this.chunk.Write(330, reactor.Handle);
+                chunk.Write(330, reactor.Handle);
             }
-            this.chunk.Write(102, "}");
+            chunk.Write(102, "}");
 
-            this.chunk.Write(330, ownerHandle);
+            chunk.Write(330, ownerHandle);
 
-            this.chunk.Write(100, SubclassMarker.RasterImageDef);
-            this.chunk.Write(1, imageDefinition.File);
+            chunk.Write(100, SubclassMarker.RasterImageDef);
+            chunk.Write(1, imageDefinition.File);
 
-            this.chunk.Write(10, (double) imageDefinition.Width);
-            this.chunk.Write(20, (double) imageDefinition.Height);
+            chunk.Write(10, (double) imageDefinition.Width);
+            chunk.Write(20, (double) imageDefinition.Height);
 
             // The documentation says that this is the size of one pixel in AutoCAD units, but it seems that this is always the size of one pixel in millimeters
             // this value is used to calculate the image resolution in PPI or PPC, and the default image size.
             double factor = UnitHelper.ConversionFactor((ImageUnits) imageDefinition.ResolutionUnits, DrawingUnits.Millimeters);
-            this.chunk.Write(11, factor/imageDefinition.HorizontalResolution);
-            this.chunk.Write(21, factor/imageDefinition.VerticalResolution);
+            chunk.Write(11, factor/imageDefinition.HorizontalResolution);
+            chunk.Write(21, factor/imageDefinition.VerticalResolution);
 
-            this.chunk.Write(280, (short) 1);
-            this.chunk.Write(281, (short) imageDefinition.ResolutionUnits);
+            chunk.Write(280, (short) 1);
+            chunk.Write(281, (short) imageDefinition.ResolutionUnits);
 
-            this.WriteXData(imageDefinition.XData);
+            WriteXData(imageDefinition.XData);
         }
 
         private void WriteRasterVariables(RasterVariables variables, string ownerHandle)
         {
-            this.chunk.Write(0, variables.CodeName);
-            this.chunk.Write(5, variables.Handle);
-            this.chunk.Write(330, ownerHandle);
+            chunk.Write(0, variables.CodeName);
+            chunk.Write(5, variables.Handle);
+            chunk.Write(330, ownerHandle);
 
-            this.chunk.Write(100, SubclassMarker.RasterVariables);
-            this.chunk.Write(90, 0);
-            this.chunk.Write(70, variables.DisplayFrame ? (short) 1 : (short) 0);
-            this.chunk.Write(71, (short) variables.DisplayQuality);
-            this.chunk.Write(72, (short) variables.Units);
+            chunk.Write(100, SubclassMarker.RasterVariables);
+            chunk.Write(90, 0);
+            chunk.Write(70, variables.DisplayFrame ? (short) 1 : (short) 0);
+            chunk.Write(71, (short) variables.DisplayQuality);
+            chunk.Write(72, (short) variables.Units);
         }
 
         private void WriteMLineStyle(MLineStyle style, string ownerHandle)
         {
-            this.chunk.Write(0, style.CodeName);
-            this.chunk.Write(5, style.Handle);
-            this.chunk.Write(330, ownerHandle);
+            chunk.Write(0, style.CodeName);
+            chunk.Write(5, style.Handle);
+            chunk.Write(330, ownerHandle);
 
-            this.chunk.Write(100, SubclassMarker.MLineStyle);
+            chunk.Write(100, SubclassMarker.MLineStyle);
 
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(style.Name));
+            chunk.Write(2, EncodeNonAsciiCharacters(style.Name));
 
-            this.chunk.Write(70, (short) style.Flags);
+            chunk.Write(70, (short) style.Flags);
 
-            this.chunk.Write(3, this.EncodeNonAsciiCharacters(style.Description));
+            chunk.Write(3, EncodeNonAsciiCharacters(style.Description));
 
-            this.chunk.Write(62, style.FillColor.Index);
+            chunk.Write(62, style.FillColor.Index);
             if (style.FillColor.UseTrueColor) // && this.doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
-                this.chunk.Write(420, AciColor.ToTrueColor(style.FillColor));
-            this.chunk.Write(51, style.StartAngle);
-            this.chunk.Write(52, style.EndAngle);
-            this.chunk.Write(71, (short) style.Elements.Count);
+                chunk.Write(420, AciColor.ToTrueColor(style.FillColor));
+            chunk.Write(51, style.StartAngle);
+            chunk.Write(52, style.EndAngle);
+            chunk.Write(71, (short) style.Elements.Count);
             foreach (MLineStyleElement element in style.Elements)
             {
-                this.chunk.Write(49, element.Offset);
-                this.chunk.Write(62, element.Color.Index);
+                chunk.Write(49, element.Offset);
+                chunk.Write(62, element.Color.Index);
                 if (element.Color.UseTrueColor) // && this.doc.DrawingVariables.AcadVer > DxfVersion.AutoCad2000)
-                    this.chunk.Write(420, AciColor.ToTrueColor(element.Color));
+                    chunk.Write(420, AciColor.ToTrueColor(element.Color));
 
-                this.chunk.Write(6, this.EncodeNonAsciiCharacters(element.Linetype.Name));
+                chunk.Write(6, EncodeNonAsciiCharacters(element.Linetype.Name));
             }
 
-            this.WriteXData(style.XData);
+            WriteXData(style.XData);
         }
 
         private void WriteGroup(Group group, string ownerHandle)
         {
-            this.chunk.Write(0, group.CodeName);
-            this.chunk.Write(5, group.Handle);
-            this.chunk.Write(330, ownerHandle);
+            chunk.Write(0, group.CodeName);
+            chunk.Write(5, group.Handle);
+            chunk.Write(330, ownerHandle);
 
-            this.chunk.Write(100, SubclassMarker.Group);
+            chunk.Write(100, SubclassMarker.Group);
 
-            this.chunk.Write(300, this.EncodeNonAsciiCharacters(group.Description));
-            this.chunk.Write(70, group.IsUnnamed ? (short) 1 : (short) 0);
-            this.chunk.Write(71, group.IsSelectable ? (short) 1 : (short) 0);
+            chunk.Write(300, EncodeNonAsciiCharacters(group.Description));
+            chunk.Write(70, group.IsUnnamed ? (short) 1 : (short) 0);
+            chunk.Write(71, group.IsSelectable ? (short) 1 : (short) 0);
 
             foreach (EntityObject entity in group.Entities)
             {
-                this.chunk.Write(340, entity.Handle);
+                chunk.Write(340, entity.Handle);
             }
 
-            this.WriteXData(group.XData);
+            WriteXData(group.XData);
         }
 
         private void WriteLayout(Layout layout, string ownerHandle)
         {
-            this.chunk.Write(0, layout.CodeName);
-            this.chunk.Write(5, layout.Handle);
-            this.chunk.Write(330, ownerHandle);
+            chunk.Write(0, layout.CodeName);
+            chunk.Write(5, layout.Handle);
+            chunk.Write(330, ownerHandle);
 
-            this.WritePlotSettings(layout.PlotSettings);
+            WritePlotSettings(layout.PlotSettings);
 
-            this.chunk.Write(100, SubclassMarker.Layout);
-            this.chunk.Write(1, this.EncodeNonAsciiCharacters(layout.Name));
-            this.chunk.Write(70, (short) 1);
-            this.chunk.Write(71, layout.TabOrder);
+            chunk.Write(100, SubclassMarker.Layout);
+            chunk.Write(1, EncodeNonAsciiCharacters(layout.Name));
+            chunk.Write(70, (short) 1);
+            chunk.Write(71, layout.TabOrder);
 
-            this.chunk.Write(10, layout.MinLimit.X);
-            this.chunk.Write(20, layout.MinLimit.Y);
-            this.chunk.Write(11, layout.MaxLimit.X);
-            this.chunk.Write(21, layout.MaxLimit.Y);
+            chunk.Write(10, layout.MinLimit.X);
+            chunk.Write(20, layout.MinLimit.Y);
+            chunk.Write(11, layout.MaxLimit.X);
+            chunk.Write(21, layout.MaxLimit.Y);
 
-            this.chunk.Write(12, layout.BasePoint.X);
-            this.chunk.Write(22, layout.BasePoint.Y);
-            this.chunk.Write(32, layout.BasePoint.Z);
+            chunk.Write(12, layout.BasePoint.X);
+            chunk.Write(22, layout.BasePoint.Y);
+            chunk.Write(32, layout.BasePoint.Z);
 
-            this.chunk.Write(14, layout.MinExtents.X);
-            this.chunk.Write(24, layout.MinExtents.Y);
-            this.chunk.Write(34, layout.MinExtents.Z);
+            chunk.Write(14, layout.MinExtents.X);
+            chunk.Write(24, layout.MinExtents.Y);
+            chunk.Write(34, layout.MinExtents.Z);
 
-            this.chunk.Write(15, layout.MaxExtents.X);
-            this.chunk.Write(25, layout.MaxExtents.Y);
-            this.chunk.Write(35, layout.MaxExtents.Z);
+            chunk.Write(15, layout.MaxExtents.X);
+            chunk.Write(25, layout.MaxExtents.Y);
+            chunk.Write(35, layout.MaxExtents.Z);
 
-            this.chunk.Write(146, layout.Elevation);
+            chunk.Write(146, layout.Elevation);
 
-            this.chunk.Write(13, layout.UcsOrigin.X);
-            this.chunk.Write(23, layout.UcsOrigin.Y);
-            this.chunk.Write(33, layout.UcsOrigin.Z);
+            chunk.Write(13, layout.UcsOrigin.X);
+            chunk.Write(23, layout.UcsOrigin.Y);
+            chunk.Write(33, layout.UcsOrigin.Z);
 
 
-            this.chunk.Write(16, layout.UcsXAxis.X);
-            this.chunk.Write(26, layout.UcsXAxis.Y);
-            this.chunk.Write(36, layout.UcsXAxis.Z);
+            chunk.Write(16, layout.UcsXAxis.X);
+            chunk.Write(26, layout.UcsXAxis.Y);
+            chunk.Write(36, layout.UcsXAxis.Z);
 
-            this.chunk.Write(17, layout.UcsYAxis.X);
-            this.chunk.Write(27, layout.UcsYAxis.Y);
-            this.chunk.Write(37, layout.UcsYAxis.Z);
+            chunk.Write(17, layout.UcsYAxis.X);
+            chunk.Write(27, layout.UcsYAxis.Y);
+            chunk.Write(37, layout.UcsYAxis.Z);
 
-            this.chunk.Write(76, (short) 0);
+            chunk.Write(76, (short) 0);
 
-            this.chunk.Write(330, layout.AssociatedBlock.Owner.Handle);
+            chunk.Write(330, layout.AssociatedBlock.Owner.Handle);
 
-            this.WriteXData(layout.XData);
+            WriteXData(layout.XData);
         }
 
         private void WritePlotSettings( PlotSettings plot)
         {
-            this.chunk.Write(100, SubclassMarker.PlotSettings);
-            this.chunk.Write(1, this.EncodeNonAsciiCharacters(plot.PageSetupName));
-            this.chunk.Write(2, this.EncodeNonAsciiCharacters(plot.PlotterName));
-            this.chunk.Write(4, this.EncodeNonAsciiCharacters(plot.PaperSizeName));
-            this.chunk.Write(6, this.EncodeNonAsciiCharacters(plot.ViewName));
+            chunk.Write(100, SubclassMarker.PlotSettings);
+            chunk.Write(1, EncodeNonAsciiCharacters(plot.PageSetupName));
+            chunk.Write(2, EncodeNonAsciiCharacters(plot.PlotterName));
+            chunk.Write(4, EncodeNonAsciiCharacters(plot.PaperSizeName));
+            chunk.Write(6, EncodeNonAsciiCharacters(plot.ViewName));
 
-            this.chunk.Write(40, plot.PaperMargin.Left);
-            this.chunk.Write(41, plot.PaperMargin.Bottom);
-            this.chunk.Write(42, plot.PaperMargin.Right);
-            this.chunk.Write(43, plot.PaperMargin.Top);
-            this.chunk.Write(44, plot.PaperSize.X);
-            this.chunk.Write(45, plot.PaperSize.Y);
-            this.chunk.Write(46, plot.Origin.X);
-            this.chunk.Write(47, plot.Origin.Y);
-            this.chunk.Write(48, plot.WindowBottomLeft.X);
-            this.chunk.Write(49, plot.WindowUpRight.X);
-            this.chunk.Write(140, plot.WindowBottomLeft.Y);
-            this.chunk.Write(141, plot.WindowUpRight.Y);
-            this.chunk.Write(142, plot.PrintScaleNumerator);
-            this.chunk.Write(143, plot.PrintScaleDenominator);
+            chunk.Write(40, plot.PaperMargin.Left);
+            chunk.Write(41, plot.PaperMargin.Bottom);
+            chunk.Write(42, plot.PaperMargin.Right);
+            chunk.Write(43, plot.PaperMargin.Top);
+            chunk.Write(44, plot.PaperSize.X);
+            chunk.Write(45, plot.PaperSize.Y);
+            chunk.Write(46, plot.Origin.X);
+            chunk.Write(47, plot.Origin.Y);
+            chunk.Write(48, plot.WindowBottomLeft.X);
+            chunk.Write(49, plot.WindowUpRight.X);
+            chunk.Write(140, plot.WindowBottomLeft.Y);
+            chunk.Write(141, plot.WindowUpRight.Y);
+            chunk.Write(142, plot.PrintScaleNumerator);
+            chunk.Write(143, plot.PrintScaleDenominator);
 
-            this.chunk.Write(70, (short) plot.Flags);
-            this.chunk.Write(72, (short) plot.PaperUnits);
-            this.chunk.Write(73, (short) plot.PaperRotation);
-            this.chunk.Write(74, (short) plot.PlotType);
+            chunk.Write(70, (short) plot.Flags);
+            chunk.Write(72, (short) plot.PaperUnits);
+            chunk.Write(73, (short) plot.PaperRotation);
+            chunk.Write(74, (short) plot.PlotType);
 
-            this.chunk.Write(7, this.EncodeNonAsciiCharacters(plot.CurrentStyleSheet));
-            this.chunk.Write(75, plot.ScaleToFit ? (short) 0 : (short) 16);
+            chunk.Write(7, EncodeNonAsciiCharacters(plot.CurrentStyleSheet));
+            chunk.Write(75, plot.ScaleToFit ? (short) 0 : (short) 16);
 
-            this.chunk.Write(76, (short) plot.ShadePlotMode);
-            this.chunk.Write(77, (short) plot.ShadePlotResolutionMode);
-            this.chunk.Write(78, plot.ShadePlotDPI);
-            this.chunk.Write(147, plot.PrintScale);
+            chunk.Write(76, (short) plot.ShadePlotMode);
+            chunk.Write(77, (short) plot.ShadePlotResolutionMode);
+            chunk.Write(78, plot.ShadePlotDPI);
+            chunk.Write(147, plot.PrintScale);
 
-            this.chunk.Write(148, plot.PaperImageOrigin.X);
-            this.chunk.Write(149, plot.PaperImageOrigin.Y);
+            chunk.Write(148, plot.PaperImageOrigin.X);
+            chunk.Write(149, plot.PaperImageOrigin.Y);
         }
 
         #endregion
@@ -4822,14 +4822,14 @@ namespace netDxf.IO
         {
             // for dxf database version prior to AutoCad 2007 non ASCII characters must be encoded to the template \U+####,
             // where #### is the for digits hexadecimal number that represent that character.
-            if (this.doc.DrawingVariables.AcadVer >= DxfVersion.AutoCad2007)
+            if (doc.DrawingVariables.AcadVer >= DxfVersion.AutoCad2007)
                 return text;
 
             if (string.IsNullOrEmpty(text))
                 return string.Empty;
 
             string encoded;
-            if (this.encodedStrings.TryGetValue(text, out encoded))
+            if (encodedStrings.TryGetValue(text, out encoded))
                 return encoded;
 
             StringBuilder sb = new StringBuilder();
@@ -4842,7 +4842,7 @@ namespace netDxf.IO
             }
 
             encoded = sb.ToString();
-            this.encodedStrings.Add(text, encoded);
+            encodedStrings.Add(text, encoded);
             return encoded;
 
             // encoding of non ASCII characters, including the extended chart, using regular expressions, this code is slower
@@ -4856,7 +4856,7 @@ namespace netDxf.IO
         {
             foreach (string appReg in xData.AppIds)
             {
-                this.chunk.Write((short) XDataCode.AppReg, this.EncodeNonAsciiCharacters(appReg));
+                chunk.Write((short) XDataCode.AppReg, EncodeNonAsciiCharacters(appReg));
 
                 foreach (XDataRecord x in xData[appReg].XDataRecord)
                 {
@@ -4864,7 +4864,7 @@ namespace netDxf.IO
                     object value = x.Value;
                     if (code == 1000 || code == 1003)
                     {
-                        this.chunk.Write(code, this.EncodeNonAsciiCharacters((string) value));
+                        chunk.Write(code, EncodeNonAsciiCharacters((string) value));
                     }
                     else if (code == 1004) // binary extended data is written in chunks of 127 bytes
                     {
@@ -4876,16 +4876,16 @@ namespace netDxf.IO
                         {
                             data = new byte[127];
                             Array.Copy(bytes, index, data, 0, 127);
-                            this.chunk.Write(code, data);
+                            chunk.Write(code, data);
                             count -= 127;
                             index += 127;
                         }
                         data = new byte[bytes.Length - index];
                         Array.Copy(bytes, index, data, 0, bytes.Length - index);
-                        this.chunk.Write(code, data);
+                        chunk.Write(code, data);
                     }
                     else
-                        this.chunk.Write(code, value);
+                        chunk.Write(code, value);
                 }
             }
         }

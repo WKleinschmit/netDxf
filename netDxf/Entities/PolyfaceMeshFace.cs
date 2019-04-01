@@ -69,7 +69,7 @@ namespace netDxf.Entities
         {
             if (vertexIndexes == null)
                 throw new ArgumentNullException(nameof(vertexIndexes));
-            this.flags = VertexTypeFlags.PolyfaceMeshVertex;
+            flags = VertexTypeFlags.PolyfaceMeshVertex;
             this.vertexIndexes = new List<short>(vertexIndexes);
             if (this.vertexIndexes.Count > 4)
                 throw new ArgumentOutOfRangeException(nameof(vertexIndexes), this.vertexIndexes.Count, "The maximum number of vertexes per face is 4");
@@ -84,7 +84,7 @@ namespace netDxf.Entities
         /// </summary>
         public List<short> VertexIndexes
         {
-            get { return this.vertexIndexes; }
+            get { return vertexIndexes; }
         }
 
         #endregion
@@ -96,7 +96,7 @@ namespace netDxf.Entities
         /// </summary>
         internal VertexTypeFlags Flags
         {
-            get { return this.flags; }
+            get { return flags; }
         }
 
         #endregion
@@ -118,7 +118,7 @@ namespace netDxf.Entities
         /// <returns>A new PolyfaceMeshFace that is a copy of this instance.</returns>
         public object Clone()
         {
-            return new PolyfaceMeshFace(this.vertexIndexes);
+            return new PolyfaceMeshFace(vertexIndexes);
         }
 
         #endregion

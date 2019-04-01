@@ -43,7 +43,7 @@ namespace netDxf.Blocks
 
         protected virtual void OnXDataAddAppRegEvent(ApplicationRegistry item)
         {
-            XDataAddAppRegEventHandler ae = this.XDataAddAppReg;
+            XDataAddAppRegEventHandler ae = XDataAddAppReg;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
         }
@@ -54,7 +54,7 @@ namespace netDxf.Blocks
 
         protected virtual void OnXDataRemoveAppRegEvent(ApplicationRegistry item)
         {
-            XDataRemoveAppRegEventHandler ae = this.XDataRemoveAppReg;
+            XDataRemoveAppRegEventHandler ae = XDataRemoveAppReg;
             if (ae != null)
                 ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
         }
@@ -85,11 +85,11 @@ namespace netDxf.Blocks
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
             this.name = name;
-            this.layout = null;
-            this.units = DefaultUnits;
-            this.allowExploding = true;
-            this.scaleUniformly = false;
-            this.xData = new XDataDictionary();
+            layout = null;
+            units = DefaultUnits;
+            allowExploding = true;
+            scaleUniformly = false;
+            xData = new XDataDictionary();
         }
 
         #endregion
@@ -105,8 +105,8 @@ namespace netDxf.Blocks
         /// </remarks>
         public string Name
         {
-            get { return this.name; }
-            internal set { this.name = value; }
+            get { return name; }
+            internal set { name = value; }
         }
 
         /// <summary>
@@ -114,8 +114,8 @@ namespace netDxf.Blocks
         /// </summary>
         public Layout Layout
         {
-            get { return this.layout; }
-            internal set { this.layout = value; }
+            get { return layout; }
+            internal set { layout = value; }
         }
 
         /// <summary>
@@ -123,8 +123,8 @@ namespace netDxf.Blocks
         /// </summary>
         public DrawingUnits Units
         {
-            get { return this.units; }
-            set { this.units = value; }
+            get { return units; }
+            set { units = value; }
         }
 
         /// <summary>
@@ -145,8 +145,8 @@ namespace netDxf.Blocks
         /// </remarks>
         public bool AllowExploding
         {
-            get { return this.allowExploding; }
-            set { this.allowExploding = value; }
+            get { return allowExploding; }
+            set { allowExploding = value; }
         }
 
         /// <summary>
@@ -157,8 +157,8 @@ namespace netDxf.Blocks
         /// </remarks>
         public bool ScaleUniformly
         {
-            get { return this.scaleUniformly; }
-            set { this.scaleUniformly = value; }
+            get { return scaleUniformly; }
+            set { scaleUniformly = value; }
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace netDxf.Blocks
         /// </remarks>
         public bool IsForInternalUseOnly
         {
-            get { return this.name.StartsWith("*"); }
+            get { return name.StartsWith("*"); }
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace netDxf.Blocks
         /// </summary>
         public XDataDictionary XData
         {
-            get { return this.xData; }
+            get { return xData; }
         }
 
         #endregion
@@ -199,7 +199,7 @@ namespace netDxf.Blocks
         /// <returns>The string representation.</returns>
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
 
         #endregion

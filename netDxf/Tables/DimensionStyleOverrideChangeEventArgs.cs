@@ -53,7 +53,7 @@ namespace netDxf.Tables
         /// </summary>
         public DimensionStyleOverride Item
         {
-            get { return this.item; }
+            get { return item; }
         }
 
         #endregion

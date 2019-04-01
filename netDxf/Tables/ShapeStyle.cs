@@ -95,7 +95,7 @@ namespace netDxf.Tables
         /// </summary>
         public string File
         {
-            get { return this.file; }
+            get { return file; }
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace netDxf.Tables
         /// <remarks>This value seems to have no effect on shapes or complex line types with shapes. Default: 0.0.</remarks>
         public double Size
         {
-            get { return this.size; }
+            get { return size; }
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace netDxf.Tables
         /// <remarks>This value seems to have no effect on shapes or complex line types with shapes. Default: 1.0.</remarks>
         public double WidthFactor
         {
-            get { return this.widthFactor; }
+            get { return widthFactor; }
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace netDxf.Tables
         /// <remarks>This value seems to have no effect on shapes or complex line types with shapes. Default: 0.0.</remarks>
         public double ObliqueAngle
         {
-            get { return this.obliqueAngle; }
+            get { return obliqueAngle; }
         }
 
         /// <summary>
@@ -146,9 +146,9 @@ namespace netDxf.Tables
         /// <remarks>If the actual shape style belongs to a document, it will look for the SHP file also in the document support folders.</remarks>
         public bool ContainsShapeName(string name)
         {
-            string f = Path.ChangeExtension(this.file, "SHP");
-            if (this.Owner != null)
-                f = this.Owner.Owner.SupportFolders.FindFile(f);
+            string f = Path.ChangeExtension(file, "SHP");
+            if (Owner != null)
+                f = Owner.Owner.SupportFolders.FindFile(f);
             else
                 if(!System.IO.File.Exists(f)) f = string.Empty;
 
@@ -187,9 +187,9 @@ namespace netDxf.Tables
         public short ShapeNumber(string name)
         {
             // we will look for the shape name in the SHP file
-            string f = Path.ChangeExtension(this.file, "SHP");
-            if (this.Owner != null)
-                f = this.Owner.Owner.SupportFolders.FindFile(f);
+            string f = Path.ChangeExtension(file, "SHP");
+            if (Owner != null)
+                f = Owner.Owner.SupportFolders.FindFile(f);
             else
                 if (!System.IO.File.Exists(f)) f = string.Empty;
 
@@ -227,9 +227,9 @@ namespace netDxf.Tables
         public string ShapeName(short number)
         {
             // we will look for the shape name in the SHP file
-            string f = Path.ChangeExtension(this.file, "SHP");
-            if (this.Owner != null)
-                f = this.Owner.Owner.SupportFolders.FindFile(f);
+            string f = Path.ChangeExtension(file, "SHP");
+            if (Owner != null)
+                f = Owner.Owner.SupportFolders.FindFile(f);
             else
                 if (!System.IO.File.Exists(f)) f = string.Empty;
 
@@ -270,9 +270,9 @@ namespace netDxf.Tables
         /// <returns>A new TextStyle that is a copy of this instance.</returns>
         public override TableObject Clone(string newName)
         {
-            ShapeStyle copy = new ShapeStyle(newName, this.file, this.size, this.widthFactor, this.obliqueAngle);
+            ShapeStyle copy = new ShapeStyle(newName, file, size, widthFactor, obliqueAngle);
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 copy.XData.Add((XData)data.Clone());
 
             return copy;
@@ -284,7 +284,7 @@ namespace netDxf.Tables
         /// <returns>A new TextStyle that is a copy of this instance.</returns>
         public override object Clone()
         {
-            return this.Clone(this.Name);
+            return Clone(Name);
         }
 
         #endregion

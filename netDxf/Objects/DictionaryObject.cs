@@ -40,10 +40,10 @@ namespace netDxf.Objects
         internal DictionaryObject(DxfObject owner)
             : base(DxfObjectCode.Dictionary)
         {
-            this.isHardOwner = false;
-            this.cloning = DictionaryCloningFlags.KeepExisting;
-            this.entries = new Dictionary<string, string>();
-            this.Owner = owner;
+            isHardOwner = false;
+            cloning = DictionaryCloningFlags.KeepExisting;
+            entries = new Dictionary<string, string>();
+            Owner = owner;
         }
 
         #endregion
@@ -55,7 +55,7 @@ namespace netDxf.Objects
         /// </summary>
         public Dictionary<string, string> Entries
         {
-            get { return this.entries; }
+            get { return entries; }
         }
 
         /// <summary>
@@ -63,8 +63,8 @@ namespace netDxf.Objects
         /// </summary>
         public bool IsHardOwner
         {
-            get { return this.isHardOwner; }
-            set { this.isHardOwner = value; }
+            get { return isHardOwner; }
+            set { isHardOwner = value; }
         }
 
         /// <summary>
@@ -72,8 +72,8 @@ namespace netDxf.Objects
         /// </summary>
         public DictionaryCloningFlags Cloning
         {
-            get { return this.cloning; }
-            set { this.cloning = value; }
+            get { return cloning; }
+            set { cloning = value; }
         }
 
         #endregion

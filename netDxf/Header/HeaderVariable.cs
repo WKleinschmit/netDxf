@@ -39,7 +39,7 @@ namespace netDxf.Header
         public HeaderVariable(string name, object value)
         {
             this.name = name;
-            this.variable = value;
+            variable = value;
         }
 
         #endregion
@@ -51,7 +51,7 @@ namespace netDxf.Header
         /// </summary>
         public string Name
         {
-            get { return this.name; }
+            get { return name; }
         }
 
         /// <summary>
@@ -59,8 +59,8 @@ namespace netDxf.Header
         /// </summary>
         public object Value
         {
-            get { return this.variable; }
-            set { this.variable = value; }
+            get { return variable; }
+            set { variable = value; }
         }
 
         #endregion
@@ -69,7 +69,7 @@ namespace netDxf.Header
 
         public override string ToString()
         {
-            return string.Format("{0}:{1}", this.name, this.variable);
+            return string.Format("{0}:{1}", name, variable);
         }
 
         #endregion

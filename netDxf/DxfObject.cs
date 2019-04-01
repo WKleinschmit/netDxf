@@ -44,8 +44,8 @@ namespace netDxf
         protected DxfObject(string codename)
         {
             this.codename = codename;
-            this.handle = null;
-            this.owner = null;
+            handle = null;
+            owner = null;
         }
 
         #endregion
@@ -57,8 +57,8 @@ namespace netDxf
         /// </summary>
         public string CodeName
         {
-            get { return this.codename; }
-            protected set { this.codename = value; }
+            get { return codename; }
+            protected set { codename = value; }
         }
 
         /// <summary>
@@ -70,8 +70,8 @@ namespace netDxf
         /// </remarks>
         public string Handle
         {
-            get { return this.handle; }
-            internal set { this.handle = value; }
+            get { return handle; }
+            internal set { handle = value; }
         }
 
         /// <summary>
@@ -79,8 +79,8 @@ namespace netDxf
         /// </summary>
         public DxfObject Owner
         {
-            get { return this.owner; }
-            internal set { this.owner = value; }
+            get { return owner; }
+            internal set { owner = value; }
         }
 
         #endregion
@@ -98,7 +98,7 @@ namespace netDxf
         /// </remarks>
         internal virtual long AsignHandle(long entityNumber)
         {
-            this.handle = entityNumber.ToString("X");
+            handle = entityNumber.ToString("X");
             return entityNumber + 1;
         }
 
@@ -112,7 +112,7 @@ namespace netDxf
         /// <returns>A string text.</returns>
         public override string ToString()
         {
-            return this.codename;
+            return codename;
         }
 
         #endregion

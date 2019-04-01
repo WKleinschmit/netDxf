@@ -100,7 +100,7 @@ namespace netDxf.Tables
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name), "The text style name should be at least one character long.");
-            this.IsReserved = name.Equals(DefaultName, StringComparison.OrdinalIgnoreCase);
+            IsReserved = name.Equals(DefaultName, StringComparison.OrdinalIgnoreCase);
 
             if (string.IsNullOrEmpty(font))
                 throw new ArgumentNullException(nameof(font));
@@ -109,16 +109,16 @@ namespace netDxf.Tables
                 !Path.GetExtension(font).Equals(".SHX", StringComparison.InvariantCultureIgnoreCase))
                 throw new ArgumentException("Only true type TTF fonts and ACAD compiled shape SHX fonts are allowed.");
 
-            this.file = font;
-            this.bigFont = string.Empty;
-            this.widthFactor = 1.0;
-            this.obliqueAngle = 0.0;
-            this.height = 0.0;
-            this.isVertical = false;
-            this.isBackward = false;
-            this.isUpsideDown = false;
-            this.fontFamilyName = TrueTypeFontFamilyName(font);
-            this.fontStyle = FontStyle.Regular;
+            file = font;
+            bigFont = string.Empty;
+            widthFactor = 1.0;
+            obliqueAngle = 0.0;
+            height = 0.0;
+            isVertical = false;
+            isBackward = false;
+            isUpsideDown = false;
+            fontFamilyName = TrueTypeFontFamilyName(font);
+            fontStyle = FontStyle.Regular;
         }
 
         /// <summary>
@@ -158,17 +158,17 @@ namespace netDxf.Tables
         internal TextStyle(string name, string fontFamily, FontStyle fontStyle, bool checkName)
             : base(name, DxfObjectCode.TextStyle, checkName)
         {
-            this.file = string.Empty;
-            this.bigFont = string.Empty;
-            this.widthFactor = 1.0;
-            this.obliqueAngle = 0.0;
-            this.height = 0.0;
-            this.isVertical = false;
-            this.isBackward = false;
-            this.isUpsideDown = false;
+            file = string.Empty;
+            bigFont = string.Empty;
+            widthFactor = 1.0;
+            obliqueAngle = 0.0;
+            height = 0.0;
+            isVertical = false;
+            isBackward = false;
+            isUpsideDown = false;
             if(string.IsNullOrEmpty(fontFamily))
                 throw new ArgumentNullException(nameof(fontFamily));
-            this.fontFamilyName = fontFamily;
+            fontFamilyName = fontFamily;
             this.fontStyle = fontStyle;
         }
 
@@ -186,7 +186,7 @@ namespace netDxf.Tables
         /// </remarks>
         public string FontFile
         {
-            get { return this.file; }
+            get { return file; }
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -196,9 +196,9 @@ namespace netDxf.Tables
                     !Path.GetExtension(value).Equals(".SHX", StringComparison.InvariantCultureIgnoreCase))
                     throw new ArgumentException("Only true type TTF fonts and ACAD compiled shape SHX fonts are allowed.");
 
-                this.fontFamilyName = TrueTypeFontFamilyName(value);
-                this.bigFont = string.Empty;
-                this.file = value;
+                fontFamilyName = TrueTypeFontFamilyName(value);
+                bigFont = string.Empty;
+                file = value;
             }
         }
 
@@ -208,20 +208,20 @@ namespace netDxf.Tables
         /// <remarks>Only ACAD compiled shape SHX fonts are valid for creating Big Fonts.</remarks>
         public string BigFont
         {
-            get { return this.bigFont; }
+            get { return bigFont; }
             set
             {
                 if (string.IsNullOrEmpty(value))
-                    this.bigFont = string.Empty;
+                    bigFont = string.Empty;
                 else
                 {
-                    if (string.IsNullOrEmpty(this.file))
+                    if (string.IsNullOrEmpty(file))
                         throw new NullReferenceException("The Big Font is only applicable for SHX Asian fonts.");
-                    if (!Path.GetExtension(this.file).Equals(".SHX", StringComparison.InvariantCultureIgnoreCase))
+                    if (!Path.GetExtension(file).Equals(".SHX", StringComparison.InvariantCultureIgnoreCase))
                         throw new NullReferenceException("The Big Font is only applicable for SHX Asian fonts.");
                     if(!Path.GetExtension(value).Equals(".SHX", StringComparison.InvariantCultureIgnoreCase))
                         throw new ArgumentException("The Big Font is only applicable for SHX Asian fonts.", nameof(value));
-                    this.bigFont = value;
+                    bigFont = value;
                 }               
             }
         }
@@ -236,14 +236,14 @@ namespace netDxf.Tables
         /// </remarks>
         public string FontFamilyName
         {
-            get { return this.fontFamilyName; }
+            get { return fontFamilyName; }
             set
             {
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentNullException(nameof(value));
-                this.file = string.Empty;
-                this.bigFont = string.Empty;
-                this.fontFamilyName = value;
+                file = string.Empty;
+                bigFont = string.Empty;
+                fontFamilyName = value;
             }
         }
 
@@ -256,8 +256,8 @@ namespace netDxf.Tables
         /// </remarks>
         public FontStyle FontStyle
         {
-            get { return this.fontStyle; }
-            set { this.fontStyle = value; }
+            get { return fontStyle; }
+            set { fontStyle = value; }
         }
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace netDxf.Tables
         /// </remarks>
         public bool IsTrueType
         {
-            get { return !string.IsNullOrEmpty(this.FontFamilyName); }
+            get { return !string.IsNullOrEmpty(FontFamilyName); }
         }
 
         /// <summary>
@@ -278,12 +278,12 @@ namespace netDxf.Tables
         /// <remarks>Fixed text height; 0 if not fixed.</remarks>
         public double Height
         {
-            get { return this.height; }
+            get { return height; }
             set
             {
                 if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The TextStyle height must be equals or greater than zero.");
-                this.height = value;
+                height = value;
             }
         }
 
@@ -293,12 +293,12 @@ namespace netDxf.Tables
         /// <remarks>Valid values range from 0.01 to 100. Default: 1.0.</remarks>
         public double WidthFactor
         {
-            get { return this.widthFactor; }
+            get { return widthFactor; }
             set
             {
                 if (value < 0.01 || value > 100.0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The TextStyle width factor valid values range from 0.01 to 100.");
-                this.widthFactor = value;
+                widthFactor = value;
             }
         }
 
@@ -308,12 +308,12 @@ namespace netDxf.Tables
         /// <remarks>Valid values range from -85 to 85. Default: 0.0.</remarks>
         public double ObliqueAngle
         {
-            get { return this.obliqueAngle; }
+            get { return obliqueAngle; }
             set
             {
                 if (value < -85.0 || value > 85.0)
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The TextStyle oblique angle valid values range from -85 to 85.");
-                this.obliqueAngle = value;
+                obliqueAngle = value;
             }
         }
 
@@ -322,8 +322,8 @@ namespace netDxf.Tables
         /// </summary>
         public bool IsVertical
         {
-            get { return this.isVertical; }
-            set { this.isVertical = value; }
+            get { return isVertical; }
+            set { isVertical = value; }
         }
 
         /// <summary>
@@ -331,8 +331,8 @@ namespace netDxf.Tables
         /// </summary>
         public bool IsBackward
         {
-            get { return this.isBackward; }
-            set { this.isBackward = value; }
+            get { return isBackward; }
+            set { isBackward = value; }
         }
 
         /// <summary>
@@ -340,8 +340,8 @@ namespace netDxf.Tables
         /// </summary>
         public bool IsUpsideDown
         {
-            get { return this.isUpsideDown; }
-            set { this.isUpsideDown = value; }
+            get { return isUpsideDown; }
+            set { isUpsideDown = value; }
         }
 
         /// <summary>
@@ -397,32 +397,32 @@ namespace netDxf.Tables
         {
             TextStyle copy;
 
-            if (string.IsNullOrEmpty(this.file))
+            if (string.IsNullOrEmpty(file))
             {
-                copy = new TextStyle(newName, this.fontFamilyName, this.fontStyle)
+                copy = new TextStyle(newName, fontFamilyName, fontStyle)
                 {
-                    Height = this.height,
-                    IsBackward = this.isBackward,
-                    IsUpsideDown = this.isUpsideDown,
-                    IsVertical = this.isVertical,
-                    ObliqueAngle = this.obliqueAngle,
-                    WidthFactor = this.widthFactor
+                    Height = height,
+                    IsBackward = isBackward,
+                    IsUpsideDown = isUpsideDown,
+                    IsVertical = isVertical,
+                    ObliqueAngle = obliqueAngle,
+                    WidthFactor = widthFactor
                 };
             }
             else
             {
-                copy = new TextStyle(newName, this.file)
+                copy = new TextStyle(newName, file)
                 {
-                    Height = this.height,
-                    IsBackward = this.isBackward,
-                    IsUpsideDown = this.isUpsideDown,
-                    IsVertical = this.isVertical,
-                    ObliqueAngle = this.obliqueAngle,
-                    WidthFactor = this.widthFactor
+                    Height = height,
+                    IsBackward = isBackward,
+                    IsUpsideDown = isUpsideDown,
+                    IsVertical = isVertical,
+                    ObliqueAngle = obliqueAngle,
+                    WidthFactor = widthFactor
                 };
             }
             
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 copy.XData.Add((XData)data.Clone());
 
             return copy;
@@ -434,7 +434,7 @@ namespace netDxf.Tables
         /// <returns>A new TextStyle that is a copy of this instance.</returns>
         public override object Clone()
         {
-            return this.Clone(this.Name);
+            return Clone(Name);
         }
 
         #endregion

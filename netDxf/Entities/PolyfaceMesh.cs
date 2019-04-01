@@ -54,7 +54,7 @@ namespace netDxf.Entities
         public PolyfaceMesh(IEnumerable<PolyfaceMeshVertex> vertexes, IEnumerable<PolyfaceMeshFace> faces)
             : base(EntityType.PolyfaceMesh, DxfObjectCode.Polyline)
         {
-            this.flags = PolylinetypeFlags.PolyfaceMesh;
+            flags = PolylinetypeFlags.PolyfaceMesh;
             if (vertexes == null)
                 throw new ArgumentNullException(nameof(vertexes));
             this.vertexes = new List<PolyfaceMeshVertex>(vertexes);
@@ -67,7 +67,7 @@ namespace netDxf.Entities
             if (this.faces.Count < 1)
                 throw new ArgumentOutOfRangeException(nameof(vertexes), this.faces.Count, "The polyface mesh faces list requires at least one face.");
 
-            this.endSequence = new EndSequence(this);
+            endSequence = new EndSequence(this);
         }
 
         #endregion
@@ -79,7 +79,7 @@ namespace netDxf.Entities
         /// </summary>
         public IReadOnlyList<PolyfaceMeshVertex> Vertexes
         {
-            get { return this.vertexes; }
+            get { return vertexes; }
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace netDxf.Entities
         /// </summary>
         public IReadOnlyList<PolyfaceMeshFace> Faces
         {
-            get { return this.faces; }
+            get { return faces; }
         }
 
         #endregion
@@ -99,7 +99,7 @@ namespace netDxf.Entities
         /// </summary>
         internal PolylinetypeFlags Flags
         {
-            get { return this.flags; }
+            get { return flags; }
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace netDxf.Entities
         /// </summary>
         internal EndSequence EndSequence
         {
-            get { return this.endSequence; }
+            get { return endSequence; }
         }
 
         #endregion
@@ -125,12 +125,12 @@ namespace netDxf.Entities
         /// </remarks>
         internal override long AsignHandle(long entityNumber)
         {
-            entityNumber = this.endSequence.AsignHandle(entityNumber);
-            foreach (PolyfaceMeshVertex v in this.vertexes)
+            entityNumber = endSequence.AsignHandle(entityNumber);
+            foreach (PolyfaceMeshVertex v in vertexes)
             {
                 entityNumber = v.AsignHandle(entityNumber);
             }
-            foreach (PolyfaceMeshFace f in this.faces)
+            foreach (PolyfaceMeshFace f in faces)
             {
                 entityNumber = f.AsignHandle(entityNumber);
             }
@@ -150,20 +150,20 @@ namespace netDxf.Entities
         {
             List<EntityObject> entities = new List<EntityObject>();
 
-            foreach (PolyfaceMeshFace face in this.Faces)
+            foreach (PolyfaceMeshFace face in Faces)
             {
                 if (face.VertexIndexes.Count == 1)
                 {
                     Point point = new Point
                     {
-                        Layer = (Layer) this.Layer.Clone(),
-                        Linetype = (Linetype) this.Linetype.Clone(),
-                        Color = (AciColor) this.Color.Clone(),
-                        Lineweight = this.Lineweight,
-                        Transparency = (Transparency) this.Transparency.Clone(),
-                        LinetypeScale = this.LinetypeScale,
-                        Normal = this.Normal,
-                        Position = this.Vertexes[Math.Abs(face.VertexIndexes[0]) - 1].Position,
+                        Layer = (Layer) Layer.Clone(),
+                        Linetype = (Linetype) Linetype.Clone(),
+                        Color = (AciColor) Color.Clone(),
+                        Lineweight = Lineweight,
+                        Transparency = (Transparency) Transparency.Clone(),
+                        LinetypeScale = LinetypeScale,
+                        Normal = Normal,
+                        Position = Vertexes[Math.Abs(face.VertexIndexes[0]) - 1].Position,
                     };
                     entities.Add(point);
                     continue;
@@ -172,15 +172,15 @@ namespace netDxf.Entities
                 {
                     Line line = new Line
                     {
-                        Layer = (Layer) this.Layer.Clone(),
-                        Linetype = (Linetype) this.Linetype.Clone(),
-                        Color = (AciColor) this.Color.Clone(),
-                        Lineweight = this.Lineweight,
-                        Transparency = (Transparency) this.Transparency.Clone(),
-                        LinetypeScale = this.LinetypeScale,
-                        Normal = this.Normal,
-                        StartPoint = this.Vertexes[Math.Abs(face.VertexIndexes[0]) - 1].Position,
-                        EndPoint = this.Vertexes[Math.Abs(face.VertexIndexes[1]) - 1].Position,
+                        Layer = (Layer) Layer.Clone(),
+                        Linetype = (Linetype) Linetype.Clone(),
+                        Color = (AciColor) Color.Clone(),
+                        Lineweight = Lineweight,
+                        Transparency = (Transparency) Transparency.Clone(),
+                        LinetypeScale = LinetypeScale,
+                        Normal = Normal,
+                        StartPoint = Vertexes[Math.Abs(face.VertexIndexes[0]) - 1].Position,
+                        EndPoint = Vertexes[Math.Abs(face.VertexIndexes[1]) - 1].Position,
                     };
                     entities.Add(line);
                     continue;
@@ -203,20 +203,20 @@ namespace netDxf.Entities
                 if (indexV4 < 0)
                     edgeVisibility = edgeVisibility | Face3dEdgeFlags.Fourth;
 
-                Vector3 v1 = this.Vertexes[Math.Abs(indexV1) - 1].Position;
-                Vector3 v2 = this.Vertexes[Math.Abs(indexV2) - 1].Position;
-                Vector3 v3 = this.Vertexes[Math.Abs(indexV3) - 1].Position;
-                Vector3 v4 = this.Vertexes[Math.Abs(indexV4) - 1].Position;
+                Vector3 v1 = Vertexes[Math.Abs(indexV1) - 1].Position;
+                Vector3 v2 = Vertexes[Math.Abs(indexV2) - 1].Position;
+                Vector3 v3 = Vertexes[Math.Abs(indexV3) - 1].Position;
+                Vector3 v4 = Vertexes[Math.Abs(indexV4) - 1].Position;
 
                 Face3d face3d = new Face3d
                 {
-                    Layer = (Layer) this.Layer.Clone(),
-                    Linetype = (Linetype) this.Linetype.Clone(),
-                    Color = (AciColor) this.Color.Clone(),
-                    Lineweight = this.Lineweight,
-                    Transparency = (Transparency) this.Transparency.Clone(),
-                    LinetypeScale = this.LinetypeScale,
-                    Normal = this.Normal,
+                    Layer = (Layer) Layer.Clone(),
+                    Linetype = (Linetype) Linetype.Clone(),
+                    Color = (AciColor) Color.Clone(),
+                    Lineweight = Lineweight,
+                    Transparency = (Transparency) Transparency.Clone(),
+                    LinetypeScale = LinetypeScale,
+                    Normal = Normal,
                     FirstVertex = v1,
                     SecondVertex = v2,
                     ThirdVertex = v3,
@@ -240,12 +240,12 @@ namespace netDxf.Entities
         /// <param name="translation">Translation vector.</param>
         public override void TransformBy(Matrix3 transformation, Vector3 translation)
         {
-            foreach (PolyfaceMeshVertex point in this.Vertexes)
+            foreach (PolyfaceMeshVertex point in Vertexes)
             {
                 point.Position = transformation * point.Position + translation;
             }
 
-            this.Normal = transformation * this.Normal;
+            Normal = transformation * Normal;
         }
 
         /// <summary>
@@ -255,12 +255,12 @@ namespace netDxf.Entities
         public override object Clone()
         {
             List<PolyfaceMeshVertex> copyVertexes = new List<PolyfaceMeshVertex>();
-            foreach (PolyfaceMeshVertex vertex in this.vertexes)
+            foreach (PolyfaceMeshVertex vertex in vertexes)
             {
                 copyVertexes.Add((PolyfaceMeshVertex) vertex.Clone());
             }
             List<PolyfaceMeshFace> copyFaces = new List<PolyfaceMeshFace>();
-            foreach (PolyfaceMeshFace face in this.faces)
+            foreach (PolyfaceMeshFace face in faces)
             {
                 copyFaces.Add((PolyfaceMeshFace) face.Clone());
             }
@@ -268,18 +268,18 @@ namespace netDxf.Entities
             PolyfaceMesh entity = new PolyfaceMesh(copyVertexes, copyFaces)
             {
                 //EntityObject properties
-                Layer = (Layer) this.Layer.Clone(),
-                Linetype = (Linetype) this.Linetype.Clone(),
-                Color = (AciColor) this.Color.Clone(),
-                Lineweight = this.Lineweight,
-                Transparency = (Transparency) this.Transparency.Clone(),
-                LinetypeScale = this.LinetypeScale,
-                Normal = this.Normal,
-                IsVisible = this.IsVisible,
+                Layer = (Layer) Layer.Clone(),
+                Linetype = (Linetype) Linetype.Clone(),
+                Color = (AciColor) Color.Clone(),
+                Lineweight = Lineweight,
+                Transparency = (Transparency) Transparency.Clone(),
+                LinetypeScale = LinetypeScale,
+                Normal = Normal,
+                IsVisible = IsVisible,
                 //PolyfaceMesh properties
             };
 
-            foreach (XData data in this.XData.Values)
+            foreach (XData data in XData.Values)
                 entity.XData.Add((XData) data.Clone());
 
             return entity;

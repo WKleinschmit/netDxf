@@ -48,10 +48,10 @@ namespace netDxf.Entities
         /// </summary>
         public HatchPatternLineDefinition()
         {
-            this.angle = 0.0;
-            this.origin = Vector2.Zero;
-            this.delta = Vector2.Zero;
-            this.dashPattern = new List<double>();
+            angle = 0.0;
+            origin = Vector2.Zero;
+            delta = Vector2.Zero;
+            dashPattern = new List<double>();
         }
 
         #endregion
@@ -63,8 +63,8 @@ namespace netDxf.Entities
         /// </summary>
         public double Angle
         {
-            get { return this.angle; }
-            set { this.angle = MathHelper.NormalizeAngle(value); }
+            get { return angle; }
+            set { angle = MathHelper.NormalizeAngle(value); }
         }
 
         /// <summary>
@@ -72,8 +72,8 @@ namespace netDxf.Entities
         /// </summary>
         public Vector2 Origin
         {
-            get { return this.origin; }
-            set { this.origin = value; }
+            get { return origin; }
+            set { origin = value; }
         }
 
         /// <summary>
@@ -85,8 +85,8 @@ namespace netDxf.Entities
         /// </remarks>
         public Vector2 Delta
         {
-            get { return this.delta; }
-            set { this.delta = value; }
+            get { return delta; }
+            set { delta = value; }
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace netDxf.Entities
         /// </remarks>
         public List<double> DashPattern
         {
-            get { return this.dashPattern; }
+            get { return dashPattern; }
         }
 
         #endregion
@@ -112,12 +112,12 @@ namespace netDxf.Entities
         {
             HatchPatternLineDefinition copy = new HatchPatternLineDefinition
             {
-                Angle = this.angle,
-                Origin = this.origin,
-                Delta = this.delta,
+                Angle = angle,
+                Origin = origin,
+                Delta = delta,
             };
 
-            foreach (double dash in this.dashPattern)
+            foreach (double dash in dashPattern)
                 copy.DashPattern.Add(dash);
 
             return copy;

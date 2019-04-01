@@ -42,7 +42,7 @@ namespace netDxf.Entities
 
         internal MLineVertex(Vector2 location, Vector2 direction, Vector2 miter, List<double>[] distances)
         {
-            this.position = location;
+            position = location;
             this.direction = direction;
             this.miter = miter;
             this.distances = distances;
@@ -60,8 +60,8 @@ namespace netDxf.Entities
         /// </remarks>
         public Vector2 Position
         {
-            get { return this.position; }
-            set { this.position = value; }
+            get { return position; }
+            set { position = value; }
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace netDxf.Entities
         /// </summary>
         public Vector2 Direction
         {
-            get { return this.direction; }
+            get { return direction; }
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace netDxf.Entities
         /// </summary>
         public Vector2 Miter
         {
-            get { return this.miter; }
+            get { return miter; }
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace netDxf.Entities
         /// </remarks>
         public List<double>[] Distances
         {
-            get { return this.distances; }
+            get { return distances; }
         }
 
         #endregion
@@ -111,7 +111,7 @@ namespace netDxf.Entities
         /// <returns>The string representation.</returns>
         public override string ToString()
         {
-            return string.Format("{0}: ({1})", "MLineVertex", this.position);
+            return string.Format("{0}: ({1})", "MLineVertex", position);
         }
 
         /// <summary>
@@ -120,13 +120,13 @@ namespace netDxf.Entities
         /// <returns>A new MLineVertex that is a copy of this instance.</returns>
         public object Clone()
         {
-            List<double>[] copyDistances = new List<double>[this.distances.Length];
-            for (int i = 0; i < this.distances.Length; i++)
+            List<double>[] copyDistances = new List<double>[distances.Length];
+            for (int i = 0; i < distances.Length; i++)
             {
                 copyDistances[i] = new List<double>();
-                copyDistances[i].AddRange(this.distances[i]);
+                copyDistances[i].AddRange(distances[i]);
             }
-            return new MLineVertex(this.position, this.direction, this.miter, copyDistances);
+            return new MLineVertex(position, direction, miter, copyDistances);
         }
 
         #endregion

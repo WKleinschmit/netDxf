@@ -53,13 +53,13 @@ namespace netDxf.Objects
             switch (type)
             {
                 case UnderlayType.DGN:
-                    this.CodeName = DxfObjectCode.UnderlayDgnDefinition;
+                    CodeName = DxfObjectCode.UnderlayDgnDefinition;
                     break;
                 case UnderlayType.DWF:
-                    this.CodeName = DxfObjectCode.UnderlayDwfDefinition;
+                    CodeName = DxfObjectCode.UnderlayDwfDefinition;
                     break;
                 case UnderlayType.PDF:
-                    this.CodeName = DxfObjectCode.UnderlayPdfDefinition;
+                    CodeName = DxfObjectCode.UnderlayPdfDefinition;
                     break;
             }
         }
@@ -73,7 +73,7 @@ namespace netDxf.Objects
         /// </summary>
         public UnderlayType Type
         {
-            get { return this.type; }
+            get { return type; }
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace netDxf.Objects
         /// </summary>
         public string File
         {
-            get { return this.file; }
+            get { return file; }
         }
 
         #endregion
