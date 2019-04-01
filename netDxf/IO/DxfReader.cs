@@ -1753,23 +1753,23 @@ namespace netDxf.IO
                         this.chunk.Next();
                         break;
                     case 340:
-                        dimtxsty = this.chunk.ReadHex();
+                        dimtxsty = this.chunk.ReadString();
                         this.chunk.Next();
                         break;
                     case 341:
-                        dimldrblk = this.chunk.ReadHex();
+                        dimldrblk = this.chunk.ReadString();
                         this.chunk.Next();
                         break;
                     case 342:
-                        dimblk = this.chunk.ReadHex();
+                        dimblk = this.chunk.ReadString();
                         this.chunk.Next();
                         break;
                     case 343:
-                        dimblk1 = this.chunk.ReadHex();
+                        dimblk1 = this.chunk.ReadString();
                         this.chunk.Next();
                         break;
                     case 344:
-                        dimblk2 = this.chunk.ReadHex();
+                        dimblk2 = this.chunk.ReadString();
                         this.chunk.Next();
                         break;
                     case 345:
